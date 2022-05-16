@@ -1,0 +1,39 @@
+import app.eduroam.shared.Config
+import app.eduroam.shared.Libs
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion Config.compileSdk
+
+    defaultConfig {
+        minSdkVersion Config.minSdk
+        targetSdkVersion Config.targetSdk
+        versionName "1.0"
+        consumerProguardFiles 'proguard-consumer-rules.pro'
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets.each {
+        def root = "src/androidMain/${it.name}"
+        it.setRoot(root)
+        it.java.srcDirs += "${root}/kotlin"
+        it.manifest.srcFile "src/androidMain/AndroidManifest.xml"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+}
+
+dependencies {
+    api Libs.Kotlin.Coroutines.android
+    api Libs.timberLog
+    implementation Libs.Ktor.clientAndroid
+}

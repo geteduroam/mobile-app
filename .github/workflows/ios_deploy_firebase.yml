@@ -1,0 +1,48 @@
+name: Deploy Firebase (iOS)
+
+on:
+    workflow_dispatch:
+        inputs:
+            checkout_branch:
+                description: 'Build from branch'
+                required: true
+                default: 'main'
+
+jobs:
+    build-and-distribute:
+        name: Build and distribute iOS target
+        runs-on: macOS-latest
+        timeout-minutes: 210
+        steps:
+            -   name: Check out
+                uses: actions/checkout@v2
+                if: git diff --name-only --diff-filter=AM ${{ github.event.before }} ${{ github.sha }} # If there are changes since the last run
+                with:
+                    ref: ${{ github.event_name == 'schedule' && 'develop' || github.event.inputs.checkout_branch }}
+            -   name: Install JDK
+                uses: actions/setup-java@v2
+                with:
+                    distribution: 'temurin'
+                    java-version: '16'
+                    cache: 'gradle'
+            -   name: List available Xcode versions
+                run: ls /Applications | grep Xcode
+            -   name: Decrypt Secret Files
+                run: ./.secret/decrypt.sh
+                env:
+                    CERTIFICATE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+            -   name: Create common.framework placeholder # This fools cocoapods to include common.framework already, while it's not yet compiled
+                run: mkdir -p common/build/cocoapods/framework/common.framework
+            -   name: Prepare to Deploy iOS app
+                run: |
+                    bundle config set path 'vendor/bundle'
+                    bundle install
+                    bundle exec pod install --project-directory=ios
+                    bundle exec fastlane ios set_build_number
+                env:
+                    CERTIFICATE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+            -   name: Deploy iOS
+                run: bundle exec fastlane ios deploy_firebase_ci --env ios
+                env:
+                    CERTIFICATE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+                    FIREBASE_CLI_TOKEN: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}

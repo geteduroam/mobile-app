@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "918090700616",
+    "project_id": "geteduroam-37beb",
+    "storage_bucket": "geteduroam-37beb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918090700616:android:c3e9a20483c21df224857d",
+        "android_client_info": {
+          "package_name": "app.eduroam.geteduroam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgGjvpOIvR2KZz3_CNbHe4NPwpzRw6XTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918090700616:android:13e4248e61baaa7824857d",
+        "android_client_info": {
+          "package_name": "app.eduroam.geteduroam.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgGjvpOIvR2KZz3_CNbHe4NPwpzRw6XTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,80 @@
+#=========================================ANDROID===================================================
+# This is the workflow responsible for verifying a PR before it gets merged. It will build the
+# project on every PR opened to the main branch
+
+name: Android 03 - Release Candidate
+
+on:
+    workflow_dispatch:
+        inputs:
+            versionCode:
+                description: 'The Android app version code. Must be higher than the last release candidate tag.'
+                required: false
+jobs:
+    build:
+        name: Build debug version of the project
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            -   name: Checkout repo including tags
+                uses: actions/checkout@v3
+                # Fetch depth needs to be 0 in order to pull the merge messages into the release notes
+                with:
+                    fetch-depth: 0
+            -   run: git fetch origin 'refs/tags/*:refs/tags/*'
+
+
+            # Setup caches
+            -   name: Cache Gradle
+                uses: actions/cache@v3
+                with:
+                    path: |
+                        ~/.gradle/caches
+                        ~/.gradle/wrapper
+                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+                    restore-keys: |
+                        ${{ runner.os }}-gradle-
+            -   name: Cache Maven
+                uses: actions/cache@v3
+                with:
+                    path: ~/.m2/repository
+                    key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+                    restore-keys: |
+                        ${{ runner.os }}-maven-
+            -   name: Configure Java for the runner
+                uses: actions/setup-java@v1
+                with:
+                    java-version: '15'
+
+            -   name: Promote the latest snapshot to release candidate & create release tag
+                run: |
+                    ./android/scripts/promote_last_snapshot.sh
+                    ./android/scripts/create_new_release_tag.sh androidrelease
+
+            -   name: Auto-populate with the last snapshot build number & create tag
+                run: |
+                    ./android/scripts/promote_last_snapshot.sh
+                    ./android/scripts/create_new_release_tag.sh androidrelease
+
+            -   name: Get the firebase credentials from secrets and put them in a json file
+                run: |
+                    echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > firebase.json
+                env:
+                    GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+            -   name: Build  & upload the debug version of the app
+                env:
+                    GOOGLE_APPLICATION_CREDENTIALS: ./firebase.json
+                run: |
+                    echo "Check firebase credentials here"
+                    cat ./firebase.json
+                    echo $GOOGLE_APPLICATION_CREDENTIALS
+                    ./gradlew :android:app:assembleRelease :android:app:appDistributionUploadRelease
+
+            -   name: Push tag for snapshot
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    git config user.name "github-actions"
+                    git config user.email "github-actions@github.com"
+                    git push --tags

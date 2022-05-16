@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="app.eduroam.geteduroam">
+
+	<uses-permission android:name="android.permission.INTERNET" />
+
+	<application
+		android:name=".AndroidApp"
+		android:allowBackup="false"
+		android:label="@string/name"
+		android:supportsRtl="true"
+		android:theme="@style/Theme.AndroidApp">
+		<!-- Disable Firebase analytics until the user has given consent -->
+		<meta-data
+			android:name="firebase_analytics_collection_enabled"
+			android:value="false" />
+
+		<activity
+			android:name=".MainActivity"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+	</application>
+</manifest> 

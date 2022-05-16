@@ -1,0 +1,69 @@
+import app.eduroam.shared.Libs
+
+apply plugin: 'kotlin-multiplatform'
+apply plugin: 'kotlin-native-cocoapods'
+apply plugin: 'kotlinx-serialization'
+apply from: 'android.gradle'
+
+group = "app.eduroam.shared"
+version = "1.0"
+
+kotlin {
+    cocoapods {
+        summary = 'The common multiplatform library used by both Android and iOS.'
+        homepage = 'https://www.egeniq.com/'
+    }
+
+    targets {
+        fromPreset(presets.android, 'android')
+
+        def sdkName = System.getenv("SDK_NAME") ?: ""
+        // Add platform switching to have IDE support.
+        if (sdkName.startsWith("iphoneos")) {
+            iosArm64("ios") {
+                compilations.main {
+                    kotlinOptions.freeCompilerArgs += "-Xobjc-generics"
+                }
+            }
+        } else {
+            iosX64("ios") {
+                compilations.main {
+                    kotlinOptions.freeCompilerArgs += "-Xobjc-generics"
+                }
+            }
+        }
+
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+
+    sourceSets {
+        all {
+            languageSettings {
+                useExperimentalAnnotation('kotlin.Experimental')
+            }
+        }
+        commonMain {
+            dependencies {
+                implementation Libs.Kotlin.stdlibCommon
+                implementation Libs.Kotlin.serialization
+                implementation Libs.Ktor.clientCore
+                implementation Libs.Ktor.clientSerialization
+                api Libs.Ktor.logging
+            }
+        }
+        iosMain {
+            dependencies {
+                implementation Libs.Ktor.clientiOS
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
