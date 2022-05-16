@@ -43,7 +43,7 @@ android {
             applicationIdSuffix ".debug"
             firebaseAppDistribution {
                 artifactType "APK"
-                artifactPath "${buildDir}/outputs/apk/debug/android-debug.apk"
+                artifactPath "${buildDir}/outputs/apk/debug/app-debug.apk"
                 releaseNotesFile "${buildDir}/release_notes.txt"
                 testersFile "android/android_alpha_testers.txt"
             }
