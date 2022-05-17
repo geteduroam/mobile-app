@@ -51,9 +51,14 @@ kotlin {
             dependencies {
                 implementation Libs.Kotlin.stdlibCommon
                 implementation Libs.Kotlin.serialization
+                implementation Libs.Kotlin.Coroutines.core
+                implementation Libs.Koin.core
                 implementation Libs.Ktor.clientCore
                 implementation Libs.Ktor.clientSerialization
+                implementation Libs.Ktor.contentNegotiation
                 api Libs.Ktor.logging
+                implementation Libs.Touchlab.stately
+                api Libs.Touchlab.kermit
             }
         }
         iosMain {

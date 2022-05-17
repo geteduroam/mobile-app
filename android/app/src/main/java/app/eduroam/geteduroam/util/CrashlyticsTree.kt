@@ -1,4 +1,4 @@
-package com.fin.sisaa.android.util
+package app.eduroam.geteduroam.util
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics

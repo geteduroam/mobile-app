@@ -35,5 +35,7 @@ android {
 dependencies {
     api Libs.Kotlin.Coroutines.android
     api Libs.timberLog
+    api Libs.Koin.android
     implementation Libs.Ktor.clientAndroid
+    implementation Libs.AndroidX.Lifecycle.viewModelKtx
 }
