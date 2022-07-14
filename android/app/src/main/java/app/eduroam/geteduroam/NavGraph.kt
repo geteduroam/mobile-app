@@ -4,17 +4,19 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import app.eduroam.geteduroam.welcome.Welcome
+import app.eduroam.geteduroam.welcome.SelectInstitutionScreen
+import app.eduroam.shared.select.SelectInstitutionViewModel
+import co.touchlab.kermit.Logger
 
 @Composable
-fun NavGraph() {
+fun NavGraph(viewModel: SelectInstitutionViewModel, log: Logger) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = OnboardingRoute
+        startDestination = SelectInstitution
     ) {
-        composable(OnboardingRoute) { Welcome() }
+        composable(SelectInstitution) { SelectInstitutionScreen(viewModel, log) }
     }
 }
 
-private const val OnboardingRoute = "onboarding"
+private const val SelectInstitution = "selectInstitution"

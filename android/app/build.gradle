@@ -113,6 +113,7 @@ dependencies {
     implementation Libs.AndroidX.Compose.animation
     implementation Libs.AndroidX.Compose.toolingPreview
     implementation Libs.AndroidX.Lifecycle.viewModelCompose
+    implementation Libs.AndroidX.splashCore
 
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
@@ -122,10 +123,13 @@ dependencies {
     implementation platform(Libs.Firebase.billOfMaterials)
     implementation Libs.Firebase.analytics
     implementation Libs.Firebase.crashlytics
+    implementation Libs.Material.design
 
     debugImplementation Libs.AndroidX.Compose.tooling
 
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
+    implementation Libs.AndroidX.Lifecycle.runtimeKtx
+    implementation Libs.Koin.android
 
     debugImplementation Libs.AndroidX.Compose.uiTestManifest
 }

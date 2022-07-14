@@ -1,20 +1,10 @@
 package app.eduroam.geteduroam.ui.theme
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
-
-//Generate via https://material-foundation.github.io/material-theme-builder/#/custom
 
 private val LightThemeColors = lightColorScheme(
 
@@ -78,18 +68,8 @@ private val DarkThemeColors = darkColorScheme(
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable() () -> Unit,
 ) {
-    val view = LocalView.current
-    val context = LocalContext.current
-    //If not in preview, change the insets
-    if (LocalInspectionMode.current.not()) {
-        SideEffect {
-            WindowCompat.getInsetsController(context.findActivity().window, view)
-                ?.isAppearanceLightStatusBars = !useDarkTheme
-        }
-    }
-
     val colors = if (!useDarkTheme) {
         LightThemeColors
     } else {
@@ -102,11 +82,3 @@ fun AppTheme(
         content = content
     )
 }
-
-
-private tailrec fun Context.findActivity(): Activity =
-    when (this) {
-        is Activity -> this
-        is ContextWrapper -> this.baseContext.findActivity()
-        else -> throw IllegalArgumentException("Could not find activity!")
-    }
