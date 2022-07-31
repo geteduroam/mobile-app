@@ -100,6 +100,8 @@ android {
 dependencies {
     implementation project(":shared:core")
     implementation Libs.Kotlin.stdlibJdk
+    implementation Libs.Ktor.clientSerializationJvm
+
     implementation Libs.Kotlin.Coroutines.android
     implementation Libs.AndroidX.Activity.activityCompose
     implementation Libs.AndroidX.appcompat

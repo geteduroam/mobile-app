@@ -10,43 +10,58 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SelectInstitutionViewModel(
-    private val institutionRepository: SelectInstitutionRepository,
+    private val institutionRepository: InstitutionsRepository,
     log: Logger,
 ) : ViewModel() {
 
     private val log = log.withTag("SelectInstitutionViewModel")
 
-    val institutions: StateFlow<DataState<ItemDataSummary>> = MutableStateFlow(
+    val uiDataState: StateFlow<DataState<ItemDataSummary>> = MutableStateFlow(
         DataState(loading = true)
     )
 
+    val currentInstitution: MutableStateFlow<Institution?> = MutableStateFlow(null)
+
     init {
-        observeInstitutions()
+        fetchInstitutionsList()
+    }
+
+    private fun fetchInstitutionsList() {
+        viewModelScope.launch {
+            institutionRepository.fetchInstitutions().collect { dataState ->
+                if (dataState.loading) {
+                    updateDataState(uiDataState.value.copy(loading = true))
+                } else {
+                    updateDataState(dataState)
+                }
+            }
+        }
     }
 
     override fun onCleared() {
         log.v("Clearing SelectInstitutionViewModel")
     }
 
-
     fun onInstitutionSelect(selectedInstitution: Institution) {
-        //TODO: handle selection
-    }
-
-    private fun observeInstitutions() {
-        viewModelScope.launch {
-            log.v { "getInstitutionsList: Collecting Things" }
-            institutionRepository.fetchInstitutions().collect { dataState ->
-                if (dataState.loading) {
-                    updateInstitutions(institutions.value.copy(loading = true))
-                } else {
-                    updateInstitutions(dataState)
-                }
-            }
+        if (selectedInstitution.hasSingleProfile()) {
+            updateDataState(uiDataState.value.copy(loading = true))
+            //todo: download EAP file
+        } else {
+            currentInstitution.value = selectedInstitution
         }
     }
 
-    private fun updateInstitutions(newValue: DataState<ItemDataSummary>) {
-        (institutions as MutableStateFlow).value = newValue
+    private fun updateDataState(newValue: DataState<ItemDataSummary>) {
+        (uiDataState as MutableStateFlow).value = newValue
+    }
+
+    fun onSearchTextChange(search: String) {
+        val listData = uiDataState.value.data ?: return
+        updateDataState(DataState(listData.copy(filterOn = search)))
+        if (search.length >= 3) {
+            val filteredList = listData.institutions.filter { it.name.startsWith(search, true) || it.name.contains(search, true) }
+            updateDataState(DataState(listData.copy(filterOn = search,
+                institutions = filteredList)))
+        }
     }
 }
