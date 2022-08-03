@@ -9,7 +9,7 @@ class SelectInstitutionViewModel: ObservableObject {
     var loading = false
 
     @Published
-    var institutions: [Institution]?
+    var institutions: [Institution] = []
 
     @Published
     var error: String?
@@ -21,7 +21,7 @@ class SelectInstitutionViewModel: ObservableObject {
 
         doPublish(viewModel.institutions) { [weak self] dataState in
             self?.loading = dataState.loading
-            self?.institutions = dataState.data?.institutions
+            self?.institutions = dataState.data?.institutions ?? []
             self?.error = dataState.exception
         }.store(in: &cancellables)
 
@@ -35,6 +35,10 @@ class SelectInstitutionViewModel: ObservableObject {
         viewModel?.clear()
         viewModel = nil
     }
+    
+    func search(_ query: String) {
+        viewModel?.onSearchTextChange(search: query)
+    }
 }
 
 struct ContentView: View {
@@ -45,7 +49,7 @@ struct ContentView: View {
 	var body: some View {
         NavigationView {
             List {
-                ForEach(searchResults, id: \.self) { item in
+                ForEach(observableModel.institutions, id: \.self) { item in
                     NavigationLink(destination: InstitutionDetail(institution: item)) {
                         Text(item.name)
                     }
@@ -54,6 +58,7 @@ struct ContentView: View {
             .listStyle(.plain)
             .navigationTitle("Eduroam ⚙️")
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Kies een organisatie")
+            .onChange(of: query) { observableModel.search($0) }
         }
         .onAppear(perform: {
             observableModel.activate()
@@ -62,17 +67,6 @@ struct ContentView: View {
             observableModel.deactivate()
         })
 	}
-    
-    var searchResults: [Institution] {
-        guard let institutions = observableModel.institutions else { return [] }
-        
-        if query.isEmpty {
-            return institutions
-        } else {
-            let lowercasedQuery = query.lowercased()
-            return institutions.filter { $0.name.lowercased().contains(lowercasedQuery) }
-        }
-    }
 }
 
 struct InstitutionDetail: View {
