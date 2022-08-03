@@ -2,7 +2,7 @@ package app.eduroam.shared
 
 import app.eduroam.shared.ktor.InstitutionApi
 import app.eduroam.shared.ktor.InstitutionApiImpl
-import app.eduroam.shared.select.SelectInstitutionRepository
+import app.eduroam.shared.select.InstitutionsRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
@@ -54,7 +54,7 @@ private val coreModule = module {
     factory { (tag: String?) -> if (tag != null) baseLogger.withTag(tag) else baseLogger }
 
     single {
-        SelectInstitutionRepository(
+        InstitutionsRepository(
             get(),
             getWith("SelectInstitutionRepository"),
         )

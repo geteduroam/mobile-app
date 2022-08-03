@@ -9,6 +9,7 @@ object Libs {
     const val desugaring = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object AndroidX {
+        const val core = "androidx.core:core-ktx:1.8.0"
         const val appcompat = "androidx.appcompat:appcompat:1.4.1"
         const val splashCore = "androidx.core:core-splashscreen:1.0.0-beta02"
 
@@ -115,6 +116,7 @@ object Libs {
         const val stdlibCommon = "org.jetbrains.kotlin:kotlin-stdlib-common:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
+        const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
 
         object Coroutines {
@@ -130,6 +132,7 @@ object Libs {
         const val clientCore = "io.ktor:ktor-client-core:$version"
         const val clientJson = "io.ktor:ktor-client-json:$version"
         const val clientSerialization = "io.ktor:ktor-serialization-kotlinx-json:$version"
+        const val clientSerializationJvm = "io.ktor:ktor-client-serialization-jvm:$version"
         const val contentNegotiation = "io.ktor:ktor-client-content-negotiation:$version"
         const val clientAndroid = "io.ktor:ktor-client-okhttp:$version"
         const val clientiOS = "io.ktor:ktor-client-ios:$version"
@@ -137,7 +140,7 @@ object Libs {
     }
 
     object Material {
-        private const val version = "1.6.0"
+        private const val version = "1.6.1"
         const val design = "com.google.android.material:material:$version"
     }
 
