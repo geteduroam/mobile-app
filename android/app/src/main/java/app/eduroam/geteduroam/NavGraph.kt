@@ -5,11 +5,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.eduroam.geteduroam.institutions.SelectInstitutionScreen
+import app.eduroam.geteduroam.profile.SelectProfileScreen
+import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.select.SelectInstitutionViewModel
 import co.touchlab.kermit.Logger
 
 @Composable
-fun NavGraph(viewModel: SelectInstitutionViewModel, log: Logger) {
+fun NavGraph(viewModel: SelectInstitutionViewModel, profileViewModel: SelectProfileViewModel, log: Logger) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -25,7 +27,9 @@ fun NavGraph(viewModel: SelectInstitutionViewModel, log: Logger) {
             route = Screens.SelectProfile.routeWithArgs,
             arguments = Screens.SelectProfile.arguments
         ) { backStackEntry ->
-            //TODO: open profile screen
+            val institution = backStackEntry.arguments?.getString(Screens.SelectProfile.institution).orEmpty()
+            profileViewModel.profilesForInstitution(institution)
+            SelectProfileScreen(viewModel = profileViewModel, gotToProfileSelection = {})
         }
     }
 }
