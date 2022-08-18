@@ -11,25 +11,29 @@ import app.eduroam.shared.select.SelectInstitutionViewModel
 import co.touchlab.kermit.Logger
 
 @Composable
-fun NavGraph(viewModel: SelectInstitutionViewModel, profileViewModel: SelectProfileViewModel, log: Logger) {
+fun NavGraph(
+    viewModel: SelectInstitutionViewModel, profileViewModel: SelectProfileViewModel, log: Logger
+) {
     val navController = rememberNavController()
     NavHost(
-        navController = navController,
-        startDestination = Screens.SelectInstitution.route
+        navController = navController, startDestination = Screens.SelectInstitution.route
     ) {
         composable(Screens.SelectInstitution.route) {
-            SelectInstitutionScreen(
-                viewModel = viewModel,
-                gotToProfileSelection = { it -> navController.navigate("${Screens.SelectProfile.route}/$it") }
-            )
+            SelectInstitutionScreen(viewModel = viewModel,
+                gotToProfileSelection = { institutionJson ->
+                    navController.navigate(
+                        Screens.SelectProfile.encodeArguments(
+                            institutionJson
+                        )
+                    )
+                })
         }
         composable(
-            route = Screens.SelectProfile.routeWithArgs,
-            arguments = Screens.SelectProfile.arguments
+            route = Screens.SelectProfile.routeWithArgs, arguments = Screens.SelectProfile.arguments
         ) { backStackEntry ->
-            val institution = backStackEntry.arguments?.getString(Screens.SelectProfile.institution).orEmpty()
+            val institution = Screens.SelectProfile.decodeUrlArgument(backStackEntry.arguments)
             profileViewModel.profilesForInstitution(institution)
-            SelectProfileScreen(viewModel = profileViewModel, gotToProfileSelection = {})
+            SelectProfileScreen(viewModel = profileViewModel, goToAuth = {})
         }
     }
 }

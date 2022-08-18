@@ -25,6 +25,10 @@ class InstitutionsRepository(
         emit(institutionsList)
     }
 
+    fun downloadEapFile() {
+
+    }
+
     private suspend fun getInstitutionsFromNetwork(): DataState<ItemDataSummary> = try {
         val institutionResult = institutionApi.getJsonFromApi()
         log.v { "Institutions network result: ${institutionResult.instances.size}" }

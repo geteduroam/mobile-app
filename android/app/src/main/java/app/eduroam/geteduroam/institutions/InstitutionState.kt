@@ -46,6 +46,7 @@ class SelectInstitutionState(
             viewModel.currentInstitution.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 if (it != null) {
                     val institutionArgument = Json.encodeToString(it)
+                    viewModel.clearCurrentInstitutionSelection()
                     goToProfileSelection(institutionArgument)
                 }
             }

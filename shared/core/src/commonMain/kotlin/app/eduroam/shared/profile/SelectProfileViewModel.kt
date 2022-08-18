@@ -8,8 +8,6 @@ import app.eduroam.shared.response.Profile
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class SelectProfileViewModel(
     log: Logger,
@@ -21,20 +19,21 @@ class SelectProfileViewModel(
         DataState(loading = true)
     )
 
-    val currentProfile: MutableStateFlow<Profile?> = MutableStateFlow(null)
-
 
     override fun onCleared() {
         log.v("Clearing SelectInstitutionViewModel")
     }
 
-    fun profilesForInstitution(institutionJson: String) {
-        val institution = Json.decodeFromString<Institution>(institutionJson)
-        updateDataState(DataState(SelectProfileSummary(institution.profiles, null), loading = false))
+    fun profilesForInstitution(institution: Institution) {
+        updateDataState(
+            DataState(
+                SelectProfileSummary(institution.profiles, null), loading = false
+            )
+        )
     }
 
-    fun onProfileSelect(selectedProfile: Profile) {
-        currentProfile.value = selectedProfile
+    fun onSelectProfile(selectedProfile: Profile) {
+        updateDataState(uiDataState.value.copy(loading = true))
         //todo: handle authentication if required
     }
 

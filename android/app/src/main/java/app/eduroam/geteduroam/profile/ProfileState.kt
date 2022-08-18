@@ -5,14 +5,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.response.Profile
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 
 @Composable
@@ -41,18 +37,21 @@ class SelectProfileState(
     goToProfileSelection: (String) -> Unit,
     lifecycleOwner: LifecycleOwner,
 ) {
+    var isMenuExpanded: Boolean by mutableStateOf(false)
+    var selectLabel: String by mutableStateOf("")
+
     init {
-        coroutineScope.launch {
-            viewModel.currentProfile.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
-                if (it != null) {
-                    val institutionArgument = Json.encodeToString(it)
-                    goToProfileSelection(institutionArgument)
-                }
-            }
-        }
+        coroutineScope.launch {}
+    }
+
+    fun changeMenuExpandedState(newState: Boolean?) {
+        //no explicit state was passed, then we just toggle it.
+        isMenuExpanded = newState ?: !isMenuExpanded
     }
 
     fun onSelectProfile(profile: Profile) {
-        viewModel.onProfileSelect(profile)
+        isMenuExpanded = false
+        selectLabel = profile.name
+        viewModel.onSelectProfile(profile)
     }
 }
