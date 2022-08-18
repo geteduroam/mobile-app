@@ -22,6 +22,9 @@ class SelectInstitutionViewModel(
 
     val currentInstitution: MutableStateFlow<Institution?> = MutableStateFlow(null)
 
+    //There is no end point that allows searching so we have to get all the institutions once and cache the result
+    lateinit var allInstitutions: List<Institution>
+
     init {
         fetchInstitutionsList()
     }
@@ -32,6 +35,7 @@ class SelectInstitutionViewModel(
                 if (dataState.loading) {
                     updateDataState(uiDataState.value.copy(loading = true))
                 } else {
+                    allInstitutions = dataState.data?.institutions ?: emptyList()
                     updateDataState(dataState)
                 }
             }
@@ -56,12 +60,21 @@ class SelectInstitutionViewModel(
     }
 
     fun onSearchTextChange(search: String) {
-        val listData = uiDataState.value.data ?: return
+        val listData: ItemDataSummary = uiDataState.value.data ?: return
         updateDataState(DataState(listData.copy(filterOn = search)))
         if (search.length >= 3) {
-            val filteredList = listData.institutions.filter { it.name.startsWith(search, true) || it.name.contains(search, true) }
-            updateDataState(DataState(listData.copy(filterOn = search,
-                institutions = filteredList)))
+            val filteredList = allInstitutions.filter {
+                it.name.startsWith(search, true) || it.name.contains(
+                    search, true
+                )
+            }
+            updateDataState(
+                DataState(
+                    listData.copy(
+                        filterOn = search, institutions = filteredList
+                    )
+                )
+            )
         }
     }
 }
