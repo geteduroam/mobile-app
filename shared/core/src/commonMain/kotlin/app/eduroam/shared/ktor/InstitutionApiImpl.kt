@@ -57,6 +57,19 @@ class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine
         }.body()
     }
 
+    suspend fun test(downloadUrl: String) {
+    }
+
+    override suspend fun downloadEapFile(eapConfigEndpoint: String): ByteArray {
+        log.d("Download EAP file")
+        val response = client.get(eapConfigEndpoint) {
+            onDownload { bytesSentTotal, contentLength ->
+                log.d("Received $bytesSentTotal bytes from $contentLength")
+            }
+        }
+        return response.body()
+    }
+
     private fun HttpRequestBuilder.institutions(path: String) {
         url {
             takeFrom("https://discovery.eduroam.app/")

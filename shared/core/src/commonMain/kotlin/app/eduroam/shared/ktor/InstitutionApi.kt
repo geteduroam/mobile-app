@@ -4,4 +4,5 @@ import app.eduroam.shared.response.InstitutionResult
 
 interface InstitutionApi {
     suspend fun getJsonFromApi(): InstitutionResult
+    suspend fun downloadEapFile(eapconfigEndpoint: String): ByteArray
 }

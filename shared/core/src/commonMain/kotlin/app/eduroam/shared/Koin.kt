@@ -50,13 +50,15 @@ private val coreModule = module {
     // uses you *may* want to have a more robust configuration from the native platform. In KaMP Kit,
     // that would likely go into platformModule expect/actual.
     // See https://github.com/touchlab/Kermit
-    val baseLogger = Logger(config = StaticConfig(logWriterList = listOf(platformLogWriter())), "KampKit")
+    val baseLogger =
+        Logger(config = StaticConfig(logWriterList = listOf(platformLogWriter())), "eduroam")
     factory { (tag: String?) -> if (tag != null) baseLogger.withTag(tag) else baseLogger }
 
     single {
         InstitutionsRepository(
-            get(),
-            getWith("SelectInstitutionRepository"),
+            institutionApi = get(),
+            driverFactory = get(),
+            log = getWith("SelectInstitutionRepository"),
         )
     }
 }

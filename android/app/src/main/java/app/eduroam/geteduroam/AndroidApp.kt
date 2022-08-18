@@ -20,8 +20,8 @@ class AndroidApp : Application() {
         initKoin(module {
             single<Context> { this@AndroidApp }
             viewModel {
-                SelectInstitutionViewModel(get(),
-                    get { parametersOf("SelectInstitutionViewModel") })
+                SelectInstitutionViewModel(institutionRepository = get(),
+                    log = get { parametersOf("SelectInstitutionViewModel") })
             }
             viewModel { SelectProfileViewModel(get { parametersOf("SelectProfileViewModel") }) }
             single<AppInfo> { AndroidAppInfo }

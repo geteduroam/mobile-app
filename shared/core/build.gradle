@@ -3,7 +3,15 @@ import app.eduroam.shared.Libs
 apply plugin: 'kotlin-multiplatform'
 apply plugin: 'kotlin-native-cocoapods'
 apply plugin: 'kotlinx-serialization'
+apply plugin: 'com.squareup.sqldelight'
 apply from: 'android.gradle'
+
+sqldelight {
+    EduRoamDatabase {
+        packageName = "app.eduroam.shared.storage"
+        sourceFolders = ["sqldelight"]
+    }
+}
 
 group = "app.eduroam.shared"
 version = "1.0"
@@ -56,14 +64,23 @@ kotlin {
                 implementation Libs.Ktor.clientCore
                 implementation Libs.Ktor.clientSerialization
                 implementation Libs.Ktor.contentNegotiation
+                implementation Libs.DateTime.datetime
                 api Libs.Ktor.logging
                 implementation Libs.Touchlab.stately
                 api Libs.Touchlab.kermit
             }
         }
+
+        androidMain {
+            dependencies {
+                implementation Libs.SqlDelight.androidDriver
+            }
+        }
+
         iosMain {
             dependencies {
                 implementation Libs.Ktor.clientiOS
+                implementation Libs.SqlDelight.iOsDriver
             }
         }
     }

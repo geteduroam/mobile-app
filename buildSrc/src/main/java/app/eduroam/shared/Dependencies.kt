@@ -4,7 +4,8 @@ object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.1.3"
     const val googleService = "com.google.gms:google-services:4.3.10"
     const val crashlyticsPlugin = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
-    const val firebaseDistributionPlugin = "com.google.firebase:firebase-appdistribution-gradle:3.0.1"
+    const val firebaseDistributionPlugin =
+        "com.google.firebase:firebase-appdistribution-gradle:3.0.1"
     const val timberLog = "com.jakewharton.timber:timber:5.0.1"
     const val desugaring = "com.android.tools:desugar_jdk_libs:1.1.5"
 
@@ -24,7 +25,8 @@ object Libs {
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
             const val material = "androidx.compose.material:material:$version"
-            const val materialIconsExt = "androidx.compose.material:material-icons-extended:$version"
+            const val materialIconsExt =
+                "androidx.compose.material:material-icons-extended:$version"
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val layout = "androidx.compose.foundation:foundation-layout:$version"
             const val tooling = "androidx.compose.ui:ui-tooling:$version"
@@ -77,6 +79,11 @@ object Libs {
     object Coil {
         private const val version = "1.3.2"
         const val coilCompose = "io.coil-kt:coil-compose:$version"
+    }
+
+    object DateTime {
+        private const val version = "0.4.0"
+        const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:$version"
     }
 
     object Firebase {
@@ -142,6 +149,13 @@ object Libs {
     object Material {
         private const val version = "1.6.1"
         const val design = "com.google.android.material:material:$version"
+    }
+
+    object SqlDelight {
+        const val version = "1.5.3"
+        const val androidDriver = "com.squareup.sqldelight:android-driver:$version"
+        const val iOsDriver = "com.squareup.sqldelight:native-driver:$version"
+        const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$version"
     }
 
     object Touchlab {
