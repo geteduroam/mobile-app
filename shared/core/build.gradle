@@ -51,14 +51,11 @@ kotlin {
 
     sourceSets {
         all {
-            languageSettings {
-                useExperimentalAnnotation('kotlin.Experimental')
-            }
+            languageSettings.optIn("kotlin.Experimental")
         }
         commonMain {
             dependencies {
                 implementation Libs.Kotlin.stdlibCommon
-                implementation Libs.Kotlin.serialization
                 implementation Libs.Kotlin.Coroutines.core
                 implementation Libs.Koin.core
                 implementation Libs.Ktor.clientCore
@@ -71,9 +68,10 @@ kotlin {
             }
         }
 
-        androidMain {
+        commonTest {
             dependencies {
-                implementation Libs.SqlDelight.androidDriver
+                kotlin "org.jetbrains.kotlin:test"
+//                implementation "org.jetbrains.kotlin:test"
             }
         }
 
@@ -81,6 +79,13 @@ kotlin {
             dependencies {
                 implementation Libs.Ktor.clientiOS
                 implementation Libs.SqlDelight.iOsDriver
+            }
+        }
+
+        androidTest {
+            dependencies {
+                implementation Libs.Testing.junit
+                implementation Libs.Testing.kotlinTest
             }
         }
     }

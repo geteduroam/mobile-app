@@ -1,8 +1,8 @@
 package app.eduroam.shared
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.1.3"
-    const val googleService = "com.google.gms:google-services:4.3.10"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0-rc01"
+    const val googleService = "com.google.gms:google-services:4.3.13"
     const val crashlyticsPlugin = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val firebaseDistributionPlugin =
         "com.google.firebase:firebase-appdistribution-gradle:3.0.1"
@@ -20,9 +20,12 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            private const val version = "1.2.0-alpha06"
+            private const val version = "1.2.1"
+            private const val kotlinCompilerExtensionVersion = "1.3.0"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
+            const val compiler =
+                "androidx.compose.compiler:compiler:$kotlinCompilerExtensionVersion"
             const val runtimeLivedata = "androidx.compose.runtime:runtime-livedata:$version"
             const val material = "androidx.compose.material:material:$version"
             const val materialIconsExt =
@@ -104,9 +107,10 @@ object Libs {
         const val testing = "com.google.dagger:hilt-android-testing:$version"
     }
 
-    object JUnit {
-        private const val version = "4.13"
-        const val junit = "junit:junit:$version"
+    object Testing {
+        const val junit = "junit:junit:4.13.2"
+        const val kotlinTest = "org.jetbrains.kotlin:kotlin-test"
+        const val test = "org.jetbrains.kotlin:test"
     }
 
     object Koin {
@@ -117,10 +121,11 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.6.10"
+        private const val version = "1.7.10"
 
         const val stdlibJdk = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val stdlibCommon = "org.jetbrains.kotlin:kotlin-stdlib-common:$version"
+        const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val serializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
@@ -135,7 +140,7 @@ object Libs {
     }
 
     object Ktor {
-        private const val version = "2.0.1"
+        private const val version = "2.0.3"
         const val clientCore = "io.ktor:ktor-client-core:$version"
         const val clientJson = "io.ktor:ktor-client-json:$version"
         const val clientSerialization = "io.ktor:ktor-serialization-kotlinx-json:$version"

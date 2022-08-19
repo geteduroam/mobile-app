@@ -4,6 +4,7 @@ import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.models.ViewModel
 import app.eduroam.shared.response.Institution
+import app.eduroam.shared.response.Profile
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,14 +58,15 @@ class SelectInstitutionViewModel(
                     try {
                         val eapData = institutionRepository.getEapData(
                             selectedInstitution.id, profile.id, profile.eapconfig_endpoint.orEmpty()
-
                         )
+
                     } catch (e: Exception) {
                         log.e("Failed to download anon EAP config file", e)
                     } finally {
                         updateDataState(uiDataState.value.copy(loading = false))
                     }
-
+                    //https://gist.github.com/e5l/3b4d5d704b4d7c6e2a65cf68de8e9ca4
+//                    XMLSerializer()
                     //todo: Start parsing XML file here
                 }
             }
