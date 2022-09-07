@@ -6,4 +6,5 @@
     <string name="institution_search_text">Search for an institution</string>
     <string name="institution_select_title">Select an institution</string>
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
+    <string name="profile_select_profile">Select profile</string>
 </resources>

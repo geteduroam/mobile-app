@@ -62,6 +62,13 @@ class SelectInstitutionViewModel(
     fun onSearchTextChange(search: String) {
         val listData: ItemDataSummary = uiDataState.value.data ?: return
         updateDataState(DataState(listData.copy(filterOn = search)))
+        searchOnFilter(search, listData)
+    }
+
+    private fun searchOnFilter(
+        search: String,
+        listData: ItemDataSummary
+    ) {
         if (search.length >= 3) {
             val filteredList = allInstitutions.filter {
                 it.name.startsWith(search, true) || it.name.contains(
@@ -76,5 +83,25 @@ class SelectInstitutionViewModel(
                 )
             )
         }
+    }
+
+    private fun searchOnMultipleProfiles(
+        search: String,
+        listData: ItemDataSummary
+    ) {
+        val filteredList = allInstitutions.filter {
+            it.profiles.size > 1
+        }
+        updateDataState(
+            DataState(
+                listData.copy(
+                    filterOn = search, institutions = filteredList
+                )
+            )
+        )
+    }
+
+    fun clearCurrentInstitutionSelection() {
+        currentInstitution.value = null
     }
 }

@@ -12,12 +12,9 @@ data class Institution(
 ) {
     fun hasSingleProfile() = profiles.size == 1
 
-    fun requiresAuth(profile: Profile? = null) = if (profiles.size == 1 || profile == null) {
-        profiles[0].oauth
-    } else if (profile != null) {
-        profile.oauth
-    } else {
-        false
-    }
+    fun requiresAuth(profile: Profile? = null): Boolean =
+        if (profiles.size == 1 || profile == null) {
+            profiles[0].oauth
+        } else profile.oauth
 
 }
