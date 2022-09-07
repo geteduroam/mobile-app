@@ -48,8 +48,26 @@ class SelectInstitutionViewModel(
 
     fun onInstitutionSelect(selectedInstitution: Institution) {
         if (selectedInstitution.hasSingleProfile()) {
-            updateDataState(uiDataState.value.copy(loading = true))
-            //todo: download EAP file
+            val profile = selectedInstitution.profiles[0]
+            if (selectedInstitution.requiresAuth(profile)) {
+                //TODO: start OAuth flow
+            } else {
+                updateDataState(uiDataState.value.copy(loading = true))
+                viewModelScope.launch {
+                    try {
+                        val eapData = institutionRepository.getEapData(
+                            selectedInstitution.id, profile.id, profile.eapconfig_endpoint.orEmpty()
+
+                        )
+                    } catch (e: Exception) {
+                        log.e("Failed to download anon EAP config file", e)
+                    } finally {
+                        updateDataState(uiDataState.value.copy(loading = false))
+                    }
+
+                    //todo: Start parsing XML file here
+                }
+            }
         } else {
             currentInstitution.value = selectedInstitution
         }
@@ -66,8 +84,7 @@ class SelectInstitutionViewModel(
     }
 
     private fun searchOnFilter(
-        search: String,
-        listData: ItemDataSummary
+        search: String, listData: ItemDataSummary
     ) {
         if (search.length >= 3) {
             val filteredList = allInstitutions.filter {
@@ -86,8 +103,7 @@ class SelectInstitutionViewModel(
     }
 
     private fun searchOnMultipleProfiles(
-        search: String,
-        listData: ItemDataSummary
+        search: String, listData: ItemDataSummary
     ) {
         val filteredList = allInstitutions.filter {
             it.profiles.size > 1

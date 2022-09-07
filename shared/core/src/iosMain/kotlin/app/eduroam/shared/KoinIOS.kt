@@ -1,17 +1,14 @@
 package app.eduroam.shared
 
 import app.eduroam.shared.models.SelectInstitutionCallbackViewModel
-import org.koin.core.module.Module
-import org.koin.dsl.module
-
+import app.eduroam.shared.storage.DriverFactory
 import co.touchlab.kermit.Logger
-import io.ktor.client.engine.darwin.Darwin
+import io.ktor.client.engine.darwin.*
 import org.koin.core.Koin
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
-import platform.Foundation.NSUserDefaults
 
 fun initKoinIos(
     appInfo: AppInfo,
@@ -26,8 +23,14 @@ fun initKoinIos(
 actual val platformModule = module {
 
     single { Darwin.create() }
+    single { DriverFactory() }
 
-    single { SelectInstitutionCallbackViewModel(get(), getWith("SelectInstitutionCallbackViewModel")) }
+    single {
+        SelectInstitutionCallbackViewModel(
+            get(),
+            getWith("SelectInstitutionCallbackViewModel")
+        )
+    }
 }
 
 // Access from Swift to create a logger
