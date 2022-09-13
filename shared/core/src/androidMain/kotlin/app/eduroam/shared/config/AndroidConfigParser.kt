@@ -1,80 +1,93 @@
 package app.eduroam.shared.config
 
-import android.util.Xml
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.xmlpull.v1.XmlPullParser
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
+import java.io.ByteArrayInputStream
+import java.io.InputStreamReader
+import java.io.Reader
+import javax.xml.xpath.XPath
+import javax.xml.xpath.XPathConstants
+import javax.xml.xpath.XPathFactory
+
 
 class AndroidConfigParser : ConfigParser {
+    private val xmlRootPath = "/EAPIdentityProviderList/EAPIdentityProvider"
+    private val ieee80211path = "$xmlRootPath/CredentialApplicability/IEEE80211"
+    private val serverSideCredentialPath =
+        "$xmlRootPath/AuthenticationMethods/AuthenticationMethod/ServerSideCredential"
+    private val clientSideCredentialPath =
+        "$xmlRootPath/AuthenticationMethods/AuthenticationMethod/ClientSideCredential"
+
     override suspend fun parse(source: ByteArray): WifiConfigData = withContext(Dispatchers.IO) {
-        val parser = Xml.newPullParser().apply {
-            setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-        }
+        val xPath: XPath = XPathFactory.newInstance().newXPath()
 
-        val xml = String(source, Charsets.UTF_16)
-        xml.reader().use { reader ->
-            parser.setInput(reader)
-            var tag = parser.nextTag()
-            while (tag != XmlPullParser.START_TAG && parser.name != "EAPIdentityProviderList") {
-                skip(parser)
-                tag = parser.next()
-            }
-            parser.nextTag()
-        }
-
-        WifiConfigData(emptyList(), emptyList(), null, null, null)
+        WifiConfigData(
+            ssids = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$ieee80211path/SSID/text()"
+            ).distinct(),
+            oids = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$ieee80211path/ConsortiumOID/text()"
+            ).map { it.toLong(16) }.distinct(),
+            clientCertificate = getClientCertificate(xPath, source),
+            anonymousIdentity = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$clientSideCredentialPath/OuterIdentity/text()"
+            ).firstOrNull(),
+            caCertificates = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$serverSideCredentialPath/CA/text()"
+            ).distinct(),
+            serverNames = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$serverSideCredentialPath/ServerID/text()"
+            ).distinct(),
+            username = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$clientSideCredentialPath/UserName/text()"
+            ).firstOrNull(),
+            password = xPath.nodeValues(
+                reader = getReader(source),
+                expression = "$clientSideCredentialPath/Password/text()"
+            ).firstOrNull()
+        )
     }
 
-    private fun readConfig(parser: XmlPullParser) {
-        parser.require(XmlPullParser.START_TAG, null, "EAPIdentityProvider")
-        skip(parser)
-        parser.next()
+    private fun getReader(source: ByteArray) = InputStreamReader(ByteArrayInputStream(source))
 
+    private fun getClientCertificate(xPath: XPath, source: ByteArray) : ClientCertificate? {
+        val passphrase = xPath.nodeValues(
+            reader = getReader(source), expression = "$clientSideCredentialPath/Passphrase/text()"
+        ).firstOrNull()
+        val clientCertificate = xPath.nodeValues(
+            reader = getReader(source),
+            expression = "$clientSideCredentialPath/ClientCertificate/text()"
+        ).firstOrNull()
 
-        var title: String? = null
-        var link: String? = null
-        var description: String? = null
-        var imageUrl: String? = null
+        return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
+            null
+        else ClientCertificate(
+            privateKeyBase64 = passphrase,
+            certificate = clientCertificate
+        )
+    }
 
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.eventType != XmlPullParser.START_TAG) continue
-            when (parser.name) {
-                "title" -> title = readTagText("title", parser)
-                "link" -> link = readTagText("link", parser)
-                "description" -> description = readTagText("description", parser)
-                else -> skip(parser)
-            }
+    private fun XPath.nodeValues(reader: Reader, expression: String): List<String> = (this.evaluate(
+        expression,
+        InputSource(reader),
+        XPathConstants.NODESET
+    ) as NodeList).nodeValues()
+
+    private fun NodeList.nodeValues(): List<String> {
+        val list = mutableListOf<String>()
+
+        for (i in 0 until this.length) {
+            list.add(this.item(i).nodeValue)
         }
-    }
 
-    private fun readTagText(tagName: String, parser: XmlPullParser): String {
-        parser.require(XmlPullParser.START_TAG, null, tagName)
-        val title = readText(parser)
-        parser.require(XmlPullParser.END_TAG, null, tagName)
-        return title
+        return list
     }
-
-    private fun readText(parser: XmlPullParser): String {
-        var result = ""
-        if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.text
-            parser.nextTag()
-        }
-        return result
-    }
-
-    private fun skip(parser: XmlPullParser) {
-        parser.require(XmlPullParser.START_TAG, null, null)
-        var depth = 1
-        while (depth != 0) {
-            when (parser.next()) {
-                XmlPullParser.END_TAG -> depth--
-                XmlPullParser.START_TAG -> depth++
-            }
-        }
-    }
-}
-
-fun main() {
-    println("Test")
 }

@@ -5,6 +5,8 @@ import android.content.Context
 import app.eduroam.geteduroam.util.CrashlyticsTree
 import app.eduroam.shared.AppInfo
 import app.eduroam.shared.BuildConfig
+import app.eduroam.shared.config.AndroidConfigParser
+import app.eduroam.shared.config.ConfigParser
 import app.eduroam.shared.initKoin
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.select.SelectInstitutionViewModel
@@ -21,10 +23,12 @@ class AndroidApp : Application() {
             single<Context> { this@AndroidApp }
             viewModel {
                 SelectInstitutionViewModel(institutionRepository = get(),
+                    configParser = get(),
                     log = get { parametersOf("SelectInstitutionViewModel") })
             }
             viewModel { SelectProfileViewModel(get { parametersOf("SelectProfileViewModel") }) }
             single<AppInfo> { AndroidAppInfo }
+            single<ConfigParser> { AndroidConfigParser() }
             single {
                 { Timber.tag("Startup").i("Hello from Android/Kotlin!") }
             }
