@@ -1,9 +1,11 @@
 package app.eduroam.shared.select
 
+import app.eduroam.shared.config.ConfigParser
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.models.ViewModel
 import app.eduroam.shared.response.Institution
+import app.eduroam.shared.response.Profile
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class SelectInstitutionViewModel(
     private val institutionRepository: InstitutionsRepository,
+    private val configParser: ConfigParser,
     log: Logger,
 ) : ViewModel() {
 
@@ -57,15 +60,13 @@ class SelectInstitutionViewModel(
                     try {
                         val eapData = institutionRepository.getEapData(
                             selectedInstitution.id, profile.id, profile.eapconfig_endpoint.orEmpty()
-
                         )
+                        configParser.parse(eapData)
                     } catch (e: Exception) {
                         log.e("Failed to download anon EAP config file", e)
                     } finally {
                         updateDataState(uiDataState.value.copy(loading = false))
                     }
-
-                    //todo: Start parsing XML file here
                 }
             }
         } else {

@@ -1,11 +1,13 @@
 import app.eduroam.shared.Config
 import app.eduroam.shared.Libs
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.appdistribution'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.firebase.appdistribution'
+    id 'com.google.gms.google-services'
+}
 
 def buildNumberFile = new File("${buildDir}/build_number.txt")
 def versionNameFile = new File("version_name.txt")
@@ -86,7 +88,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.kotlinCompilerExtensionVersion
     }
 
     packagingOptions {
