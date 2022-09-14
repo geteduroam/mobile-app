@@ -1,6 +1,5 @@
 package app.eduroam.geteduroam.profile
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,40 +10,54 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.SelectProfileSummary
 import app.eduroam.shared.profile.SelectProfileViewModel
+import app.eduroam.shared.response.Profile
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SelectProfileScreen(
     viewModel: SelectProfileViewModel,
-    goToAuth: (String) -> Unit,
     selectInstitutionState: SelectProfileState = rememberSelectProfileState(
-        viewModel, goToAuth
+        viewModel
     ),
+    goToOAuth: (String, Profile) -> Unit,
+    goToConfigScreen: (String) -> Unit,
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleAwareUiDataStateFlow = remember(viewModel.uiDataState, lifecycleOwner) {
-        viewModel.uiDataState.flowWithLifecycle(lifecycleOwner.lifecycle)
+    val uiDataState: DataState<SelectProfileSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
+    val authorizationUrl by viewModel.authorizationUrl.collectAsStateWithLifecycle(null)
+    val configData by viewModel.configData.collectAsStateWithLifecycle(null)
+
+    authorizationUrl?.let {
+        LaunchedEffect(it) {
+            val selectedProfile = viewModel.currentSelectedProfile()
+            if (selectedProfile != null) {
+                viewModel.handledAuthorization()
+                goToOAuth(it, selectedProfile)
+            }
+        }
     }
-
-    @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
-    val uiDataState: DataState<SelectProfileSummary> by lifecycleAwareUiDataStateFlow.collectAsState(
-        viewModel.uiDataState.value
-    )
-
+    configData?.let {
+        LaunchedEffect(it) {
+            viewModel.clearWifiConfigData()
+            val wifiConfigData = Json.encodeToString(it)
+            goToConfigScreen(wifiConfigData)
+        }
+    }
     SelectProfileContent(
         uiDataState = uiDataState,
         state = selectInstitutionState,

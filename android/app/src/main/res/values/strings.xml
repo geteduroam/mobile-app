@@ -7,4 +7,8 @@
     <string name="institution_select_title">Select an institution</string>
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
     <string name="profile_select_profile">Select profile</string>
+    <string name="configuration_progress">Establishing WiFi connection</string>
+    <string name="configuration_logs">Log messages:</string>
+    <string name="configuration_canceled">Canceled</string>
+    <string name="configuration_completed">Completed</string>
 </resources>

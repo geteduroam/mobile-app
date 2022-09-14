@@ -2,6 +2,7 @@ package app.eduroam.geteduroam
 
 import android.app.Application
 import android.content.Context
+import app.eduroam.geteduroam.oauth.OAuthViewModel
 import app.eduroam.geteduroam.util.CrashlyticsTree
 import app.eduroam.shared.AppInfo
 import app.eduroam.shared.BuildConfig
@@ -26,7 +27,16 @@ class AndroidApp : Application() {
                     configParser = get(),
                     log = get { parametersOf("SelectInstitutionViewModel") })
             }
-            viewModel { SelectProfileViewModel(get { parametersOf("SelectProfileViewModel") }) }
+            viewModel {
+                SelectProfileViewModel(institutionRepository = get(),
+                    configParser = get(),
+                    get { parametersOf("SelectProfileViewModel") })
+            }
+            viewModel {
+                OAuthViewModel(institutionsRepository = get(),
+                    configParser = get(),
+                    get { parametersOf("OAuthViewModel") })
+            }
             single<AppInfo> { AndroidAppInfo }
             single<ConfigParser> { AndroidConfigParser() }
             single {

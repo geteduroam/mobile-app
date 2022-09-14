@@ -70,8 +70,8 @@ class AndroidConfigParser : ConfigParser {
         return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
             null
         else ClientCertificate(
-            privateKeyBase64 = passphrase,
-            certificate = clientCertificate
+            passphrase = passphrase,
+            pkcs12StoreB64 = clientCertificate
         )
     }
 

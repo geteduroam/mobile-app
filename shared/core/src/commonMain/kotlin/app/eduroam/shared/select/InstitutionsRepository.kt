@@ -3,6 +3,7 @@ package app.eduroam.shared.select
 import app.eduroam.shared.ktor.InstitutionApi
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
+import app.eduroam.shared.response.TokenResponse
 import app.eduroam.shared.storage.DriverFactory
 import app.eduroam.shared.storage.createDatabase
 import co.touchlab.kermit.Logger
@@ -30,16 +31,31 @@ class InstitutionsRepository(
         emit(institutionsList)
     }
 
-    suspend fun getEapData(id: String, profileId: String, eapconfigEndpoint: String): ByteArray =
-        database.eduroamdbQueries.getEapFile(categoryId = id, profileId = profileId)
-            .executeAsOneOrNull() ?: downloadEapFile(id, profileId, eapconfigEndpoint)
+    suspend fun postToken(
+        tokenUrl: String,
+        code: String,
+        redirectUri: String,
+        clientId: String,
+        codeVerifier: String
+    ): TokenResponse =
+        institutionApi.postToken(tokenUrl, code, redirectUri, clientId, codeVerifier)
 
-    suspend fun downloadEapFile(
+    suspend fun getEapData(
         id: String,
         profileId: String,
-        eapconfigEndpoint: String
+        eapconfigEndpoint: String,
+        accessToken: String? = null
+    ): ByteArray =
+        database.eduroamdbQueries.getEapFile(categoryId = id, profileId = profileId)
+            .executeAsOneOrNull() ?: downloadEapFile(id, profileId, eapconfigEndpoint, accessToken)
+
+    private suspend fun downloadEapFile(
+        id: String,
+        profileId: String,
+        eapconfigEndpoint: String,
+        accessToken: String? = null
     ): ByteArray {
-        val byteArray = institutionApi.downloadEapFile(eapconfigEndpoint)
+        val byteArray = institutionApi.downloadEapFile(eapconfigEndpoint, accessToken)
 
         database.eduroamdbQueries.saveEapFile(
             categoryId = id,
