@@ -13,14 +13,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
+import app.eduroam.geteduroam.util.Oauth2
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
+import app.eduroam.shared.response.Institution
 import app.eduroam.shared.select.SelectInstitutionViewModel
+import io.ktor.http.*
+import java.lang.StringBuilder
+import java.net.URI
 
 @Composable
 fun SelectInstitutionScreen(
@@ -28,6 +34,7 @@ fun SelectInstitutionScreen(
     gotToProfileSelection: (String) -> Unit,
     selectInstitutionState: SelectInstitutionState = rememberSelectInstitutionState(viewModel, gotToProfileSelection),
 ) {
+    val uriHandler = LocalUriHandler.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareUiDataStateFlow = remember(viewModel.uiDataState, lifecycleOwner) {
         viewModel.uiDataState.flowWithLifecycle(lifecycleOwner.lifecycle)
@@ -38,7 +45,13 @@ fun SelectInstitutionScreen(
 
     SelectInstitutionContent(
         institutionsState = uiDataState,
-        selectInstitutionState = selectInstitutionState,
+        onSelectInstitution = { institution ->
+            if (institution.requiresAuth()) {
+                uriHandler.openUri(Oauth2.getAuthorizationUrl(institution))
+            } else {
+                selectInstitutionState.onSelectInstitution(institution)
+            }
+        },
         searchText = uiDataState.data?.filterOn.orEmpty(),
         onSearchTextChange = { viewModel.onSearchTextChange(it) },
     )
@@ -47,7 +60,7 @@ fun SelectInstitutionScreen(
 @Composable
 fun SelectInstitutionContent(
     institutionsState: DataState<ItemDataSummary>,
-    selectInstitutionState: SelectInstitutionState,
+    onSelectInstitution:(Institution) -> Unit,
     searchText: String,
     onSearchTextChange: (String) -> Unit = {},
 ) = Scaffold(
@@ -104,7 +117,7 @@ fun SelectInstitutionContent(
 
                     institutionsState.data?.institutions?.forEach { institution ->
                         item {
-                            InstitutionRow(institution, { selectInstitutionState.onSelectInstitution(it) })
+                            InstitutionRow(institution, onSelectInstitution)
                         }
                     }
                 }

@@ -51,10 +51,8 @@ class SelectInstitutionViewModel(
 
     fun onInstitutionSelect(selectedInstitution: Institution) {
         if (selectedInstitution.hasSingleProfile()) {
-            val profile = selectedInstitution.profiles[0]
-            if (selectedInstitution.requiresAuth(profile)) {
-                //TODO: start OAuth flow
-            } else {
+            if (!selectedInstitution.requiresAuth()) {
+                val profile = selectedInstitution.profiles.first()
                 updateDataState(uiDataState.value.copy(loading = true))
                 viewModelScope.launch {
                     try {

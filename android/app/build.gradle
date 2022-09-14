@@ -134,6 +134,7 @@ dependencies {
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
     implementation Libs.AndroidX.Lifecycle.runtimeKtx
     implementation Libs.Koin.android
+    implementation Libs.scribejava
 
     debugImplementation Libs.AndroidX.Compose.uiTestManifest
 }
