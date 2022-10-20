@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -25,7 +26,7 @@ sealed class Screens(val route: String) {
         val arguments = listOf(
             navArgument(urlArg) {
                 type = NavType.StringType
-                defaultValue = "https://www.google.com"
+                defaultValue = Uri.EMPTY.toString()
             },
             navArgument(profileArg) {
                 type = NavType.StringType
