@@ -21,12 +21,11 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
+import app.eduroam.shared.config.WifiConfigData
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.SelectProfileSummary
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.response.Profile
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -36,7 +35,7 @@ fun SelectProfileScreen(
         viewModel
     ),
     goToOAuth: (String, Profile) -> Unit,
-    goToConfigScreen: (String) -> Unit,
+    goToConfigScreen: (WifiConfigData) -> Unit,
 ) {
     val uiDataState: DataState<SelectProfileSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
     val authorizationUrl by viewModel.authorizationUrl.collectAsStateWithLifecycle(null)
@@ -51,10 +50,9 @@ fun SelectProfileScreen(
             }
         }
     }
-    configData?.let {
-        LaunchedEffect(it) {
+    configData?.let { wifiConfigData ->
+        LaunchedEffect(wifiConfigData) {
             viewModel.clearWifiConfigData()
-            val wifiConfigData = Json.encodeToString(it)
             goToConfigScreen(wifiConfigData)
         }
     }

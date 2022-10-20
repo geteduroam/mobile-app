@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.oauth
 
+import app.eduroam.geteduroam.Screens
 import app.eduroam.shared.OAuth2Android
 import app.eduroam.shared.config.ConfigParser
 import app.eduroam.shared.config.WifiConfigData
@@ -20,16 +21,15 @@ class OAuthViewModel(
         code: String,
         institutionId: String,
         error: String,
-        redirectUri: String,
-        clientId: String,
         profile: Profile
     ) {
+
         viewModelScope.launch {
             val token = institutionsRepository.postToken(
                 tokenUrl = profile.token_endpoint.orEmpty(),
                 code = code,
-                redirectUri = redirectUri,
-                clientId = clientId,
+                redirectUri = Screens.OAuth.redirectUrl,
+                clientId = Screens.OAuth.APP_ID,
                 codeVerifier = OAuth2Android.getCodeVerifier()
             )
             val eapData = institutionsRepository.getEapData(
@@ -38,7 +38,7 @@ class OAuthViewModel(
                 eapconfigEndpoint = profile.eapconfig_endpoint.orEmpty(),
                 accessToken = token.access_token
             )
-            configData.emit(configParser.parse(eapData))
+            configData.value = configParser.parse(eapData)
         }
     }
 

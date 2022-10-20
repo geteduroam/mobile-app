@@ -62,17 +62,19 @@ sealed class Screens(val route: String) {
             defaultValue = ""
         })
 
-        fun encodeArguments(institutionJson: String): String = route + ("/${
-            URLEncoder.encode(
+        fun encodeArguments(institution: Institution): String {
+            val institutionJson = Json.encodeToString(institution)
+            val instutitionArg = URLEncoder.encode(
                 institutionJson, Charsets.UTF_8.toString()
             )
-        }")
+            return "$route/$instutitionArg"
+        }
 
         fun decodeUrlArgument(arguments: Bundle?): Institution {
             val encodedInstitution = arguments?.getString(institutionArg).orEmpty()
             val decodedInstitutionJson =
                 URLDecoder.decode(encodedInstitution, Charsets.UTF_8.toString())
-            return Json.decodeFromString<Institution>(decodedInstitutionJson)
+            return Json.decodeFromString(decodedInstitutionJson)
         }
     }
 
@@ -84,17 +86,19 @@ sealed class Screens(val route: String) {
             defaultValue = ""
         })
 
-        fun encodeArguments(wifiConfigDataJson: String): String = route + ("/${
-            URLEncoder.encode(
+        fun encodeArguments(wifiConfigData: WifiConfigData): String {
+            val wifiConfigDataJson = Json.encodeToString(wifiConfigData)
+            val encodedWifiConfig = URLEncoder.encode(
                 wifiConfigDataJson, Charsets.UTF_8.toString()
             )
-        }")
+            return "$route/$encodedWifiConfig"
+        }
 
         fun decodeUrlArgument(arguments: Bundle?): WifiConfigData {
-            val encodedInstitution = arguments?.getString(wifiConfigDataArg).orEmpty()
-            val decodedInstitutionJson =
-                URLDecoder.decode(encodedInstitution, Charsets.UTF_8.toString())
-            return Json.decodeFromString<WifiConfigData>(decodedInstitutionJson)
+            val encodedWifiConfigData = arguments?.getString(wifiConfigDataArg).orEmpty()
+            val decodedWifiConfigDataJson =
+                URLDecoder.decode(encodedWifiConfigData, Charsets.UTF_8.toString())
+            return Json.decodeFromString(decodedWifiConfigDataJson)
         }
     }
 

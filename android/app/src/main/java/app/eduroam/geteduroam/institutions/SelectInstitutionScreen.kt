@@ -17,41 +17,36 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Screens
+import app.eduroam.shared.config.WifiConfigData
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.response.Institution
 import app.eduroam.shared.response.Profile
 import app.eduroam.shared.select.SelectInstitutionViewModel
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.util.*
-import java.util.stream.Collectors
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SelectInstitutionScreen(
     viewModel: SelectInstitutionViewModel,
     goToOAuth: (String, Profile) -> Unit,
-    gotToProfileSelection: (String) -> Unit,
-    goToConfigScreen: (String) -> Unit,
+    gotToProfileSelection: (Institution) -> Unit,
+    goToConfigScreen: (WifiConfigData) -> Unit,
 ) {
     val uiDataState: DataState<ItemDataSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
     val authorizationUrl by viewModel.authorizationUrl.collectAsStateWithLifecycle(null)
     val selectedInstitution by viewModel.currentInstitution.collectAsStateWithLifecycle(null)
     val configData by viewModel.configData.collectAsStateWithLifecycle(null)
 
-    selectedInstitution?.let {
-        LaunchedEffect(it) {
+    selectedInstitution?.let { selectedInstitution ->
+        LaunchedEffect(selectedInstitution) {
             viewModel.clearCurrentInstitutionSelection()
-            val institutionArgument = Json.encodeToString(it)
-            gotToProfileSelection(institutionArgument)
+            gotToProfileSelection(selectedInstitution)
         }
     }
 
-    configData?.let {
-        LaunchedEffect(it) {
+    configData?.let { wifiConfigData ->
+        LaunchedEffect(wifiConfigData) {
             viewModel.clearWifiConfigData()
-            val wifiConfigData = Json.encodeToString(it)
             goToConfigScreen(wifiConfigData)
         }
     }
@@ -143,32 +138,4 @@ fun SelectInstitutionContent(
             }
         }
     }
-}
-
-fun main() {
-    val newArray = Arrays.stream(
-        getCertificates(
-            arrayOf("1", "2", "3")
-        )
-    ).filter { certificate -> // We really shouldn't expect any certificate here to NOT be a CA,
-        // CAT shows a nice red warning when you try to configure this,
-        // but experience shows that sometimes this is not enough of a deterrent.
-        // We may very well block profiles like this, but then it should be done BEFORE
-        // the user enters their username/password, not after.
-        if (certificate == null) {
-            false
-        } else {
-            certificate is String
-        }
-    }.collect(Collectors.toList())
-    println("Result $newArray")
-}
-
-fun getCertificates(list: Array<String>): Array<String?> {
-    val newList = arrayOfNulls<String>(list.size)
-    for (i in list.indices) {
-        if (i == 1) throw IllegalArgumentException("Fail now")
-        else newList[i] = list[i]
-    }
-    return newList
 }
