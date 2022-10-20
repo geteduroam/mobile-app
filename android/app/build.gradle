@@ -69,7 +69,7 @@ android {
         }
     }
 
-    lintOptions {
+    lint {
         checkReleaseBuilds false
     }
 
