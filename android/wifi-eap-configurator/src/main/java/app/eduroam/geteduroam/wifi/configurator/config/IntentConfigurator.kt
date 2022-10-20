@@ -23,7 +23,7 @@ import androidx.annotation.RequiresApi
  */
 @RequiresApi(api = Build.VERSION_CODES.R)
 class IntentConfigurator(context: Context?) : SuggestionConfigurator(context) {
-    override fun installSuggestions(suggestions: List<WifiNetworkSuggestion>) {
+    override fun installSuggestions(suggestions: List<WifiNetworkSuggestion>?) {
         // TODO ideally we want to remove old networks, especially Passpoint
         var suggestions: List<WifiNetworkSuggestion>? = suggestions
         if (suggestions !is ArrayList<*>) {

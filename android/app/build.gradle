@@ -52,7 +52,8 @@ android {
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
         }
     }
 
@@ -121,6 +122,8 @@ dependencies {
 
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
+    implementation Libs.Accompanist.permissions
+    implementation Libs.Accompanist.webview
     implementation Libs.Coil.coilCompose
     implementation Libs.AndroidX.Compose.Navigation.nav
 
@@ -133,6 +136,7 @@ dependencies {
 
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
     implementation Libs.AndroidX.Lifecycle.runtimeKtx
+    implementation Libs.AndroidX.Lifecycle.runtimeCompose
     implementation Libs.Koin.android
 
     debugImplementation Libs.AndroidX.Compose.uiTestManifest
