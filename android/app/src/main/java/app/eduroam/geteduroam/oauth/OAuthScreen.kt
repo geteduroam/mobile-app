@@ -61,7 +61,8 @@ fun OAuthScreen(
                         institutionId = institutionId,
                         error = error,
                         redirectUri = Screens.OAuth.redirectUrl,
-                        clientId = Screens.OAuth.APP_ID
+                        clientId = Screens.OAuth.APP_ID,
+                        profile = profile
                     )
                     return true
                 }
