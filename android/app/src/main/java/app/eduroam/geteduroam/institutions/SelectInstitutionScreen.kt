@@ -23,6 +23,7 @@ import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.response.Institution
 import app.eduroam.shared.response.Profile
 import app.eduroam.shared.select.SelectInstitutionViewModel
+import app.eduroam.shared.select.Step
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -33,30 +34,25 @@ fun SelectInstitutionScreen(
     goToConfigScreen: (WifiConfigData) -> Unit,
 ) {
     val uiDataState: DataState<ItemDataSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
-    val authorizationUrl by viewModel.authorizationUrl.collectAsStateWithLifecycle(null)
-    val selectedInstitution by viewModel.currentInstitution.collectAsStateWithLifecycle(null)
-    val configData by viewModel.configData.collectAsStateWithLifecycle(null)
+    val step by viewModel.step.collectAsStateWithLifecycle(Step.Start)
 
-    selectedInstitution?.let { selectedInstitution ->
-        LaunchedEffect(selectedInstitution) {
-            viewModel.clearCurrentInstitutionSelection()
-            gotToProfileSelection(selectedInstitution)
-        }
-    }
-
-    configData?.let { wifiConfigData ->
-        LaunchedEffect(wifiConfigData) {
-            viewModel.clearWifiConfigData()
-            goToConfigScreen(wifiConfigData)
-        }
-    }
-
-    authorizationUrl?.let {
-        LaunchedEffect(it) {
-            val firstProfile = viewModel.getFirstProfile()
-            if (firstProfile != null) {
-                viewModel.handledAuthorization()
-                goToOAuth(it, firstProfile)
+    LaunchedEffect(step) {
+        when (step) {
+            is Step.DoOAuthFor -> {
+                viewModel.onStepCompleted()
+                val doAuth = step as Step.DoOAuthFor
+                goToOAuth(doAuth.authorizationUrl, doAuth.profile)
+            }
+            is Step.DoConfig -> {
+                viewModel.onStepCompleted()
+                goToConfigScreen((step as Step.DoConfig).wifiConfigData)
+            }
+            is Step.PickProfileFrom -> {
+                viewModel.onStepCompleted()
+                gotToProfileSelection((step as Step.PickProfileFrom).institution)
+            }
+            Step.Start -> {
+                //Do nothing
             }
         }
     }

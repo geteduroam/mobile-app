@@ -9,6 +9,7 @@ import app.eduroam.geteduroam.config.WifiConfigViewModel
 import app.eduroam.geteduroam.institutions.SelectInstitutionScreen
 import app.eduroam.geteduroam.oauth.OAuthScreen
 import app.eduroam.geteduroam.oauth.OAuthViewModel
+import app.eduroam.geteduroam.oauth.OpenIdOAuthScreen
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.select.SelectInstitutionViewModel
@@ -84,7 +85,8 @@ fun NavGraph(
         composable(
             route = Screens.OAuth.routeWithArgs, arguments = Screens.OAuth.arguments
         ) { backStackEntry ->
-            OAuthScreen(
+            OpenIdOAuthScreen(
+                institutionId = "cat_7016",
                 url = Screens.OAuth.decodeUrlArgument(
                     backStackEntry.arguments
                 ),

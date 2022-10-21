@@ -15,6 +15,10 @@ import javax.xml.xpath.XPathFactory
 class AndroidConfigParser : ConfigParser {
     private val xmlRootPath = "/EAPIdentityProviderList/EAPIdentityProvider"
     private val ieee80211path = "$xmlRootPath/CredentialApplicability/IEEE80211"
+    private val authenticationMethod = "$xmlRootPath/AuthenticationMethods/AuthenticationMethod"
+    private val authMethodType = "$authenticationMethod/EAPMethod/Type"
+    private val innerAuthMethodType =
+        "$authenticationMethod/InnerAuthenticationMethod/EAPMethod/Type"
     private val serverSideCredentialPath =
         "$xmlRootPath/AuthenticationMethods/AuthenticationMethod/ServerSideCredential"
     private val clientSideCredentialPath =
@@ -58,7 +62,7 @@ class AndroidConfigParser : ConfigParser {
 
     private fun getReader(source: ByteArray) = InputStreamReader(ByteArrayInputStream(source))
 
-    private fun getClientCertificate(xPath: XPath, source: ByteArray) : ClientCertificate? {
+    private fun getClientCertificate(xPath: XPath, source: ByteArray): ClientCertificate? {
         val passphrase = xPath.nodeValues(
             reader = getReader(source), expression = "$clientSideCredentialPath/Passphrase/text()"
         ).firstOrNull()

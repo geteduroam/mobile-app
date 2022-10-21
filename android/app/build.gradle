@@ -21,6 +21,9 @@ android {
         targetSdk = Config.targetSdk
         versionName appName
         versionCode buildNumberFile.exists() ? buildNumberFile.text.trim() as Integer : 1
+        manifestPlaceholders = [
+                'appAuthRedirectScheme': 'app.eduroam.geteduroam'
+        ]
     }
 
     signingConfigs {
@@ -131,6 +134,7 @@ dependencies {
     implementation Libs.Firebase.analytics
     implementation Libs.Firebase.crashlytics
     implementation Libs.Material.design
+    implementation Libs.OAuth.android
 
     debugImplementation Libs.AndroidX.Compose.tooling
 

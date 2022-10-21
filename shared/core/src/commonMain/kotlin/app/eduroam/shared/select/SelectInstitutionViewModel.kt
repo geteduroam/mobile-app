@@ -17,18 +17,14 @@ class SelectInstitutionViewModel(
     private val configParser: ConfigParser,
     log: Logger,
 ) : ViewModel() {
-
-    private val log = log.withTag("SelectInstitutionViewModel")
-
+    val step: MutableStateFlow<Step> = MutableStateFlow(Step.Start)
     val uiDataState: StateFlow<DataState<ItemDataSummary>> = MutableStateFlow(
         DataState(loading = true)
     )
-    val authorizationUrl: MutableStateFlow<String?> = MutableStateFlow(null)
-    val currentInstitution: MutableStateFlow<Institution?> = MutableStateFlow(null)
-    val configData: MutableStateFlow<WifiConfigData?> = MutableStateFlow(null)
 
     //There is no end point that allows searching so we have to get all the institutions once and cache the result
     private lateinit var allInstitutions: List<Institution>
+    private val log = log.withTag("SelectInstitutionViewModel")
 
     init {
         fetchInstitutionsList()
@@ -65,7 +61,7 @@ class SelectInstitutionViewModel(
                         val eapData = institutionRepository.getEapData(
                             selectedInstitution.id, profile.id, profile.eapconfig_endpoint.orEmpty()
                         )
-                        configData.emit(configParser.parse(eapData))
+                        step.value = Step.DoConfig(configParser.parse(eapData))
                     } catch (e: Exception) {
                         log.e("Failed to download anon EAP config file", e)
                     } finally {
@@ -74,20 +70,21 @@ class SelectInstitutionViewModel(
                 }
             } else if (selectedInstitution.requiresAuth()) {
                 log.d("OAuth required for the single profile available")
-                authorizationUrl.value = OAuth2().getAuthorizationUrl(
-                    selectedInstitution.id,
-                    selectedInstitution.profiles[0].authorization_endpoint,
-                    redirectUri,
-                    clientId
+                step.value = Step.DoOAuthFor(
+                    selectedInstitution.profiles[0], OAuth2().getAuthorizationUrl(
+                        selectedInstitution.id,
+                        selectedInstitution.profiles[0].authorization_endpoint,
+                        redirectUri,
+                        clientId
+                    )
                 )
             }
         } else {
             log.d("Must first select profile")
-            currentInstitution.value = selectedInstitution
+            step.value = Step.PickProfileFrom(selectedInstitution)
         }
     }
 
-    fun getFirstProfile() = currentInstitution.value?.profiles?.first()
     private fun updateDataState(newValue: DataState<ItemDataSummary>) {
         (uiDataState as MutableStateFlow).value = newValue
     }
@@ -97,11 +94,6 @@ class SelectInstitutionViewModel(
         updateDataState(DataState(listData.copy(filterOn = search)))
         searchOnFilter(search, listData)
     }
-
-    fun handledAuthorization() {
-        authorizationUrl.value = null
-    }
-
     private fun searchOnFilter(
         search: String, listData: ItemDataSummary
     ) {
@@ -136,12 +128,8 @@ class SelectInstitutionViewModel(
         )
     }
 
-    fun clearCurrentInstitutionSelection() {
-        currentInstitution.value = null
-    }
-
-    fun clearWifiConfigData() {
-        configData.value = null
+    fun onStepCompleted() {
+        step.value = Step.Start
     }
 
     private val fakeProfileData = """

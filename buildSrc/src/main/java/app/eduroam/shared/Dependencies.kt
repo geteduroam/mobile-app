@@ -159,6 +159,10 @@ object Libs {
         const val design = "com.google.android.material:material:$version"
     }
 
+    object OAuth {
+        const val android = "net.openid:appauth:0.11.1"
+    }
+
     object SqlDelight {
         const val version = "1.5.3"
         const val androidDriver = "com.squareup.sqldelight:android-driver:$version"

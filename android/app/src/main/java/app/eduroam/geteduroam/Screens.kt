@@ -2,6 +2,7 @@ package app.eduroam.geteduroam
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import app.eduroam.shared.config.WifiConfigData
@@ -37,21 +38,29 @@ sealed class Screens(val route: String) {
         fun decodeUrlArgument(arguments: Bundle?): String {
             val encodedUrl = arguments?.getString(urlArg).orEmpty()
             val decodedUrl = URLDecoder.decode(encodedUrl, Charsets.UTF_8.toString())
+            Log.d(
+                "ScreensNav",
+                "$route : decoded URL: $decodedUrl"
+            )
             return decodedUrl
         }
 
         fun decodeProfileArgument(arguments: Bundle?): Profile {
-            val profileJson = arguments?.getString(profileArg).orEmpty()
+            val encodedProfile = arguments?.getString(profileArg).orEmpty()
+            val profileJson = URLDecoder.decode(encodedProfile, Charsets.UTF_8.toString())
             return Json.decodeFromString(profileJson)
         }
 
-        fun encodeArguments(url: String, profile: Profile): String = route + ("/${
-            URLEncoder.encode(
-                url, Charsets.UTF_8.toString()
+        fun encodeArguments(url: String, profile: Profile): String {
+            Log.d(
+                "ScreensNav",
+                "$route : encodeArguments() called with: url = $url, profile = $profile"
             )
-        }") + ("/${
-            Json.encodeToString(profile)
-        }")
+            val encodedUrl = URLEncoder.encode(url, Charsets.UTF_8.toString())
+            val encodedProfile =
+                URLEncoder.encode(Json.encodeToString(profile), Charsets.UTF_8.toString())
+            return "$route/$encodedUrl/$encodedProfile"
+        }
 
     }
 
