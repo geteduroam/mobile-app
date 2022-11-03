@@ -1,11 +1,13 @@
 import app.eduroam.shared.Config
 import app.eduroam.shared.Libs
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.appdistribution'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.firebase.appdistribution'
+    id 'com.google.gms.google-services'
+}
 
 def buildNumberFile = new File("${buildDir}/build_number.txt")
 def versionNameFile = new File("version_name.txt")
@@ -50,7 +52,8 @@ android {
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
         }
     }
 
@@ -86,7 +89,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.kotlinCompilerExtensionVersion
     }
 
     packagingOptions {
@@ -119,6 +122,8 @@ dependencies {
 
     implementation Libs.Accompanist.pager
     implementation Libs.Accompanist.pagerIndicators
+    implementation Libs.Accompanist.permissions
+    implementation Libs.Accompanist.webview
     implementation Libs.Coil.coilCompose
     implementation Libs.AndroidX.Compose.Navigation.nav
 
@@ -131,6 +136,7 @@ dependencies {
 
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
     implementation Libs.AndroidX.Lifecycle.runtimeKtx
+    implementation Libs.AndroidX.Lifecycle.runtimeCompose
     implementation Libs.Koin.android
 
     debugImplementation Libs.AndroidX.Compose.uiTestManifest

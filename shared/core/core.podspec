@@ -2,24 +2,20 @@ Pod::Spec.new do |spec|
     spec.name                     = 'core'
     spec.version                  = '1.0'
     spec.homepage                 = 'https://www.egeniq.com/'
-    spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
+    spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
     spec.summary                  = 'The common multiplatform library used by both Android and iOS.'
-
-    spec.vendored_frameworks      = "build/cocoapods/framework/core.framework"
-    spec.libraries                = "c++"
-    spec.module_name              = "#{spec.name}_umbrella"
-
+    spec.vendored_frameworks      = 'build/cocoapods/framework/core.framework'
+    spec.libraries                = 'c++'
                 
-
                 
-
+                
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':shared:core',
         'PRODUCT_MODULE_NAME' => 'core',
     }
-
+                
     spec.script_phases = [
         {
             :name => 'Build core',
@@ -35,8 +31,9 @@ Pod::Spec.new do |spec|
                 "$REPO_ROOT/../../gradlew" -p "$REPO_ROOT" $KOTLIN_PROJECT_PATH:syncFramework \
                     -Pkotlin.native.cocoapods.platform=$PLATFORM_NAME \
                     -Pkotlin.native.cocoapods.archs="$ARCHS" \
-                    -Pkotlin.native.cocoapods.configuration=$CONFIGURATION
+                    -Pkotlin.native.cocoapods.configuration="$CONFIGURATION"
             SCRIPT
         }
     ]
+                
 end

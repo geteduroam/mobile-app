@@ -1,6 +1,7 @@
 package app.eduroam.shared.ktor
 
 import app.eduroam.shared.response.InstitutionResult
+import app.eduroam.shared.response.TokenResponse
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -9,6 +10,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
@@ -39,10 +41,9 @@ class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine
             level = LogLevel.INFO
         }
         install(HttpTimeout) {
-            val timeout = 30000L
-            connectTimeoutMillis = timeout
-            requestTimeoutMillis = timeout
-            socketTimeoutMillis = timeout
+            this.socketTimeoutMillis = 80_000L
+            this.connectTimeoutMillis = 60_000L
+            this.requestTimeoutMillis = 60_000L
         }
     }
 
@@ -57,10 +58,58 @@ class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine
         }.body()
     }
 
+    override suspend fun postToken(
+        tokenUrl: String,
+        code: String,
+        redirectUri: String,
+        clientId: String,
+        codeVerifier: String
+    ): TokenResponse {
+        log.d { "Fetching token via POST" }
+        return client.post {
+            tokenEndpoint(tokenUrl)
+            setBody(formData {
+                append("grant_type", "code")
+                append("authorization_code", code)
+                append("redirect_uri", redirectUri)
+                append("client_id", clientId)
+                append("code_verifier", codeVerifier)
+            })
+        }.body()
+    }
+
+    override suspend fun downloadEapFile(
+        eapConfigEndpoint: String,
+        accessToken: String?
+    ): ByteArray {
+        log.d("Download EAP file")
+        val response = if (accessToken == null) {
+            client.get(eapConfigEndpoint) {
+                onDownload { bytesSentTotal, contentLength ->
+                    log.d("Received $bytesSentTotal bytes from $contentLength")
+                }
+            }
+        } else {
+            client.post(eapConfigEndpoint) {
+                headers["Authorization"] = "Bearer $accessToken"
+                onDownload { bytesSentTotal, contentLength ->
+                    log.d("Received $bytesSentTotal bytes from $contentLength")
+                }
+            }
+        }
+        return response.body()
+    }
+
     private fun HttpRequestBuilder.institutions(path: String) {
         url {
             takeFrom("https://discovery.eduroam.app/")
             encodedPath = path
+        }
+    }
+
+    private fun HttpRequestBuilder.tokenEndpoint(tokenUrl: String) {
+        url {
+            takeFrom(tokenUrl)
         }
     }
 }

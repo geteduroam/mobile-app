@@ -36,6 +36,9 @@ dependencies {
     api Libs.Kotlin.Coroutines.android
     api Libs.timberLog
     api Libs.Koin.android
+    implementation Libs.Kotlin.stdlib
     implementation Libs.Ktor.clientAndroid
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
+    implementation Libs.SqlDelight.androidDriver
+    implementation Libs.scribejava
 }
