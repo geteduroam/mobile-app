@@ -13,7 +13,7 @@ EXTERNAL SOURCES:
     :path: "../WifiEapConfigurator"
 
 SPEC CHECKSUMS:
-  core: 4c338eea65c5156a5794910f40acf7001f6bedcc
+  core: b7d37785058f3483e1ffb4dfc3e0245aa1bfb949
   WifiEapConfigurator: 724f43ebaeac5b8a59428153e0421cb1a9efd20a
 
 PODFILE CHECKSUM: c8d6910c9fe3be5aacc62eb0114bcb9a0bb6849b

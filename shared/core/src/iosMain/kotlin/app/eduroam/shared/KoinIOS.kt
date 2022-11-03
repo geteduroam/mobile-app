@@ -1,5 +1,6 @@
 package app.eduroam.shared
 
+import app.eduroam.shared.config.IOSConfigParser
 import app.eduroam.shared.models.SelectInstitutionCallbackViewModel
 import app.eduroam.shared.storage.DriverFactory
 import co.touchlab.kermit.Logger
@@ -28,6 +29,7 @@ actual val platformModule = module {
     single {
         SelectInstitutionCallbackViewModel(
             get(),
+            IOSConfigParser(),
             getWith("SelectInstitutionCallbackViewModel")
         )
     }
