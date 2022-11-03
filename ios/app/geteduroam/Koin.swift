@@ -11,7 +11,7 @@ import core
 
 func startKoin() {
     let iosAppInfo = IosAppInfo()
-    let doOnStartup = { NSLog("Hello from iOS/Swift!") }
+    let doOnStartup = { }
 
     let koinApplication = KoinIOSKt.doInitKoinIos(
         appInfo: iosAppInfo,

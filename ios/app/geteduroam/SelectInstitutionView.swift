@@ -41,7 +41,7 @@ class SelectInstitutionViewModel: ObservableObject {
     }
 }
 
-struct ContentView: View {
+struct SelectInstitutionView: View {
     @ObservedObject var observableModel = SelectInstitutionViewModel()
     
     @State private var query: String = ""
@@ -50,16 +50,17 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(observableModel.institutions, id: \.self) { item in
-                    NavigationLink(destination: InstitutionDetail(institution: item)) {
-                        Text(item.name)
+                    NavigationLink(destination: InstitutionView(institution: item)) {
+                        InstitutionRowView(institution: item)
                     }
                 }
             }
             .listStyle(.plain)
-            .navigationTitle("Eduroam ⚙️")
+            .navigationTitle("Eduroam")
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Kies een organisatie")
             .onChange(of: query) { observableModel.search($0) }
         }
+        .navigationViewStyle(.stack)
         .onAppear(perform: {
             observableModel.activate()
         })
@@ -69,18 +70,8 @@ struct ContentView: View {
 	}
 }
 
-struct InstitutionDetail: View {
-    var institution: Institution
-
-    var body: some View {
-        Text(institution.name)
-            .frame(width: 200, height: 200)
-            .navigationTitle(institution.name)
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
+struct SelectInstitutionView_Previews: PreviewProvider {
 	static var previews: some View {
-		ContentView()
+		SelectInstitutionView()
 	}
 }

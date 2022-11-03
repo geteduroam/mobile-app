@@ -8,7 +8,7 @@ struct GeteduroamApp: App {
     
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+			SelectInstitutionView()
 		}
 	}
 }
