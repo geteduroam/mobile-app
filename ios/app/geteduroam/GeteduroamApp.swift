@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct iOSApp: App {
+struct GeteduroamApp: App {
     init() {
         startKoin()
     }

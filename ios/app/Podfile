@@ -1,4 +1,4 @@
-target 'ios' do
+target 'geteduroam' do
   use_frameworks!
   platform :ios, '14.1'
   pod 'core', :path => '../../shared/core'
