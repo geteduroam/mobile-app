@@ -1,7 +1,7 @@
 package app.eduroam.shared
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.1"
     const val googleService = "com.google.gms:google-services:4.3.14"
     const val crashlyticsPlugin = "com.google.firebase:firebase-crashlytics-gradle:2.8.1"
     const val firebaseDistributionPlugin =
@@ -22,7 +22,7 @@ object Libs {
         object Compose {
             const val snapshot = ""
             private const val version = "1.3.0-beta03"
-            private const val kotlinCompilerExtensionVersion = "1.3.1"
+            const val kotlinCompilerExtensionVersion = "1.3.1"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val compiler =

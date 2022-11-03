@@ -13,6 +13,18 @@ import androidx.annotation.RequiresApi
 import app.eduroam.shared.config.WifiConfigData
 import java.nio.charset.Charset
 
+
+fun WifiConfigData.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
+    val suggestions = buildSSIDSuggestions()
+    val passpointSuggestions = buildPasspointSuggestion()
+    return if (passpointSuggestions != null) {
+        suggestions + passpointSuggestions
+    } else {
+        suggestions
+    }
+
+}
+
 /**
  * Create SSID-based network suggestions for this profile
  *

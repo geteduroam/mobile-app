@@ -42,7 +42,7 @@ sealed class Screens(val route: String) {
 
         fun decodeProfileArgument(arguments: Bundle?): Profile {
             val profileJson = arguments?.getString(profileArg).orEmpty()
-            return Json.decodeFromString<Profile>(profileJson)
+            return Json.decodeFromString(profileJson)
         }
 
         fun encodeArguments(url: String, profile: Profile): String = route + ("/${

@@ -28,7 +28,7 @@ class SelectInstitutionViewModel(
     val configData: MutableStateFlow<WifiConfigData?> = MutableStateFlow(null)
 
     //There is no end point that allows searching so we have to get all the institutions once and cache the result
-    lateinit var allInstitutions: List<Institution>
+    private lateinit var allInstitutions: List<Institution>
 
     init {
         fetchInstitutionsList()
