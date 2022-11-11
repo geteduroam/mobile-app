@@ -15,6 +15,10 @@
 	<true/>
 	<key>com.apple.external-accessory.wireless-configuration</key>
 	<true/>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)com.apple.networkextensionsharing</string>

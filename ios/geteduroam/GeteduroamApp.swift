@@ -4,16 +4,12 @@ import AppAuth
 
 @main
 struct GeteduroamApp: App {
+    
+    #if os(iOS)
     @UIApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate
-   
-    init() {
-        startKoin()
-    }
-    
-//    @EnvironmentObject private var appDelegate: GeteduroamAppDelegate
-    
-    // property of the containing class
-    private var authState: OIDAuthState?
+    #elseif os(macOS)
+    @NSApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate
+    #endif
     
 	var body: some Scene {
 		WindowGroup {
@@ -54,20 +50,19 @@ struct GeteduroamApp: App {
 
                             let authState = try await appDelegate.startAuth(request: request)
                             
-                            let (accessToken, idToken) = try await authState.tokens()
+                            let (accessToken, _) = try await authState.tokens()
                             
                             var urlRequest = URLRequest(url: profile.eapconfig_endpoint!)
                             urlRequest.httpMethod = "POST"
                             urlRequest.allHTTPHeaderFields = ["Authorization": "Bearer \(accessToken)"]
                             
-                            let (eapConfigData, response) = try await URLSession.shared.data(for: urlRequest)
-                            
-                            print("Found \(eapConfigData as NSData)")
+                            let (eapConfigData, _) = try await URLSession.shared.data(for: urlRequest)
                             
                             let wifi = try XMLTrial().parse(xmlData: eapConfigData)
                             
-                            print("Found \(wifi) \(wifi.ssids)")
+                            print("Found \(wifi)")
 
+                            #if os(iOS)
                             let configurator = WifiEapConfigurator()
 
                             configurator.configureAP(wifi) { success, messages in
@@ -75,7 +70,7 @@ struct GeteduroamApp: App {
                                 
                                 print("messages \(messages)")
                             }
-            
+                            #endif
                         } else {
                             
                         }
@@ -87,12 +82,23 @@ struct GeteduroamApp: App {
 	}
 }
 
+#if os(iOS)
+enum StartAuthError: Error {
+    case noWindow
+    case noRootViewController
+    case unknownError
+}
+
 class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
-    var currentAuthorizationFlow: OIDExternalUserAgentSession?
+    private var currentAuthorizationFlow: OIDExternalUserAgentSession?
   
     func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
-        let window = UIApplication.shared.windows.first!
-        let presenter = window.rootViewController!
+        guard let window = UIApplication.shared.windows.first else {
+            throw StartAuthError.noWindow
+        }
+        guard let presenter = window.rootViewController else {
+            throw StartAuthError.noRootViewController
+        }
         return try await withCheckedThrowingContinuation { continuation in
             self.currentAuthorizationFlow = OIDAuthState.authState(byPresenting: request, presenting: presenter) { authState, error in
                 if let authState {
@@ -100,7 +106,7 @@ class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
                 } else if let error {
                     continuation.resume(throwing: error)
                 } else {
-                    continuation.resume(throwing: NSError(domain: "Huh", code: 1))
+                    continuation.resume(throwing: StartAuthError.unknownError)
                 }
             }
         }
@@ -116,6 +122,28 @@ class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
         return false
     }
 }
+#elseif os(macOS)
+class GeteduroamAppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+
+    func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
+        let redirectHTTPHandler = OIDRedirectHTTPHandler(successURL: request.redirectURL)
+        redirectHTTPHandler.startHTTPListener(nil) // TODO handle error!
+
+        let window = await NSApplication.shared.mainWindow
+        return try await withCheckedThrowingContinuation { continuation in
+            redirectHTTPHandler.currentAuthorizationFlow =   OIDAuthState.authState(byPresenting: request, presenting: window!) { authState, error in
+                if let authState {
+                    continuation.resume(returning: authState)
+                } else if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(throwing: NSError(domain: "Huh", code: 1))
+                }
+            }
+        }
+    }
+}
+#endif
 
 extension OIDAuthState {
     

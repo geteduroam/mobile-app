@@ -62,26 +62,26 @@ class XMLTrial: NSObject {
             username: username,
             password: password,
             caCertificates: caCertificates)
-        
+
 //        return WifiConfigData(ssids: ssids, oids: oids, clientCertificate: clientCertificate, anonymousIdentity: outerIdentity, caCertificates: caCertificates, enterpriseEAP: enterpriseEAP, serverNames: serverNames, username: username, password: password, enterprisePhase2Auth: enterprisePhase2Auth, fqdn: fqdn)
     }
     
 }
 
-//struct WifiConfigData: Codable {
-//    let ssids: [String]
-//    let oids: [String]
-//    var clientCertificate: ClientCertificate?
-//    let anonymousIdentity: String?
-//    // Working with certificate as base64 encoded strings, to be parsed by the platform into platform specific type.
-//    let caCertificates: [String]?
-//    let enterpriseEAP: Int
-//    let serverNames: [String]?
-//    let username: String?
-//    let password: String?
-//    let enterprisePhase2Auth: Int
-//    let fqdn: String?
-//}
+struct WifiConfigData: Codable {
+    let ssids: [String]
+    let oids: [String]
+    var clientCertificate: ClientCertificate?
+    let anonymousIdentity: String?
+    // Working with certificate as base64 encoded strings, to be parsed by the platform into platform specific type.
+    let caCertificates: [String]?
+    let enterpriseEAP: Int
+    let serverNames: [String]?
+    let username: String?
+    let password: String?
+    let enterprisePhase2Auth: Int
+    let fqdn: String?
+}
 
 struct ClientCertificate: Codable {
     let passphrase: String
