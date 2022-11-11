@@ -10,8 +10,9 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* GeteduroamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* GeteduroamApp.swift */; };
-		7555FF83242A565900829871 /* SelectInstitutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* SelectInstitutionView.swift */; };
 		87117E79C15D89236DFE61FE /* Pods_geteduroam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C77F52042913F0430056530E /* Pods_geteduroam.framework */; };
+		C759A6DA291E7499009B30C1 /* WifiEapConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C759A6D9291E7498009B30C1 /* WifiEapConfigurator.swift */; };
+		C7885F7229156EC600C59B76 /* AppAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C7885F7129156EC600C59B76 /* AppAuth */; };
 		C7A1B07429140892002A40EF /* Fuzi in Frameworks */ = {isa = PBXBuildFile; productRef = C7A1B07329140892002A40EF /* Fuzi */; };
 		C7A1B07729140F15002A40EF /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = C7A1B07629140F15002A40EF /* Algorithms */; };
 		C7A1B07929141D3C002A40EF /* InstitutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A1B07829141D3C002A40EF /* InstitutionView.swift */; };
@@ -33,7 +34,12 @@
 		7555FF82242A565900829871 /* SelectInstitutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectInstitutionView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C21C8099B7E080F26EA2BAD1 /* Pods-geteduroam.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-geteduroam.release.xcconfig"; path = "Target Support Files/Pods-geteduroam/Pods-geteduroam.release.xcconfig"; sourceTree = "<group>"; };
+		C759A6D9291E7498009B30C1 /* WifiEapConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WifiEapConfigurator.swift; sourceTree = "<group>"; };
+		C759A6DB291E800B009B30C1 /* geteduroam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = geteduroam.entitlements; sourceTree = "<group>"; };
 		C77F52042913F0430056530E /* Pods_geteduroam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_geteduroam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7885F73291571A800C59B76 /* ServerAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerAuthService.swift; sourceTree = "<group>"; };
+		C7885F75291572D700C59B76 /* OAuthExternalUserAgent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OAuthExternalUserAgent.swift; sourceTree = "<group>"; };
+		C7885F77291573B000C59B76 /* AuthState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthState.swift; sourceTree = "<group>"; };
 		C7A1B07829141D3C002A40EF /* InstitutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstitutionView.swift; sourceTree = "<group>"; };
 		C7A1B07A29141E79002A40EF /* InstitutionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstitutionRowView.swift; sourceTree = "<group>"; };
 		C7A1B07C29142051002A40EF /* URLRoutingTrial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRoutingTrial.swift; sourceTree = "<group>"; };
@@ -49,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7885F7229156EC600C59B76 /* AppAuth in Frameworks */,
 				C7A1B08029142098002A40EF /* URLRouting in Frameworks */,
 				C7A1B07729140F15002A40EF /* Algorithms in Frameworks */,
 				C7A1B07429140892002A40EF /* Fuzi in Frameworks */,
@@ -89,6 +96,7 @@
 		7555FF7D242A565900829871 /* geteduroam */ = {
 			isa = PBXGroup;
 			children = (
+				C759A6DB291E800B009B30C1 /* geteduroam.entitlements */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				CD69EDAB28800FAC00AE7F1C /* CombineAdapters.swift */,
 				2152FB032600AC8F00CF470E /* GeteduroamApp.swift */,
@@ -100,6 +108,10 @@
 				C7A1B07A29141E79002A40EF /* InstitutionRowView.swift */,
 				C7C17083291403B700D39FE6 /* XMLTrial.swift */,
 				C7A1B07C29142051002A40EF /* URLRoutingTrial.swift */,
+				C7885F73291571A800C59B76 /* ServerAuthService.swift */,
+				C7885F75291572D700C59B76 /* OAuthExternalUserAgent.swift */,
+				C7885F77291573B000C59B76 /* AuthState.swift */,
+				C759A6D9291E7498009B30C1 /* WifiEapConfigurator.swift */,
 			);
 			path = geteduroam;
 			sourceTree = "<group>";
@@ -145,6 +157,7 @@
 				C7A1B07329140892002A40EF /* Fuzi */,
 				C7A1B07629140F15002A40EF /* Algorithms */,
 				C7A1B07F29142098002A40EF /* URLRouting */,
+				C7885F7129156EC600C59B76 /* AppAuth */,
 			);
 			productName = ios;
 			productReference = 7555FF7B242A565900829871 /* geteduroam.app */;
@@ -178,6 +191,7 @@
 				C7A1B07229140892002A40EF /* XCRemoteSwiftPackageReference "Fuzi" */,
 				C7A1B07529140F15002A40EF /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				C7A1B07E29142098002A40EF /* XCRemoteSwiftPackageReference "swift-url-routing" */,
+				C7885F7029156EC500C59B76 /* XCRemoteSwiftPackageReference "AppAuth-iOS" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -251,8 +265,8 @@
 				CD69EDAC28800FAC00AE7F1C /* CombineAdapters.swift in Sources */,
 				2152FB042600AC8F00CF470E /* GeteduroamApp.swift in Sources */,
 				C7A1B07B29141E79002A40EF /* InstitutionRowView.swift in Sources */,
+				C759A6DA291E7499009B30C1 /* WifiEapConfigurator.swift in Sources */,
 				C7C17084291403B700D39FE6 /* XMLTrial.swift in Sources */,
-				7555FF83242A565900829871 /* SelectInstitutionView.swift in Sources */,
 				C7A1B07929141D3C002A40EF /* InstitutionView.swift in Sources */,
 				C7A1B07D29142051002A40EF /* URLRoutingTrial.swift in Sources */,
 			);
@@ -382,6 +396,7 @@
 			baseConfigurationReference = 4054F8E66E4113C4EC005DCF /* Pods-geteduroam.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = geteduroam/geteduroam.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"geteduroam/Preview Content\"";
@@ -409,6 +424,7 @@
 			baseConfigurationReference = C21C8099B7E080F26EA2BAD1 /* Pods-geteduroam.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = geteduroam/geteduroam.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"geteduroam/Preview Content\"";
@@ -455,6 +471,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C7885F7029156EC500C59B76 /* XCRemoteSwiftPackageReference "AppAuth-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/openid/AppAuth-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		C7A1B07229140892002A40EF /* XCRemoteSwiftPackageReference "Fuzi" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cezheng/Fuzi";
@@ -482,6 +506,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		C7885F7129156EC600C59B76 /* AppAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7885F7029156EC500C59B76 /* XCRemoteSwiftPackageReference "AppAuth-iOS" */;
+			productName = AppAuth;
+		};
 		C7A1B07329140892002A40EF /* Fuzi */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C7A1B07229140892002A40EF /* XCRemoteSwiftPackageReference "Fuzi" */;

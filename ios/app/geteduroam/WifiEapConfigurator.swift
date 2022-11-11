@@ -13,7 +13,7 @@ public class WifiEapConfigurator {
 	@param innerAuthMethod Integer representing an auth method
 	@result NEHotspotEAPSettings.TTLSInnerAuthenticationType representing the given auth method
 	*/
-	func getInnerAuthMethod(innerAuthMethod: Int?) -> NEHotspotEAPSettings.TTLSInnerAuthenticationType? {
+	class func getInnerAuthMethod(innerAuthMethod: Int?) -> NEHotspotEAPSettings.TTLSInnerAuthenticationType? {
 		switch innerAuthMethod {
 		case -1: // Non-EAP PAP
 			return .eapttlsInnerAuthenticationPAP
@@ -38,7 +38,7 @@ public class WifiEapConfigurator {
 	@param outerEapType Integer representing an EAP type
 	@result NEHotspotEAPSettings.EAPType representing the given EAP type
 	*/
-	func getOuterEapType(outerEapType: Int) -> NEHotspotEAPSettings.EAPType? {
+    class func getOuterEapType(outerEapType: Int) -> NEHotspotEAPSettings.EAPType? {
 		switch outerEapType {
 		case 13:
 			return NEHotspotEAPSettings.EAPType.EAPTLS
@@ -83,7 +83,23 @@ public class WifiEapConfigurator {
 	*/
     
     public struct AccessPoint {
-        let id: String
+        public init(id: String, domain: String, ssids: [String], oids: [String], outerIdentity: String, serverNames: [String], outerEapTypes: [NEHotspotEAPSettings.EAPType], innerAuthType: NEHotspotEAPSettings.TTLSInnerAuthenticationType? = nil, clientCertificate: String? = nil, passphrase: String? = nil, username: String? = nil, password: String? = nil, caCertificates: [String]) {
+            self.id = id
+            self.domain = domain
+            self.ssids = ssids
+            self.oids = oids
+            self.outerIdentity = outerIdentity
+            self.serverNames = serverNames
+            self.outerEapTypes = outerEapTypes
+            self.innerAuthType = innerAuthType
+            self.clientCertificate = clientCertificate
+            self.passphrase = passphrase
+            self.username = username
+            self.password = password
+            self.caCertificates = caCertificates
+        }
+        
+        private let id: String
         let domain: String
         let ssids: [String]
         let oids: [String]
@@ -670,4 +686,37 @@ public class WifiEapConfigurator {
 extension Error {
 	var code: Int { return (self as NSError).code }
 	var domain: String { return (self as NSError).domain }
+}
+
+
+public class SSID {
+    class func fetchNetworkInfo() -> [NetworkInfo]? {
+        if let interfaces: NSArray = CNCopySupportedInterfaces() {
+            var networkInfos = [NetworkInfo]()
+            for interface in interfaces {
+                let interfaceName = interface as! String
+                var networkInfo = NetworkInfo(
+                    interface: interfaceName,
+                    success: false,
+                    ssid: nil,
+                    bssid: nil
+                )
+                if let dict = CNCopyCurrentNetworkInfo(interfaceName as CFString) as NSDictionary? {
+                    networkInfo.success = true
+                    networkInfo.ssid = dict[kCNNetworkInfoKeySSID as String] as? String
+                    networkInfo.bssid = dict[kCNNetworkInfoKeyBSSID as String] as? String
+                }
+                networkInfos.append(networkInfo)
+            }
+            return networkInfos
+        }
+        return nil
+    }
+}
+
+struct NetworkInfo {
+    var interface: String
+    var success: Bool = false
+    var ssid: String?
+    var bssid: String?
 }
