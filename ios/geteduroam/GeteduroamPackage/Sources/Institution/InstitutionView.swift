@@ -1,3 +1,4 @@
+import DiscoveryClient
 import SwiftUI
 
 struct InstitutionView: View {

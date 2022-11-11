@@ -1,6 +1,6 @@
+import ComposableArchitecture
+import Main
 import SwiftUI
-import URLRouting
-import AppAuth
 
 @main
 struct GeteduroamApp: App {
@@ -11,12 +11,14 @@ struct GeteduroamApp: App {
     @NSApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate
     #endif
     
+    let store: StoreOf<Main> = .init(initialState: .init(), reducer: Main())
+    
 	var body: some Scene {
 		WindowGroup {
-			Text("Placeholder")
-                .task {
+            MainView(store: store)
+ /*               .task {
                     do {
-                        let apiClient = URLRoutingClient.live(router: router.baseURL("https://discovery.eduroam.app/v1/"))
+                        let apiClient = URLRoutingClient.live(router: discoveryRouter.baseURL("https://discovery.eduroam.app/v1/"))
                         
                         let institutions = try await apiClient.decodedResponse(for: .discover, as: InstitutionsResponse.self).value.instances
                         
@@ -78,86 +80,7 @@ struct GeteduroamApp: App {
                         print("Found \(error)")
                     }
                 }
+  */
 		}
 	}
 }
-
-#if os(iOS)
-enum StartAuthError: Error {
-    case noWindow
-    case noRootViewController
-    case unknownError
-}
-
-class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
-    private var currentAuthorizationFlow: OIDExternalUserAgentSession?
-  
-    func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
-        guard let window = UIApplication.shared.windows.first else {
-            throw StartAuthError.noWindow
-        }
-        guard let presenter = window.rootViewController else {
-            throw StartAuthError.noRootViewController
-        }
-        return try await withCheckedThrowingContinuation { continuation in
-            self.currentAuthorizationFlow = OIDAuthState.authState(byPresenting: request, presenting: presenter) { authState, error in
-                if let authState {
-                    continuation.resume(returning: authState)
-                } else if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(throwing: StartAuthError.unknownError)
-                }
-            }
-        }
-    }
-
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        // Sends the URL to the current authorization flow (if any) which will process it if it relates to an authorization response.
-        if let currentAuthorizationFlow, currentAuthorizationFlow.resumeExternalUserAgentFlow(with: url) {
-            self.currentAuthorizationFlow = nil
-            return true
-        }
-        
-        return false
-    }
-}
-#elseif os(macOS)
-class GeteduroamAppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
-
-    func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
-        let redirectHTTPHandler = OIDRedirectHTTPHandler(successURL: request.redirectURL)
-        redirectHTTPHandler.startHTTPListener(nil) // TODO handle error!
-
-        let window = await NSApplication.shared.mainWindow
-        return try await withCheckedThrowingContinuation { continuation in
-            redirectHTTPHandler.currentAuthorizationFlow =   OIDAuthState.authState(byPresenting: request, presenting: window!) { authState, error in
-                if let authState {
-                    continuation.resume(returning: authState)
-                } else if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(throwing: NSError(domain: "Huh", code: 1))
-                }
-            }
-        }
-    }
-}
-#endif
-
-extension OIDAuthState {
-    
-    func tokens() async throws -> (accessToken: String, idToken: String?) {
-        try await withCheckedThrowingContinuation { continuation in
-            performAction() { accessToken, idToken, error in
-                guard let accessToken else {
-                    continuation.resume(throwing: error ?? NSError(domain: "Huh", code: 2))
-                    return
-                }
-                continuation.resume(returning: (accessToken, idToken))
-            }
-        }
-    }
-    
-}
-
