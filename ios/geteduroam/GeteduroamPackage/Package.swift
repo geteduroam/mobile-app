@@ -53,7 +53,7 @@ let package = Package(
             name: "EAPConfig",
             dependencies: [
                 .product(name: "Algorithms", package: "swift-algorithms"),
-                .product(name: "Fuzi", package: "Fuzig")
+                .product(name: "Fuzi", package: "Fuzi")
             ]),
         .target(
             name: "Institution",
