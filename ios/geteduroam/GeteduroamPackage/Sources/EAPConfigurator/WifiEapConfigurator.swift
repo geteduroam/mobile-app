@@ -3,10 +3,12 @@ import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import CoreLocation
 import UserNotifications
+import Models
 
 #if os(iOS)
 public class WifiEapConfigurator {
-
+    public init() { }
+    
 	/**
 	@function getInnerAuthMethod
 	@abstract Convert inner auth method integer to NEHotspotEAPSettings.TTLSInnerAuthenticationType enum
@@ -76,44 +78,6 @@ public class WifiEapConfigurator {
 		assert(result == noErr || result == errSecItemNotFound, "Error deleting keychain data (\(result))")
 	}
 
-	/**
-	@function configureAP
-	@abstract Capacitor call to configure networks
-	@param call Capacitor call object
-	*/
-    
-    public struct AccessPoint {
-        public init(id: String, domain: String, ssids: [String], oids: [String], outerIdentity: String, serverNames: [String], outerEapTypes: [NEHotspotEAPSettings.EAPType], innerAuthType: NEHotspotEAPSettings.TTLSInnerAuthenticationType? = nil, clientCertificate: String? = nil, passphrase: String? = nil, username: String? = nil, password: String? = nil, caCertificates: [String]) {
-            self.id = id
-            self.domain = domain
-            self.ssids = ssids
-            self.oids = oids
-            self.outerIdentity = outerIdentity
-            self.serverNames = serverNames
-            self.outerEapTypes = outerEapTypes
-            self.innerAuthType = innerAuthType
-            self.clientCertificate = clientCertificate
-            self.passphrase = passphrase
-            self.username = username
-            self.password = password
-            self.caCertificates = caCertificates
-        }
-        
-        private let id: String
-        let domain: String
-        let ssids: [String]
-        let oids: [String]
-        let outerIdentity: String
-        let serverNames: [String]
-        let outerEapTypes: [NEHotspotEAPSettings.EAPType]
-        let innerAuthType: NEHotspotEAPSettings.TTLSInnerAuthenticationType?
-        let clientCertificate: String?
-        let passphrase: String?
-        let username: String?
-        let password: String?
-        let caCertificates: [String]
-    }
-    
     public func configureAP(_ accessPoint: AccessPoint, completionHandler: @escaping (_ success: Bool, _ messages: String?) -> Void) {
 		// At this point, we're not certain this configuration can work,
 		// but we can't do this any step later, because createNetworkConfigurations will import things to the keychain.
@@ -130,6 +94,18 @@ public class WifiEapConfigurator {
 		}
 	}
 
+    public func configure(accessPoint: AccessPoint) async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in
+            configureAP(accessPoint) { success, messages in
+                guard success else {
+                    continuation.resume(throwing: NSError(domain: "WifiEapConfigurator", code: 2))
+                    return
+                }
+                continuation.resume(returning: success)
+            }
+        }
+    }
+    
 	/**
 	@function createNetworkConfigurations
 	@abstract Create network configuration objects
@@ -159,10 +135,10 @@ public class WifiEapConfigurator {
 			return []
 		}
 		
-        if accessPoint.outerIdentity != "" {
+        if let outerIdentity = accessPoint.outerIdentity, outerIdentity != "" {
 			// only works with EAP-TTLS, EAP-PEAP, and EAP-FAST
 			// https://developer.apple.com/documentation/networkextension/nehotspoteapsettings/2866691-outeridentity
-            eapSettings.outerIdentity = accessPoint.outerIdentity
+            eapSettings.outerIdentity = outerIdentity
 		}
 
         if !accessPoint.serverNames.isEmpty {
@@ -321,8 +297,10 @@ public class WifiEapConfigurator {
 	@result Hotspot EAP settings object
 	*/
     func buildSettings(accessPoint: AccessPoint) -> NEHotspotEAPSettings? {
-        for outerEapType in accessPoint.outerEapTypes {
-			switch(outerEapType) {
+        let outerEapTypes = accessPoint.outerEapTypes.compactMap(Self.getOuterEapType(outerEapType:))
+        let innerAuthType = Self.getInnerAuthMethod(innerAuthMethod: accessPoint.innerAuthType)
+        for outerEapType in outerEapTypes {
+            switch outerEapType {
 			case NEHotspotEAPSettings.EAPType.EAPTLS:
                 if accessPoint.clientCertificate != nil && accessPoint.passphrase != nil {
 					return buildSettingsWithClientCertificate(
@@ -335,18 +313,20 @@ public class WifiEapConfigurator {
 			case NEHotspotEAPSettings.EAPType.EAPTTLS:
 				fallthrough
 			case NEHotspotEAPSettings.EAPType.EAPFAST:
-				fallthrough
-			case NEHotspotEAPSettings.EAPType.EAPPEAP:
-                guard let username = accessPoint.username, let password = accessPoint.password else { break }
+                fallthrough
+            case NEHotspotEAPSettings.EAPType.EAPPEAP:
+                guard let username = accessPoint.username, let password = accessPoint.password else {
+                    NSLog("☠️ buildSettings: Failed precondition for EAPPEAP/EAPFAST")
+                    break
+                }
                 
-					return buildSettingsWithUsernamePassword(
-                        outerEapTypes: accessPoint.outerEapTypes,
-                        innerAuthType: accessPoint.innerAuthType,
-						username: username,
-						password: password
-					)
-				NSLog("☠️ buildSettings: Failed precondition for EAPPEAP/EAPFAST")
-				break
+                return buildSettingsWithUsernamePassword(
+                    outerEapTypes: outerEapTypes,
+                    innerAuthType: innerAuthType,
+                    username: username,
+                    password: password
+                )
+                
 			@unknown default:
 				NSLog("☠️ buildSettings: Unknown EAPType")
 				break

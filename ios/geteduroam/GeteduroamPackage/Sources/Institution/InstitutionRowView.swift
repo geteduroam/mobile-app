@@ -1,10 +1,14 @@
-import DiscoveryClient
+import Models
 import SwiftUI
 
-struct InstitutionRowView: View {
-    var institution: Institution
+public struct InstitutionRowView: View {
+    public init(institution: Institution) {
+        self.institution = institution
+    }
     
-    var body: some View {
+    let institution: Institution
+    
+    public var body: some View {
         VStack(alignment: .leading) {
             Text(institution.name)
             Text(institution.country)

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Institution: Codable {
+public struct Institution: Codable, Identifiable, Equatable {
     public init(id: String, name: String, country: String, cat_idp: Int, profiles: [Profile], geo: [Coordinate]) {
         self.id = id
         self.name = name

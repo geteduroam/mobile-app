@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Profile: Codable {
+public struct Profile: Codable, Equatable, Identifiable {
     public init(id: String, name: String, `default`: Bool? = nil, eapconfig_endpoint: URL? = nil, oauth: Bool? = nil, authorization_endpoint: URL? = nil, token_endpoint: URL? = nil) {
         self.id = id
         self.name = name

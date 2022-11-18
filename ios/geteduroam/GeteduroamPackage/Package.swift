@@ -12,6 +12,9 @@ let package = Package(
             name: "Main",
             targets: ["Main"]),
         .library(
+            name: "AuthClient",
+            targets: ["AuthClient"]),
+        .library(
             name: "DiscoveryClient",
             targets: ["DiscoveryClient"]),
         .library(
@@ -21,8 +24,11 @@ let package = Package(
             name: "Institution",
             targets: ["Institution"]),
         .library(
-            name: "WiFiEAPConfigurator",
-            targets: ["WiFiEAPConfigurator"]),
+            name: "Models",
+            targets: ["Models"]),
+        .library(
+            name: "EAPConfigurator",
+            targets: ["EAPConfigurator"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
@@ -37,7 +43,9 @@ let package = Package(
         .target(
             name: "Main",
             dependencies: [
+                "AuthClient",
                 "DiscoveryClient",
+                "Institution",
                 .product(name: "AppAuth", package: "AppAuth-iOS"),
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
@@ -45,23 +53,41 @@ let package = Package(
             name: "MainTests",
             dependencies: ["Main"]),
         .target(
+            name: "AuthClient",
+            dependencies: [
+                .product(name: "AppAuth", package: "AppAuth-iOS"),
+                .product(name: "Dependencies", package: "swift-composable-architecture"),
+            ]),
+        .target(
             name: "DiscoveryClient",
             dependencies: [
+                "Models",
+                .product(name: "Dependencies", package: "swift-composable-architecture"),
                 .product(name: "URLRouting", package: "swift-url-routing")
             ]),
         .target(
             name: "EAPConfig",
             dependencies: [
+                "Models",
                 .product(name: "Algorithms", package: "swift-algorithms"),
                 .product(name: "Fuzi", package: "Fuzi")
             ]),
         .target(
             name: "Institution",
             dependencies: [
-                "DiscoveryClient"
+                "AuthClient",
+                "EAPConfig",
+                "EAPConfigurator",
+                "Models",
+                .product(name: "AppAuth", package: "AppAuth-iOS"),
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
         .target(
-            name: "WiFiEAPConfigurator",
-            dependencies: []),
+            name: "Models"),
+        .target(
+            name: "EAPConfigurator",
+            dependencies: [
+                "Models",
+            ]),
     ]
 )

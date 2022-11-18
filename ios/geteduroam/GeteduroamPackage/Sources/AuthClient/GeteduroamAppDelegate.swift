@@ -8,10 +8,10 @@ public enum StartAuthError: Error {
     case unknownError
 }
 
-public class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject {
+public class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableObject, AuthClient {
     private var currentAuthorizationFlow: OIDExternalUserAgentSession?
   
-    func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
+    public func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
         guard let window = UIApplication.shared.windows.first else {
             throw StartAuthError.noWindow
         }
@@ -42,9 +42,9 @@ public class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableO
     }
 }
 #elseif os(macOS)
-public class GeteduroamAppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+public class GeteduroamAppDelegate: NSObject, NSApplicationDelegate, ObservableObject, AuthClient {
 
-    func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
+    public func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
         let redirectHTTPHandler = OIDRedirectHTTPHandler(successURL: request.redirectURL)
         redirectHTTPHandler.startHTTPListener(nil) // TODO handle error!
 

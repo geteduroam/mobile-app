@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 import AppAuth
+import Institution
+import Models
 
 public struct MainView: View {
     public init(store: StoreOf<Main>) {
@@ -12,28 +14,66 @@ public struct MainView: View {
     public var body: some View {
         WithViewStore(store) { viewStore in
             NavigationView {
-                List {
-//                    ForEach(observableModel.institutions, id: \.self) { item in
-//                        NavigationLink(destination: InstitutionView(institution: item)) {
-//                            InstitutionRowView(institution: item)
-//                        }
-//                    }
+                switch viewStore.loadingState {
+                case .initial:
+                    EmptyView()
+                    
+                case .isLoading:
+                    ProgressView()
+                    
+                case .success:
+                    if #available(iOS 15.0, *) {
+                        List {
+                            ForEach(viewStore.searchResults) { institution in
+                                Button {
+                                    viewStore.send(.select(institution))
+                                } label: {
+                                    InstitutionRowView(institution: institution)
+                                }
+                            }
+                        }
+                        .listStyle(.plain)
+                        .navigationTitle("Eduroam")
+                        .searchable(text: viewStore.binding(get: \.query, send: Main.Action.search), placement: .navigationBarDrawer(displayMode: .always), prompt: "Kies een organisatie")
+                    } else {
+                        // Fallback on earlier versions
+                    }
+                    
+                case .failure:
+                    VStack {
+                        Image(systemName: "exclamationmark.triangle")
+                        Text("Failed to load institutions")
+                        Button {
+                            viewStore.send(.tryAgainTapped)
+                        } label: {
+                            Text("Try Again")
+                        }
+                    }
                 }
-                .listStyle(.plain)
-                .navigationTitle("Eduroam")
-//                .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Kies een organisatie")
-//                .onChange(of: query) { observableModel.search($0) }
+               
             }
 //            .navigationViewStyle(.stack)
             .onAppear {
                 viewStore.send(.onAppear)
             }
+            .sheet(isPresented: viewStore.binding(get: \.isSheetVisible, send: Main.Action.dismissSheet)) {
+                IfLetStore(store.scope(state: \.selectedInstitutionState, action: Main.Action.institution)) { store in
+                    NavigationView {
+                        InstitutionView(store: store)
+                    }
+                }
+//                .interactiveDismissDisabled()
+            }
+            .alert(
+              self.store.scope(state: \.alert),
+              dismiss: .dismissErrorTapped
+            )
         }
     }
 }
 
-//struct MainView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        MainView(store: <#T##StoreOf<Main>#>)
-//    }
-//}
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainView(store: .init(initialState: .init(), reducer: Main()))
+    }
+}

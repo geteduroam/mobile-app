@@ -1,12 +1,14 @@
 import Algorithms
 import Foundation
 import Fuzi
+import Models
 
-class XMLTrial: NSObject {
+public enum EAPConfigParser {
     
-    func parse(xmlData: Data) throws -> WifiEapConfigurator.AccessPoint {
+    public static func parse(xmlData: Data) throws -> AccessPoint {
         let document = try XMLDocument(data: xmlData)
         
+        // Definition: https://github.com/GEANT/CAT/blob/master/devices/xml/eap-metadata.xsd
         let xmlRootPath = "/EAPIdentityProviderList/EAPIdentityProvider"
         let idPath = "/EAPIdentityProviderList/EAPIdentityProvider/@ID"
         let ieee80211Path = xmlRootPath + "/CredentialApplicability/IEEE80211"
@@ -18,7 +20,6 @@ class XMLTrial: NSObject {
         let outerIdentityPath = clientSideCredentialPath + "/OuterIdentity/text()"
         let clientCertificatePassphrasePath = clientSideCredentialPath + "/Passphrase/text()"
         let clientCertificateDataPath = clientSideCredentialPath + "/ClientCertificate/text()"
-//        let anonymousIdentityPath = clientSideCredentialPath + "/OuterIdentity/text()"
         let eapMethodsPath = authenticationMethodPath + "/EAPMethod/Type/text()"
         let caCertificatesPath = serverSideCredentialPath + "/CA/text()"
         let serverNamesPath = serverSideCredentialPath + "/ServerID/text()"
@@ -37,50 +38,31 @@ class XMLTrial: NSObject {
         } else {
             clientCertificate = nil
         }
-//        let anonymousIdentity = document.xpath(anonymousIdentityPath).compactMap { $0.stringValue }.first
         let eapMethods = document.xpath(eapMethodsPath).compactMap { Int($0.stringValue) }
         let caCertificates = document.xpath(caCertificatesPath).compactMap { $0.stringValue }.uniqued { $0 }
         let enterpriseEAP = 0
         let serverNames = document.xpath(serverNamesPath).compactMap { $0.stringValue }.uniqued { $0 }
-        let outerEapTypes = eapMethods.compactMap(WifiEapConfigurator.getOuterEapType(outerEapType:))
+        let outerEapTypes = eapMethods //.compactMap(WifiEapConfigurator.getOuterEapType(outerEapType:))
         let username = document.xpath(usernamePath).compactMap { $0.stringValue }.first
         let password = document.xpath(passwordPath).compactMap { $0.stringValue }.first
         let enterprisePhase2Auth = 0
-        let fqdn: String? = nil
         
-        return WifiEapConfigurator.AccessPoint(
+        return AccessPoint(
             id: id!,
             domain: id!,
             ssids: ssids,
             oids: oids,
-            outerIdentity: outerIdentity!,
+            outerIdentity: outerIdentity,
             serverNames: serverNames,
             outerEapTypes: outerEapTypes,
-            innerAuthType: WifiEapConfigurator.getInnerAuthMethod(innerAuthMethod: 0),
+            innerAuthType: 0,
             clientCertificate: clientCertificate?.pkcs12StoreB64,
             passphrase: clientCertificate?.passphrase,
             username: username,
             password: password,
             caCertificates: caCertificates)
-
-//        return WifiConfigData(ssids: ssids, oids: oids, clientCertificate: clientCertificate, anonymousIdentity: outerIdentity, caCertificates: caCertificates, enterpriseEAP: enterpriseEAP, serverNames: serverNames, username: username, password: password, enterprisePhase2Auth: enterprisePhase2Auth, fqdn: fqdn)
     }
     
-}
-
-struct WifiConfigData: Codable {
-    let ssids: [String]
-    let oids: [String]
-    var clientCertificate: ClientCertificate?
-    let anonymousIdentity: String?
-    // Working with certificate as base64 encoded strings, to be parsed by the platform into platform specific type.
-    let caCertificates: [String]?
-    let enterpriseEAP: Int
-    let serverNames: [String]?
-    let username: String?
-    let password: String?
-    let enterprisePhase2Auth: Int
-    let fqdn: String?
 }
 
 struct ClientCertificate: Codable {

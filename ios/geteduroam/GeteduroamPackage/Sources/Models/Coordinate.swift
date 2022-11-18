@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Coordinate: Codable {
+public struct Coordinate: Codable, Equatable {
     public init(lat: Double, lon: Double) {
         self.lat = lat
         self.lon = lon
