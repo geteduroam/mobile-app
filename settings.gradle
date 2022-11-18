@@ -2,4 +2,3 @@ rootProject.name = 'geteduroam'
 
 include 'shared:core'
 include 'android:app'
-include 'android:wifi-eap-configurator'

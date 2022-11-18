@@ -65,9 +65,9 @@ class SelectProfileViewModel(
                     log.d("Selected profile requires *no* authentication")
                     try {
                         val eapData = institutionRepository.getEapData(
-                            institutionId!!,
-                            selectedProfile.id,
-                            selectedProfile.eapconfig_endpoint.orEmpty()
+                            id = institutionId!!,
+                            profileId = selectedProfile.id,
+                            eapconfigEndpoint = selectedProfile.eapconfig_endpoint.orEmpty()
                         )
                         log.d("Downloaded EAP file for profile with no authentication")
                         configData.emit(configParser.parse(eapData))

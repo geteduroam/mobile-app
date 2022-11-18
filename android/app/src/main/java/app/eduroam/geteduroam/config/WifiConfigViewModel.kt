@@ -52,20 +52,16 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
     }
 
     private fun handleAndroid11AndOver() {
-        val suggestions = wifiConfigData.buildSSIDSuggestions()
-        val passpointSuggestions = wifiConfigData.buildPasspointSuggestion()
-        val allSuggestions = if (passpointSuggestions != null) {
-            suggestions + passpointSuggestions
-        } else {
-            suggestions
-        }
-        val intent = createSuggestionsIntent(suggestions = allSuggestions)
+        val suggestions = wifiConfigData.buildAllNetworkSuggestions()
+        val intent = createSuggestionsIntent(suggestions = suggestions)
         intentWithSuggestions.value = intent
     }
 
+    /**
+     * Requires CHANGE_WIFI_STATE permission
+     * */
     fun handleAndroid10WifiConfig(context: Context) {
-        val suggestions = wifiConfigData.buildSSIDSuggestions()
-        val passpointConfig = wifiConfigData.buildPasspointConfig()
+        val suggestions = wifiConfigData.buildAllNetworkSuggestions()
         val wifiManager: WifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -86,16 +82,6 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
             Log.e("WifiConfigViewModel", "Failed to add network suggestion", e)
         }
 
-        if (passpointConfig != null) {
-            try {
-                wifiManager.addOrUpdatePasspointConfiguration(passpointConfig)
-            } catch (e: Exception) {
-                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
-                // Can throw when configuration is wrong or device does not support Passpoint
-                Log.e("WifiConfigViewModel", "Failed to add Passpoint suggestion", e)
-            }
-
-        }
         processing.value = false
     }
 
@@ -130,8 +116,7 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
             } catch (e: IllegalArgumentException) {
                 // Can throw when configuration is wrong or device does not support Passpoint
                 // while we did encounter a few devices without Passpoint support.
-                progressMessage.value =
-                    "Failed to add Passpoint. Exception: ${e.message}"
+                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
                 Log.e("WifiConfigViewModel", "Failed to Passpoint", e)
 
             }
