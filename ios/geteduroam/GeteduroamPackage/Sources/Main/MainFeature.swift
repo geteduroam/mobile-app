@@ -1,8 +1,8 @@
 import ComposableArchitecture
+import Connect
 import DiscoveryClient
-import Models
-import Institution
 import Foundation
+import Models
 
 public struct Main: ReducerProtocol {
     public init() { }
@@ -17,7 +17,7 @@ public struct Main: ReducerProtocol {
         var query: String
         var institutions: IdentifiedArrayOf<Institution>
         
-        var selectedInstitutionState: InstitutionSetup.State?
+        var selectedInstitutionState: Connect.State?
         
         var searchResults: IdentifiedArrayOf<Institution> {
             guard query.isEmpty == false else {
@@ -48,7 +48,7 @@ public struct Main: ReducerProtocol {
         case onAppear
         case search(String)
         case select(Institution)
-        case institution(InstitutionSetup.Action)
+        case institution(Connect.Action)
         case dismissSheet
         case tryAgainTapped
         case dismissErrorTapped
@@ -100,7 +100,7 @@ public struct Main: ReducerProtocol {
             }
         }
         .ifLet(\.selectedInstitutionState, action: /Action.institution) {
-            InstitutionSetup()
+            Connect()
         }
     }
 }

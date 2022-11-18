@@ -1,9 +1,9 @@
+import CoreLocation
 import Foundation
+import Models
 import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
-import CoreLocation
 import UserNotifications
-import Models
 
 #if os(iOS)
 public class WifiEapConfigurator {

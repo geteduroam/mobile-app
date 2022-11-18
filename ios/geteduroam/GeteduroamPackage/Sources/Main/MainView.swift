@@ -1,8 +1,7 @@
 import ComposableArchitecture
-import SwiftUI
-import AppAuth
-import Institution
+import Connect
 import Models
+import SwiftUI
 
 public struct MainView: View {
     public init(store: StoreOf<Main>) {
@@ -59,7 +58,7 @@ public struct MainView: View {
             .sheet(isPresented: viewStore.binding(get: \.isSheetVisible, send: Main.Action.dismissSheet)) {
                 IfLetStore(store.scope(state: \.selectedInstitutionState, action: Main.Action.institution)) { store in
                     NavigationView {
-                        InstitutionView(store: store)
+                        ConnectView(store: store)
                     }
                 }
 //                .interactiveDismissDisabled()

@@ -1,7 +1,7 @@
+import AuthClient
 import ComposableArchitecture
 import Main
 import SwiftUI
-import AuthClient
 
 @main
 struct GeteduroamApp: App {

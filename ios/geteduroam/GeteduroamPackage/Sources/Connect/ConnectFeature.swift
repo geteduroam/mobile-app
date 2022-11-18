@@ -1,13 +1,13 @@
-import ComposableArchitecture
-import Models
-import Foundation
 import AppAuth
 import AuthClient
-import SwiftUI
-import EAPConfig
+import ComposableArchitecture
+import EAPConfigParser
 import EAPConfigurator
+import Foundation
+import Models
+import SwiftUI
 
-public struct InstitutionSetup: ReducerProtocol {
+public struct Connect: ReducerProtocol {
     public init() { }
     
     public struct State: Equatable {
@@ -46,7 +46,7 @@ public struct InstitutionSetup: ReducerProtocol {
     }
     
     public enum Action: Equatable {
-        public static func == (lhs: InstitutionSetup.Action, rhs: InstitutionSetup.Action) -> Bool {
+        public static func == (lhs: Connect.Action, rhs: Connect.Action) -> Bool {
             switch (lhs, rhs) {
             case (.onAppear, .onAppear):
                 return true

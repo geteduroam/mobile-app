@@ -18,11 +18,11 @@ let package = Package(
             name: "DiscoveryClient",
             targets: ["DiscoveryClient"]),
         .library(
-            name: "EAPConfig",
-            targets: ["EAPConfig"]),
+            name: "EAPConfigParser",
+            targets: ["EAPConfigParser"]),
         .library(
-            name: "Institution",
-            targets: ["Institution"]),
+            name: "Connect",
+            targets: ["Connect"]),
         .library(
             name: "Models",
             targets: ["Models"]),
@@ -45,7 +45,7 @@ let package = Package(
             dependencies: [
                 "AuthClient",
                 "DiscoveryClient",
-                "Institution",
+                "Connect",
                 .product(name: "AppAuth", package: "AppAuth-iOS"),
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
@@ -66,17 +66,17 @@ let package = Package(
                 .product(name: "URLRouting", package: "swift-url-routing")
             ]),
         .target(
-            name: "EAPConfig",
+            name: "EAPConfigParser",
             dependencies: [
                 "Models",
                 .product(name: "Algorithms", package: "swift-algorithms"),
                 .product(name: "Fuzi", package: "Fuzi")
             ]),
         .target(
-            name: "Institution",
+            name: "Connect",
             dependencies: [
                 "AuthClient",
-                "EAPConfig",
+                "EAPConfigParser",
                 "EAPConfigurator",
                 "Models",
                 .product(name: "AppAuth", package: "AppAuth-iOS"),
