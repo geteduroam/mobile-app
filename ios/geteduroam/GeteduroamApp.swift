@@ -6,13 +6,13 @@ import SwiftUI
 @main
 struct GeteduroamApp: App {
     
-    #if os(iOS)
-    @UIApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate 
-    #elseif os(macOS)
-    @NSApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate
-    #endif
+    @UIApplicationDelegateAdaptor private var appDelegate: GeteduroamAppDelegate
     
-    let store: StoreOf<Main> = .init(initialState: .init(), reducer: Main())
+    var store: StoreOf<Main>!
+    
+    init() {
+        store = .init(initialState: .init(), reducer: Main(authClient: appDelegate))
+    }
     
 	var body: some Scene {
 		WindowGroup {

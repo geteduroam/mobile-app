@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "GeteduroamPackage",
-    platforms: [.macOS(.v11), .iOS(.v14)],
+    platforms: [.iOS(.v14), .macCatalyst(.v14)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
@@ -14,6 +14,9 @@ let package = Package(
         .library(
             name: "AuthClient",
             targets: ["AuthClient"]),
+        .library(
+            name: "Backport",
+            targets: ["Backport"]),
         .library(
             name: "DiscoveryClient",
             targets: ["DiscoveryClient"]),
@@ -36,6 +39,7 @@ let package = Package(
         .package(url: "https://github.com/openid/AppAuth-iOS.git", from: "1.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.0.0"),
+        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -44,9 +48,9 @@ let package = Package(
             name: "Main",
             dependencies: [
                 "AuthClient",
+                "Backport",
                 "DiscoveryClient",
                 "Connect",
-                .product(name: "AppAuth", package: "AppAuth-iOS"),
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
         .testTarget(
@@ -57,7 +61,11 @@ let package = Package(
             dependencies: [
                 .product(name: "AppAuth", package: "AppAuth-iOS"),
                 .product(name: "Dependencies", package: "swift-composable-architecture"),
+                .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
             ]),
+        .target(
+            name: "Backport",
+            dependencies: []),
         .target(
             name: "DiscoveryClient",
             dependencies: [

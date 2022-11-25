@@ -5,7 +5,6 @@ import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import UserNotifications
 
-#if os(iOS)
 public class WifiEapConfigurator {
     public init() { }
     
@@ -700,5 +699,3 @@ struct NetworkInfo {
     var ssid: String?
     var bssid: String?
 }
-
-#endif
