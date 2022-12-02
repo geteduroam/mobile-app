@@ -65,15 +65,16 @@ public class EAPConfigurator {
         
         let configurations = try createNetworkConfigurations(accessPoint: accessPoint)
         
-        for configuration in configurations {
-            // this line is needed in iOS 13 because there is a reported bug with iOS 13.0 until 13.1.0, where joinOnce was default true
-            // https://developer.apple.com/documentation/networkextension/nehotspotconfiguration/2887518-joinonce
-            configuration.joinOnce = false
-            // TODO: set to validity of client certificate
-            // config.lifeTimeInDays = NSNumber(integerLiteral: 825)
-            
-            try await NEHotspotConfigurationManager.shared.apply(configuration)
-        }
+        try await NEHotspotConfigurationManager.shared.apply(configurations.last!)
+//        for configuration in configurations {
+//            // this line is needed in iOS 13 because there is a reported bug with iOS 13.0 until 13.1.0, where joinOnce was default true
+//            // https://developer.apple.com/documentation/networkextension/nehotspotconfiguration/2887518-joinonce
+//            configuration.joinOnce = false
+//            // TODO: set to validity of client certificate
+//            // config.lifeTimeInDays = NSNumber(integerLiteral: 825)
+//
+//            try await NEHotspotConfigurationManager.shared.apply(configurations.last)
+//        }
     }
    
     ///  Create network configuration objects
