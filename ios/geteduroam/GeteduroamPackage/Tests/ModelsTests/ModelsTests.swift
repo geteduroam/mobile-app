@@ -5,6 +5,13 @@ import CustomDump
 
 final class ModelsTests: XCTestCase {
     
+    var decoder: XMLDecoder = {
+        let decoder = XMLDecoder()
+        decoder.shouldProcessNamespaces = true
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+    
     func testProviderInfo() throws {
         let sourceXML = """
         <ProviderInfo>
@@ -24,24 +31,21 @@ final class ModelsTests: XCTestCase {
           </Helpdesk>
         </ProviderInfo>
         """
-        
-        let decoder = XMLDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        
+
         let decoded = try decoder.decode(ProviderInfo.self, from: Data(sourceXML.utf8))
         
         XCTAssertNoDifference(decoded, ProviderInfo(
-            displayName: "Provider Display Name",
-            description: "Description",
+            displayName: .init(string: "Provider Display Name"),
+            description: .init(string: "Description"),
             providerLocations: [
                 .init(latitude: 45.987, longitude: -12.345),
                 .init(latitude: 66.333, longitude: -88.444)
             ],
             providerLogo: nil,
-            termsOfUse: "Terms Of Use",
+            termsOfUse: .init(string: "Terms Of Use"),
             helpdesk: .init(
                 emailAdress: nil,
-                webAddress: "https://www.example.com",
+                webAddress: .init(string: "https://www.example.com"),
                 phone: nil)))
     }
     
@@ -53,10 +57,6 @@ final class ModelsTests: XCTestCase {
         </ServerSideCredential>
         """
         
-        let decoder = XMLDecoder()
-        decoder.shouldProcessNamespaces = true
-        decoder.dateDecodingStrategy = .iso8601
-       
         let decoded = try decoder.decode(ServerCredential.self, from: Data(sourceXML.utf8))
         
         XCTAssertNoDifference(decoded, ServerCredential(
@@ -110,10 +110,6 @@ final class ModelsTests: XCTestCase {
         </EAPIdentityProviderList>
         """
         
-        let decoder = XMLDecoder()
-        decoder.shouldProcessNamespaces = true
-        decoder.dateDecodingStrategy = .iso8601
-       
         let decoded = try decoder.decode(EAPIdentityProviderList.self, from: Data(sourceXML.utf8))
         
         XCTAssertNoDifference(decoded, EAPIdentityProviderList(providers: [
@@ -144,7 +140,50 @@ final class ModelsTests: XCTestCase {
                         .init(ssid: "eduroam", consortiumOID: nil, minRSNProto: .CCMP)
                     ],
                     IEEE8023: []),
-                providerInfo: .init(displayName: "eduroam", description: nil, providerLocations: [], providerLogo: nil, termsOfUse: nil, helpdesk: nil))
+                providerInfo: .init(displayName: .init(string: "eduroam"), description: nil, providerLocations: [], providerLogo: nil, termsOfUse: nil, helpdesk: nil))
         ]))
+    }
+    
+    func testLocalizedProviderInfo() throws {
+        let sourceXML = """
+        <ProviderInfo>
+          <DisplayName lang="nl">Te tonen naam voor provider</DisplayName>
+          <DisplayName lang="en">Provider Display Name</DisplayName>
+          <DisplayName>Provider Display Name Fallback</DisplayName>
+          <Description>Description</Description>
+          <ProviderLocation>
+            <Longitude>-12.345</Longitude>
+            <Latitude>45.987</Latitude>
+          </ProviderLocation>
+          <ProviderLocation>
+            <Longitude>-88.444</Longitude>
+            <Latitude>66.333</Latitude>
+          </ProviderLocation>
+          <TermsOfUse>Terms Of Use</TermsOfUse>
+          <Helpdesk>
+            <WebAddress>https://www.example.com</WebAddress>
+          </Helpdesk>
+        </ProviderInfo>
+        """
+
+        let decoded = try decoder.decode(ProviderInfo.self, from: Data(sourceXML.utf8))
+        
+        XCTAssertNoDifference(decoded, ProviderInfo(
+            displayName: [
+                .init(language: "nl", value: "Te tonen naam voor provider"),
+                .init(language: "en", value: "Provider Display Name"),
+                .init(language: nil, value: "Provider Display Name Fallback")
+            ],
+            description: .init(string: "Description"),
+            providerLocations: [
+                .init(latitude: 45.987, longitude: -12.345),
+                .init(latitude: 66.333, longitude: -88.444)
+            ],
+            providerLogo: nil,
+            termsOfUse: .init(string: "Terms Of Use"),
+            helpdesk: .init(
+                emailAdress: nil,
+                webAddress: .init(string: "https://www.example.com"),
+                phone: nil)))
     }
 }

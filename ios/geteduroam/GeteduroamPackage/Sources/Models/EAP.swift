@@ -1,14 +1,6 @@
 import Foundation
 import XMLCoder
 
-#if canImport(UIKit)
-import UIKit
-typealias Image = UIImage
-#elseif canImport(AppKit)
-import AppKit
-typealias Image = NSImage
-#endif
-
 struct EAPMethod: Codable, Equatable {
     let type: Int
     
@@ -40,34 +32,21 @@ struct HelpdeskDetails: Codable, Equatable {
     }
 }
 
-//enum LocalizedString: Codable, Equatable {
-//    case simple(String)
-//    case localized([LocalizedStringEntry])
-//
-//    init(string: String) {
-//        self = .simple(string)
-//    }
-//
-//    init(localized: [LocalizedStringEntry]) {
-//        self = .localized(localized)
-//    }
-//
-////    enum CodingKeys: String, XMLChoiceCodingKey {
-////           case simp
-////           case string
-////       }
-//
-//}
+typealias LocalizedString = [LocalizedStringEntry]
 
-typealias LocalizedString = String // [LocalizedStringEntry]
+extension LocalizedString {
+    init(string: String) {
+        self = [.init(language: nil, value: string)]
+    }
+}
 
 struct LocalizedStringEntry: Codable, Equatable {
     let language: String?
     let value: String
     
     enum CodingKeys: String, CodingKey {
-        case language = "Language"
-        case value
+        case language = "lang"
+        case value = ""
     }
 }
 
@@ -85,6 +64,12 @@ struct LogoData: Codable, Equatable {
     let value: String
     let mime: String
     let encoding: String
+    
+    enum CodingKeys: String, CodingKey {
+        case value = ""
+        case mime
+        case encoding
+    }
 }
 
 struct ProviderInfo: Codable, Equatable {
