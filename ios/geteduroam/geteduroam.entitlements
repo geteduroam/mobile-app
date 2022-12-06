@@ -4,16 +4,7 @@
 <dict>
 	<key>com.apple.developer.networking.HotspotConfiguration</key>
 	<true/>
-	<key>com.apple.developer.networking.networkextension</key>
-	<array>
-		<string>app-proxy-provider</string>
-		<string>content-filter-provider</string>
-		<string>dns-proxy</string>
-		<string>dns-settings</string>
-	</array>
 	<key>com.apple.developer.networking.wifi-info</key>
-	<true/>
-	<key>com.apple.external-accessory.wireless-configuration</key>
 	<true/>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
