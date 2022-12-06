@@ -58,7 +58,9 @@ public struct Connect: ReducerProtocol {
                 return lhs == rhs
             case (.connect, .connect):
                 return true
-            case let (.connectResponse(lhs), .connectResponse(rhs)):
+            case (.connectResponse(.success), .connectResponse(.success)):
+                return true
+            case let (.connectResponse(.failure(lhs as NSError)), .connectResponse(.failure(rhs as NSError))):
                 return lhs == rhs
             default:
                 return false
@@ -68,7 +70,7 @@ public struct Connect: ReducerProtocol {
         case onAppear
         case select(Profile.ID)
         case connect
-        case connectResponse(TaskResult<Bool>)
+        case connectResponse(TaskResult<Void>)
         case dismissErrorTapped
         case startAgainTapped
     }
@@ -89,7 +91,7 @@ public struct Connect: ReducerProtocol {
             // Auto connect if there is only a single profile
             state.loadingState = .isLoading
             return .task {
-                await Action.connectResponse(TaskResult<Bool> { try await connect(profile: profile, authClient: authClient) })
+                await Action.connectResponse(TaskResult<Void> { try await connect(profile: profile, authClient: authClient) })
             }
             
         case let .select(profileId):
@@ -102,15 +104,11 @@ public struct Connect: ReducerProtocol {
             }
             state.loadingState = .isLoading
             return .task {
-                await Action.connectResponse(TaskResult<Bool> { try await connect(profile: profile, authClient: authClient) })
+                await Action.connectResponse(TaskResult<Void> { try await connect(profile: profile, authClient: authClient) })
             }
             
-        case .connectResponse(.success(true)):
+        case .connectResponse(.success):
             state.loadingState = .success
-            return .none
-            
-        case .connectResponse(.success(false)):
-            state.loadingState = .initial
             return .none
             
         case let .connectResponse(.failure(error)):
@@ -131,7 +129,7 @@ public struct Connect: ReducerProtocol {
         }
     }
     
-    func connect(profile: Profile, authClient: AuthClient) async throws -> Bool {
+    func connect(profile: Profile, authClient: AuthClient) async throws {
         let accessToken: String?
         if profile.oauth ?? false {
             guard let authorizationEndpoint = profile.authorization_endpoint else {
@@ -162,7 +160,6 @@ public struct Connect: ReducerProtocol {
         
         var urlRequest = URLRequest(url: profile.eapconfig_endpoint!)
         urlRequest.httpMethod = "POST"
-        // urlRequest.httpBody = "device=apple-mobileconfig".data(using: .utf8)
         if let accessToken {
             urlRequest.allHTTPHeaderFields = ["Authorization": "Bearer \(accessToken)"]
         }
@@ -170,16 +167,8 @@ public struct Connect: ReducerProtocol {
         let (eapConfigData, _) = try await URLSession.shared.data(for: urlRequest)
         
         let accessPoint = try EAPConfigParser.parse(xmlData: eapConfigData)
-
-        let configurator = WifiEapConfigurator()
         
-        let success = try await configurator.configure(accessPoint: accessPoint)
-        
-        guard success else {
-            throw InstitutionSetupError.accessPointConfigurationFailed
-        }
-        
-        return true
+        try await EAPConfigurator().configure(accessPoint: accessPoint)
     }
     
 }

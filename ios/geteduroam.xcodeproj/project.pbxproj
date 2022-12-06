@@ -10,6 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* GeteduroamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* GeteduroamApp.swift */; };
+		C7AF862A2931150A00BDEB69 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = C7AF86292931150A00BDEB69 /* Documentation.docc */; };
 		C7BE4BFA291EA9CB007AA0C2 /* Main in Frameworks */ = {isa = PBXBuildFile; productRef = C7BE4BF9291EA9CB007AA0C2 /* Main */; };
 /* End PBXBuildFile section */
 
@@ -21,6 +22,7 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C759A6DB291E800B009B30C1 /* geteduroam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = geteduroam.entitlements; sourceTree = "<group>"; };
 		C77F52042913F0430056530E /* Pods_geteduroam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_geteduroam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7AF86292931150A00BDEB69 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		C7C91BE02913CB54008F79FF /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		C7D61037291EA763007C9D6B /* GeteduroamPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = GeteduroamPackage; path = geteduroam/GeteduroamPackage; sourceTree = "<group>"; };
 		EB04B6747F28CF20C1B01502 /* Pods_geteduroam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_geteduroam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,6 +74,7 @@
 				2152FB032600AC8F00CF470E /* GeteduroamApp.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				C7AF86292931150A00BDEB69 /* Documentation.docc */,
 			);
 			path = geteduroam;
 			sourceTree = "<group>";
@@ -170,6 +173,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2152FB042600AC8F00CF470E /* GeteduroamApp.swift in Sources */,
+				C7AF862A2931150A00BDEB69 /* Documentation.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,7 +319,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
@@ -342,7 +346,7 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};
