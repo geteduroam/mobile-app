@@ -1,3 +1,4 @@
+import AuthClient
 import ComposableArchitecture
 import Connect
 import DiscoveryClient
@@ -5,7 +6,12 @@ import Foundation
 import Models
 
 public struct Main: ReducerProtocol {
-    public init() { }
+    public let authClient: AuthClient
+    @Dependency(\.discoveryClient) var discoveryClient
+    
+    public init(authClient: AuthClient = FailingAuthClient()) {
+        self.authClient = authClient
+    }
     
     public struct State: Equatable {
         public init(query: String = "", institutions: IdentifiedArrayOf<Institution> = .init(uniqueElements: []), loadingState: LoadingState = .initial) {
@@ -54,8 +60,6 @@ public struct Main: ReducerProtocol {
         case dismissErrorTapped
     }
     
-    @Dependency(\.discoveryClient) var discoveryClient
-    
     public var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
@@ -100,7 +104,7 @@ public struct Main: ReducerProtocol {
             }
         }
         .ifLet(\.selectedInstitutionState, action: /Action.institution) {
-            Connect()
+            Connect(authClient: authClient)
         }
     }
 }

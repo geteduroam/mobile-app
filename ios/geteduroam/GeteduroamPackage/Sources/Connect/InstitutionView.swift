@@ -9,9 +9,7 @@ public struct ConnectView: View {
     }
     
     let store: StoreOf<Connect>
-    
-    @EnvironmentObject private var appDelegate: GeteduroamAppDelegate
-    
+
     public var body: some View {
         WithViewStore(store) { viewStore in
             Group {
@@ -31,8 +29,7 @@ public struct ConnectView: View {
                             Text("Profiles")
                         }
                         Button {
-                            // Not very clean to insert the appDelegate this way, but couldn't find a way get proper access in another way
-                            viewStore.send(.connect(appDelegate))
+                            viewStore.send(.connect)
                         } label: {
                             Text("Connect")
                         }
@@ -54,7 +51,7 @@ public struct ConnectView: View {
                 }
             }
             .onAppear {
-                viewStore.send(.onAppear(appDelegate))
+                viewStore.send(.onAppear)
             }
             .navigationTitle(viewStore.institution.name)
             .navigationBarTitleDisplayMode(.inline)
@@ -66,7 +63,6 @@ public struct ConnectView: View {
     }
 }
 
-/* Disabled, crashes due to unavailable appDelegate/authClient
 struct ConnectView_Previews: PreviewProvider {
     static var previews: some View {
         ConnectView(store: .init(
@@ -89,4 +85,3 @@ struct ConnectView_Previews: PreviewProvider {
             reducer: Connect()))
     }
 }
-*/

@@ -1,3 +1,4 @@
+import Backport
 import ComposableArchitecture
 import Connect
 import Models
@@ -21,7 +22,6 @@ public struct MainView: View {
                     ProgressView()
                     
                 case .success:
-                    if #available(iOS 15.0, *) {
                         List {
                             ForEach(viewStore.searchResults) { institution in
                                 Button {
@@ -33,10 +33,8 @@ public struct MainView: View {
                         }
                         .listStyle(.plain)
                         .navigationTitle("Eduroam")
-                        .searchable(text: viewStore.binding(get: \.query, send: Main.Action.search), placement: .navigationBarDrawer(displayMode: .always), prompt: "Kies een organisatie")
-                    } else {
-                        // Fallback on earlier versions
-                    }
+                        .backport
+                        .searchable(text: viewStore.binding(get: \.query, send: Main.Action.search), placement: .automatic , prompt: "Kies een organisatie")
                     
                 case .failure:
                     VStack {
@@ -51,7 +49,7 @@ public struct MainView: View {
                 }
                
             }
-//            .navigationViewStyle(.stack)
+            .navigationViewStyle(.stack)
             .onAppear {
                 viewStore.send(.onAppear)
             }
@@ -61,7 +59,6 @@ public struct MainView: View {
                         ConnectView(store: store)
                     }
                 }
-//                .interactiveDismissDisabled()
             }
             .alert(
               self.store.scope(state: \.alert),

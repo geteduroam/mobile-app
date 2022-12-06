@@ -1,7 +1,6 @@
 import AppAuth
 import Foundation
 
-#if os(iOS)
 public enum StartAuthError: Error {
     case noWindow
     case noRootViewController
@@ -41,25 +40,3 @@ public class GeteduroamAppDelegate: NSObject, UIApplicationDelegate, ObservableO
         return false
     }
 }
-#elseif os(macOS)
-public class GeteduroamAppDelegate: NSObject, NSApplicationDelegate, ObservableObject, AuthClient {
-
-    public func startAuth(request: OIDAuthorizationRequest) async throws -> OIDAuthState {
-        let redirectHTTPHandler = OIDRedirectHTTPHandler(successURL: request.redirectURL)
-        redirectHTTPHandler.startHTTPListener(nil) // TODO handle error!
-
-        let window = await NSApplication.shared.mainWindow
-        return try await withCheckedThrowingContinuation { continuation in
-            redirectHTTPHandler.currentAuthorizationFlow =   OIDAuthState.authState(byPresenting: request, presenting: window!) { authState, error in
-                if let authState {
-                    continuation.resume(returning: authState)
-                } else if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(throwing: NSError(domain: "Huh", code: 1))
-                }
-            }
-        }
-    }
-}
-#endif

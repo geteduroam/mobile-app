@@ -8,7 +8,11 @@ import Models
 import SwiftUI
 
 public struct Connect: ReducerProtocol {
-    public init() { }
+    public let authClient: AuthClient
+    
+    public init(authClient: AuthClient = FailingAuthClient()) {
+        self.authClient = authClient
+    }
     
     public struct State: Equatable {
         public init(institution: Institution, loadingState: LoadingState = .initial) {
@@ -61,9 +65,9 @@ public struct Connect: ReducerProtocol {
             }
         }
         
-        case onAppear(any AuthClient)
+        case onAppear
         case select(Profile.ID)
-        case connect(any AuthClient)
+        case connect
         case connectResponse(TaskResult<Bool>)
         case dismissErrorTapped
         case startAgainTapped
@@ -78,7 +82,7 @@ public struct Connect: ReducerProtocol {
     
     public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
-        case let .onAppear(authClient):
+        case .onAppear:
             guard let profile = state.selectedProfile, state.institution.hasSingleProfile else {
                 return .none
             }
@@ -92,7 +96,7 @@ public struct Connect: ReducerProtocol {
             state.selectedProfileId = profileId
             return .none
             
-        case let .connect(authClient):
+        case .connect:
             guard let profile = state.selectedProfile else {
                 return .none
             }
@@ -158,15 +162,15 @@ public struct Connect: ReducerProtocol {
         
         var urlRequest = URLRequest(url: profile.eapconfig_endpoint!)
         urlRequest.httpMethod = "POST"
+        // urlRequest.httpBody = "device=apple-mobileconfig".data(using: .utf8)
         if let accessToken {
             urlRequest.allHTTPHeaderFields = ["Authorization": "Bearer \(accessToken)"]
         }
 
         let (eapConfigData, _) = try await URLSession.shared.data(for: urlRequest)
-
+        
         let accessPoint = try EAPConfigParser.parse(xmlData: eapConfigData)
 
-        #if os(iOS)
         let configurator = WifiEapConfigurator()
         
         let success = try await configurator.configure(accessPoint: accessPoint)
@@ -176,11 +180,6 @@ public struct Connect: ReducerProtocol {
         }
         
         return true
-
-        #else
-        // TODO: Write a WifiEapConfigurator for macOS
-        return false
-        #endif
     }
     
 }
