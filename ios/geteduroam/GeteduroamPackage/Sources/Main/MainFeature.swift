@@ -14,26 +14,20 @@ public struct Main: ReducerProtocol {
     }
     
     public struct State: Equatable {
-        public init(query: String = "", institutions: IdentifiedArrayOf<Institution> = .init(uniqueElements: []), loadingState: LoadingState = .initial) {
-            self.query = query
+        public init(searchQuery: String = "", institutions: IdentifiedArrayOf<Institution> = .init(uniqueElements: []), loadingState: LoadingState = .initial) {
+            self.searchQuery = searchQuery
             self.institutions = institutions
             self.loadingState = loadingState
+            self.searchResults = .init(uniqueElements: [])
         }
         
-        var query: String
+        var searchQuery: String
         var institutions: IdentifiedArrayOf<Institution>
         
         var selectedInstitutionState: Connect.State?
         
-        var searchResults: IdentifiedArrayOf<Institution> {
-            guard query.isEmpty == false else {
-                return .init(uniqueElements: [])
-            }
-            return .init(uniqueElements: institutions
-                .filter( { $0.name.localizedCaseInsensitiveContains(query) })
-                .sorted(by: { $0.name < $1.name }))
-        }
-        
+        var searchResults: IdentifiedArrayOf<Institution>
+
         var isSheetVisible: Bool {
             selectedInstitutionState != nil
         }
@@ -52,7 +46,9 @@ public struct Main: ReducerProtocol {
     public enum Action: Equatable {
         case discoveryResponse(TaskResult<InstitutionsResponse>)
         case onAppear
-        case search(String)
+        case searchQueryChanged(String)
+        case searchQueryChangeDebounced
+        case searchResponse(TaskResult<IdentifiedArrayOf<Institution>>)
         case select(Institution)
         case institution(Connect.Action)
         case dismissSheet
@@ -60,6 +56,17 @@ public struct Main: ReducerProtocol {
         case dismissErrorTapped
     }
     
+    private enum SearchID {}
+    
+    func search(query: String, institutions: IdentifiedArrayOf<Institution>) -> IdentifiedArrayOf<Institution> {
+        guard query.isEmpty == false else {
+            return .init(uniqueElements: [])
+        }
+        return .init(uniqueElements: institutions
+            .filter( { $0.name.localizedCaseInsensitiveContains(query) })
+            .sorted(by: { $0.name < $1.name }))
+    }
+
     public var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
@@ -83,8 +90,31 @@ public struct Main: ReducerProtocol {
                 )
                 return .none
                 
-            case let .search(query):
-                state.query = query
+            case let .searchQueryChanged(query):
+                state.searchQuery = query
+                
+                // When the query is cleared we can clear the search results, but we have to make sure to cancel
+                // any in-flight search requests too, otherwise we may get data coming in later.
+                guard !query.isEmpty else {
+                  state.searchResults = []
+                  return .cancel(id: SearchID.self)
+                }
+                return .none
+                
+            case .searchQueryChangeDebounced:
+                guard !state.searchQuery.isEmpty else {
+                    return .none
+                }
+                return .task { [query = state.searchQuery, institutions = state.institutions] in
+                    await .searchResponse(TaskResult { self.search(query: query, institutions: institutions) })
+                }
+                .cancellable(id: SearchID.self)
+                
+            case let .searchResponse(.success(searchResults)):
+                state.searchResults = searchResults
+                return .none
+                
+            case .searchResponse(.failure):
                 return .none
                 
             case let .select(institution):

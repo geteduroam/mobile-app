@@ -34,7 +34,13 @@ public struct MainView: View {
                         .listStyle(.plain)
                         .navigationTitle("Eduroam")
                         .backport
-                        .searchable(text: viewStore.binding(get: \.query, send: Main.Action.search), placement: .automatic , prompt: "Kies een organisatie")
+                        .searchable(text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged), placement: .automatic , prompt: "Kies een organisatie")
+                        .task(id: viewStore.searchQuery) {
+                          do {
+                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 4)
+                            await viewStore.send(.searchQueryChangeDebounced).finish()
+                          } catch {}
+                        }
                     
                 case .failure:
                     VStack {
