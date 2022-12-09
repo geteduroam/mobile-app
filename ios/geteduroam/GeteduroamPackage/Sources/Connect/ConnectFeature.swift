@@ -1,11 +1,11 @@
 import AppAuth
 import AuthClient
 import ComposableArchitecture
-import EAPConfigParser
 import EAPConfigurator
 import Foundation
 import Models
 import SwiftUI
+import XMLCoder
 
 public struct Connect: ReducerProtocol {
     public let authClient: AuthClient
@@ -80,6 +80,7 @@ public struct Connect: ReducerProtocol {
         case missingAuthorizationEndpoint
         case missingTokenEndpoint
         case accessPointConfigurationFailed
+        case noValidProviderFound
     }
     
     public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -129,6 +130,15 @@ public struct Connect: ReducerProtocol {
         }
     }
     
+    var decoder: XMLDecoder = {
+        let decoder = XMLDecoder()
+        decoder.shouldProcessNamespaces = true
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }()
+    
+    @Dependency(\.date) var date
+    
     func connect(profile: Profile, authClient: AuthClient) async throws {
         let accessToken: String?
         if profile.oauth ?? false {
@@ -166,9 +176,18 @@ public struct Connect: ReducerProtocol {
 
         let (eapConfigData, _) = try await URLSession.shared.data(for: urlRequest)
         
-        let accessPoint = try EAPConfigParser.parse(xmlData: eapConfigData)
+        let providerList = try decoder.decode(EAPIdentityProviderList.self, from: eapConfigData)
+        let firstValidProvider = providerList
+            .providers
+            .first(where: { ($0.validUntil?.timeIntervalSince(date()) ?? 0) >= 0 })
         
-        try await EAPConfigurator().configure(accessPoint: accessPoint)
+        guard let firstValidProvider else {
+            throw InstitutionSetupError.noValidProviderFound
+        }
+        
+        try await EAPConfigurator().configure(identityProvider: firstValidProvider)
+        
+        // TODO: Check if connection works?
     }
     
 }
