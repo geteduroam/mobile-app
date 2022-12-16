@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina6_72" orientation="portrait" appearance="dark"/>
+    <device id="retina6_12" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
@@ -14,18 +14,18 @@
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="430" height="932"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Launch Screen/Heart" translatesAutoresizingMaskIntoConstraints="NO" id="j4X-x2-v2v">
-                                <rect key="frame" x="115" y="266" width="200" height="200"/>
+                                <rect key="frame" x="96.666666666666686" y="226" width="200" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="3DR-PG-ktb"/>
                                     <constraint firstAttribute="height" constant="200" id="C7e-J1-rQD"/>
                                 </constraints>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" semanticContentAttribute="spatial" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Launch Screen/Eduroam" translatesAutoresizingMaskIntoConstraints="NO" id="7sK-0e-xH9">
-                                <rect key="frame" x="270" y="778" width="160" height="74"/>
+                                <rect key="frame" x="233" y="698" width="160" height="74"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="7sK-0e-xH9" secondAttribute="height" multiplier="82:38" id="STH-gc-S6r"/>
                                     <constraint firstAttribute="width" constant="160" id="Tmu-i2-w0g"/>
@@ -51,7 +51,7 @@
         <image name="Launch Screen/Eduroam" width="82" height="38"/>
         <image name="Launch Screen/Heart" width="87" height="87"/>
         <namedColor name="Launch Screen/Background">
-            <color red="0.98191159963607788" green="0.92753773927688599" blue="0.93715804815292358" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.98199999332427979" green="0.92799997329711914" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

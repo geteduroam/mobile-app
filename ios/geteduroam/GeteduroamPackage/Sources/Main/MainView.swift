@@ -24,50 +24,94 @@ public struct MainView: View {
                     ProgressView()
                     
                 case .success:
-                    VStack {
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                            
-                            TextField(
-                                "Choose an organisation",
-                                text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged))
-                            .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
-                            .focused($searchFieldIsFocused)
-                            .textInputAutocapitalization(.never)
-                            
-                            Button {
-                                viewStore.send(.searchQueryChanged(""))
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
+                    VStack(alignment: .leading, spacing: 4) {
+
+                        VStack(spacing: 8) {
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                TextField(
+                                    "Search for your institution",
+                                    text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged))
+                                .font(Font.custom("OpenSans-Regular", size: 20, relativeTo: .body))
+                                .focused($searchFieldIsFocused)
+                                .textInputAutocapitalization(.never)
+                                
+                                Button {
+                                    viewStore.send(.searchQueryChanged(""))
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                }
+                                .buttonStyle(.plain)
+                                .opacity(searchFieldIsFocused && viewStore.searchQuery.isEmpty == false ? 1 : 0)
                             }
-                            .buttonStyle(.plain)
-                            .opacity(searchFieldIsFocused && viewStore.searchQuery.isEmpty == false ? 1 : 0)
+                            Rectangle()
+                                .background(Color.white)
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 1, maxHeight: 1)
+                             
                         }
                         .padding(16)
                         
                         if searchFieldIsFocused == false && viewStore.isSearching == false && viewStore.searchQuery.isEmpty && viewStore.searchResults.isEmpty {
-                            Image("Launch Screen/Heart")
-                                .resizable()
-                                .frame(width: 200, height: 200)
-                                .transition(.scale)
-                        } else if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
-                            Text("No matches found")
+                            
                         } else {
-                            List {
-                                
-                                ForEach(viewStore.searchResults) { institution in
-                                    Button {
-                                        viewStore.send(.select(institution))
-                                    } label: {
-                                        InstitutionRowView(institution: institution)
+                            if #available(iOS 16.0, *) {
+                                List {
+                                    if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
+                                        Text("No matches found")
+                                    } else {
+                                        ForEach(viewStore.searchResults) { institution in
+                                            Button {
+                                                viewStore.send(.select(institution))
+                                            } label: {
+                                                InstitutionRowView(institution: institution)
+                                            }
+                                        }
                                     }
                                 }
+                                .scrollContentBackground(.hidden)
+                                .background(Color.yellow)
+                                .listStyle(.plain)
+                            } else {
+                                // Fallback on earlier versions
                             }
-                            .listStyle(.plain)
+//                            .listRowBackground(Color("Launch Screen/Background"))
+//                            .background(Color.clear)
                         }
-                       
+                       Spacer()
                     }
-                    .background(Color("Launch Screen/Background"))
+                  
+                    .background {
+                        ZStack {
+                            Color("Launch Screen/Background")
+                                
+                            
+                            VStack(alignment: .trailing) {
+                                Spacer()
+                                Image("Launch Screen/Eduroam")
+                                    .resizable()
+                                    .frame(width: 160, height: 74)
+                                    .padding(.bottom, 80)
+                                
+                            }
+                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .trailing)
+                            if searchFieldIsFocused == false && viewStore.isSearching == false && viewStore.searchQuery.isEmpty && viewStore.searchResults.isEmpty {
+                                VStack(spacing: 0) {
+                                    Image("Launch Screen/Heart")
+                                        .resizable()
+                                        .frame(width: 200, height: 200)
+                                        .transition(.scale)
+                                    Spacer()
+                                        .frame(width: 200, height: 200)
+                                }
+                            
+                                
+                            }
+                        }
+                        .edgesIgnoringSafeArea(.all)
+                        
+                        
+                    }
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
                     .task(id: viewStore.searchQuery) {
                         do {
                             try await Task.sleep(nanoseconds: NSEC_PER_SEC / 4)
@@ -88,6 +132,7 @@ public struct MainView: View {
                 }
                
             }
+
             .navigationViewStyle(.stack)
             .onAppear {
                 // TODO: To focus or not to focus? searchFieldIsFocused = true
