@@ -18,4 +18,4 @@ extension DependencyValues.DiscoveryClientKey: DependencyKey {
 }
 
 private let mockClient = URLRoutingClient<DiscoveryRoute>.failing
-private let liveClient = URLRoutingClient.live(router: discoveryRouter.baseURL("https://discovery.eduroam.app/v1/"))
+private let liveClient = URLRoutingClient.live(router: discoveryRouter.baseURL("https://discovery.eduroam.app/v123/"))

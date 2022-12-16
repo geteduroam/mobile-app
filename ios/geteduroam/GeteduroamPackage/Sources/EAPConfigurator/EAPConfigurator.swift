@@ -2,6 +2,7 @@ import CoreLocation
 import Foundation
 import Models
 import NetworkExtension
+import SystemConfiguration.CaptiveNetwork
 
 public class EAPConfigurator {
     public init() { }
@@ -481,6 +482,30 @@ public class EAPConfigurator {
         case missing
     }
     
+    
+    func fetchNetworkInfo() throws -> [NetworkInfo] {
+        guard let interfaces: NSArray = CNCopySupportedInterfaces() else {
+            throw EAPConfiguratorError.cannotCopySupportedInterfaces
+        }
+        
+        return interfaces.map { interface in
+            let interfaceName = interface as! String
+            let success: Bool
+            let ssid: String?
+            let bssid: String?
+            if let dict = CNCopyCurrentNetworkInfo(interfaceName as CFString) as NSDictionary? {
+                success = true
+                ssid = dict[kCNNetworkInfoKeySSID as String] as? String
+                bssid = dict[kCNNetworkInfoKeyBSSID as String] as? String
+            } else {
+                success = false
+                ssid = nil
+                bssid = nil
+            }
+            return NetworkInfo(interface: interfaceName, success: success, ssid: ssid, bssid: bssid)
+        }
+    }
+    
     /**
     @function isNetworkAssociated
     @abstract Capacitor call to check if SSID is connect, doesn't work for HS20
@@ -611,4 +636,6 @@ public enum EAPConfiguratorError: Error {
     case failedToCopyCommonName
     
     case noConfigurations
+    
+    case cannotCopySupportedInterfaces
 }

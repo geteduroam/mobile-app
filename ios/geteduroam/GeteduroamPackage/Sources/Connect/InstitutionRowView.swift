@@ -11,8 +11,9 @@ public struct InstitutionRowView: View {
     public var body: some View {
         VStack(alignment: .leading) {
             Text(institution.name)
+                .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
             Text(institution.country)
-                .font(.footnote)
+                .font(Font.custom("OpenSans-Regular", size: 11, relativeTo: .footnote))
         }
     }
 }

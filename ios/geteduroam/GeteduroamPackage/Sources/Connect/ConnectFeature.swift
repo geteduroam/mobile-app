@@ -187,6 +187,9 @@ public struct Connect: ReducerProtocol {
         
         try await EAPConfigurator().configure(identityProvider: firstValidProvider)
         
+        let info = SSID.fetchNetworkInfo()
+        
+        print("Info: \(info)")
         // TODO: Check if connection works?
     }
     

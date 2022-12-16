@@ -9,6 +9,7 @@ struct ProfileRowView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text(profile.name)
+                    .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")

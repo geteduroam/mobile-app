@@ -18,6 +18,9 @@ let package = Package(
             name: "Backport",
             targets: ["Backport"]),
         .library(
+            name: "CacheClient",
+            targets: ["CacheClient"]),
+        .library(
             name: "DiscoveryClient",
             targets: ["DiscoveryClient"]),
         .library(
@@ -46,8 +49,9 @@ let package = Package(
             dependencies: [
                 "AuthClient",
                 "Backport",
-                "DiscoveryClient",
+                "CacheClient",
                 "Connect",
+                "DiscoveryClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
         .testTarget(
@@ -63,6 +67,12 @@ let package = Package(
         .target(
             name: "Backport",
             dependencies: []),
+        .target(
+            name: "CacheClient",
+            dependencies: [
+                "Models",
+                .product(name: "Dependencies", package: "swift-composable-architecture"),
+            ]),
         .target(
             name: "DiscoveryClient",
             dependencies: [

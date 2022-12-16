@@ -27,11 +27,15 @@ public struct ConnectView: View {
                             }
                         } header: {
                             Text("Profiles")
+                                .font(Font.custom("OpenSans-SemiBold", size: 12, relativeTo: .body))
                         }
+                        
                         Button {
                             viewStore.send(.connect)
                         } label: {
                             Text("Connect")
+                                .multilineTextAlignment(.center)
+                                .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
                         }
                     }
                     

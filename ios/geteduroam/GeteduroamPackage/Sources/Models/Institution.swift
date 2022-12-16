@@ -20,12 +20,4 @@ public struct Institution: Codable, Identifiable, Equatable {
     public var hasSingleProfile: Bool {
         profiles.count == 1
     }
-    
-    public var requiresAuth: Bool {
-        if hasSingleProfile {
-            return profiles[0].oauth ?? false
-        } else {
-            return false
-        }
-    }
 }

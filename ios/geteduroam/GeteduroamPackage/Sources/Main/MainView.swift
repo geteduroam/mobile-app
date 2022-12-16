@@ -11,6 +11,8 @@ public struct MainView: View {
     
     public let store: StoreOf<Main>
     
+    @FocusState var searchFieldIsFocused: Bool
+    
     public var body: some View {
         WithViewStore(store) { viewStore in
             NavigationView {
@@ -22,25 +24,56 @@ public struct MainView: View {
                     ProgressView()
                     
                 case .success:
-                        List {
-                            ForEach(viewStore.searchResults) { institution in
-                                Button {
-                                    viewStore.send(.select(institution))
-                                } label: {
-                                    InstitutionRowView(institution: institution)
+                    VStack {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                            
+                            TextField(
+                                "Choose an organisation",
+                                text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged))
+                            .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
+                            .focused($searchFieldIsFocused)
+                            .textInputAutocapitalization(.never)
+                            
+                            Button {
+                                viewStore.send(.searchQueryChanged(""))
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.plain)
+                            .opacity(searchFieldIsFocused && viewStore.searchQuery.isEmpty == false ? 1 : 0)
+                        }
+                        .padding(16)
+                        
+                        if searchFieldIsFocused == false && viewStore.isSearching == false && viewStore.searchQuery.isEmpty && viewStore.searchResults.isEmpty {
+                            Image("Launch Screen/Heart")
+                                .resizable()
+                                .frame(width: 200, height: 200)
+                                .transition(.scale)
+                        } else if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
+                            Text("No matches found")
+                        } else {
+                            List {
+                                
+                                ForEach(viewStore.searchResults) { institution in
+                                    Button {
+                                        viewStore.send(.select(institution))
+                                    } label: {
+                                        InstitutionRowView(institution: institution)
+                                    }
                                 }
                             }
+                            .listStyle(.plain)
                         }
-                        .listStyle(.plain)
-                        .navigationTitle("Eduroam")
-                        .backport
-                        .searchable(text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged), placement: .automatic , prompt: "Kies een organisatie")
-                        .task(id: viewStore.searchQuery) {
-                          do {
+                       
+                    }
+                    .background(Color("Launch Screen/Background"))
+                    .task(id: viewStore.searchQuery) {
+                        do {
                             try await Task.sleep(nanoseconds: NSEC_PER_SEC / 4)
                             await viewStore.send(.searchQueryChangeDebounced).finish()
-                          } catch {}
-                        }
+                        } catch {}
+                    }
                     
                 case .failure:
                     VStack {
@@ -57,12 +90,22 @@ public struct MainView: View {
             }
             .navigationViewStyle(.stack)
             .onAppear {
+                // TODO: To focus or not to focus? searchFieldIsFocused = true
                 viewStore.send(.onAppear)
             }
             .sheet(isPresented: viewStore.binding(get: \.isSheetVisible, send: Main.Action.dismissSheet)) {
                 IfLetStore(store.scope(state: \.selectedInstitutionState, action: Main.Action.institution)) { store in
                     NavigationView {
                         ConnectView(store: store)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarLeading) {
+                                    Button {
+                                        viewStore.send(.dismissSheet)
+                                    } label: {
+                                        Text("Cancel")
+                                    }
+                                }
+                            }
                     }
                 }
             }

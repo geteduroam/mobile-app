@@ -3,7 +3,7 @@ import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 
 public class SSID {
-    class func fetchNetworkInfo() -> [NetworkInfo]? {
+    public class func fetchNetworkInfo() -> [NetworkInfo]? {
         if let interfaces: NSArray = CNCopySupportedInterfaces() {
             var networkInfos = [NetworkInfo]()
             for interface in interfaces {
@@ -28,9 +28,9 @@ public class SSID {
     
 }
 
-struct NetworkInfo {
-    var interface: String
-    var success: Bool = false
-    var ssid: String?
-    var bssid: String?
+public struct NetworkInfo {
+    public var interface: String
+    public var success: Bool
+    public var ssid: String?
+    public var bssid: String?
 }
