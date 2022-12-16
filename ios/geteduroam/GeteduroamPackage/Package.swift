@@ -21,9 +21,6 @@ let package = Package(
             name: "DiscoveryClient",
             targets: ["DiscoveryClient"]),
         .library(
-            name: "EAPConfigParser",
-            targets: ["EAPConfigParser"]),
-        .library(
             name: "Connect",
             targets: ["Connect"]),
         .library(
@@ -34,8 +31,6 @@ let package = Package(
             targets: ["EAPConfigurator"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
-        .package(url: "https://github.com/cezheng/Fuzi", from: "3.0.0"),
         .package(url: "https://github.com/openid/AppAuth-iOS.git", from: "1.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.0"),
@@ -76,17 +71,9 @@ let package = Package(
                 .product(name: "URLRouting", package: "swift-url-routing")
             ]),
         .target(
-            name: "EAPConfigParser",
-            dependencies: [
-                "Models",
-                .product(name: "Algorithms", package: "swift-algorithms"),
-                .product(name: "Fuzi", package: "Fuzi")
-            ]),
-        .target(
             name: "Connect",
             dependencies: [
                 "AuthClient",
-                "EAPConfigParser",
                 "EAPConfigurator",
                 "Models",
                 .product(name: "AppAuth", package: "AppAuth-iOS"),

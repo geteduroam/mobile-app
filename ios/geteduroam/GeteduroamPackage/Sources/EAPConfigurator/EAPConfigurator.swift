@@ -5,142 +5,70 @@ import NetworkExtension
 
 public class EAPConfigurator {
     public init() { }
-    
-    /**
-     @function getInnerAuthMethod
-     @abstract Convert inner auth method integer to NEHotspotEAPSettings.TTLSInnerAuthenticationType enum
-     @param innerAuthMethod Integer representing an auth method
-     @result NEHotspotEAPSettings.TTLSInnerAuthenticationType representing the given auth method
-     */
-    class func getInnerAuthMethod(innerAuthMethod: Int?) -> NEHotspotEAPSettings.TTLSInnerAuthenticationType? {
-        switch innerAuthMethod {
-        case -1: // Non-EAP PAP
-            return .eapttlsInnerAuthenticationPAP
-        case -2: // Non-EAP MSCHAP
-            return .eapttlsInnerAuthenticationMSCHAP
-        case -3: // Non-EAP MSCHAPv2
-            return .eapttlsInnerAuthenticationMSCHAPv2
-            /*
-             case _: // not in XSD
-             return .eapttlsInnerAuthenticationCHAP
-             */
-        case 26: // EAP-MSCHAPv2 (Apple supports only this inner EAP type)
-            return .eapttlsInnerAuthenticationEAP
-        default:
-            return nil
-        }
-    }
-    
-    /**
-     @function getOuterEapType
-     @abstract Convert outer EAP type integer to NEHotspotEAPSettings enum
-     @param outerEapType Integer representing an EAP type
-     @result NEHotspotEAPSettings.EAPType representing the given EAP type
-     */
-    class func getOuterEapType(outerEapType: Int) -> NEHotspotEAPSettings.EAPType? {
-        switch outerEapType {
-        case 13:
-            return NEHotspotEAPSettings.EAPType.EAPTLS
-        case 21:
-            return NEHotspotEAPSettings.EAPType.EAPTTLS
-        case 25:
-            return NEHotspotEAPSettings.EAPType.EAPPEAP
-        case 43:
-            return NEHotspotEAPSettings.EAPType.EAPFAST
-        default:
-            return nil
-        }
-    }
   
-    // MARK: - Configuring Access Points
+    // MARK: - Configuring Identity Provider
     
-    /// Configure Access Point
-    /// - Parameter accessPoint: Parsed EAP configuration
-    public func configure(accessPoint: AccessPoint) async throws {
+    /// Configure the network for an Identity Provider
+    /// - Parameter identityProvider: The Identity Provider
+    public func configure(identityProvider: EAPIdentityProvider) async throws {
         // At this point, we're not certain this configuration can work,
         // but we can't do this any step later, because createNetworkConfigurations will import things to the keychain.
         // TODO: only remove keychain items that match these networks
-        removeNetwork(ssids: accessPoint.ssids, domains: [accessPoint.domain])
-        resetKeychain()
+        let ssids = identityProvider
+            .credentialApplicability
+            .IEEE80211
+            .compactMap {
+                $0.ssid
+            }
+        let domain = identityProvider.id
+        removeNetwork(ssids: ssids, domains: [domain])
         
-        let configurations = try createNetworkConfigurations(accessPoint: accessPoint)
+        let configurations = try createNetworkConfigurations(identityProvider: identityProvider)
         
-        try await NEHotspotConfigurationManager.shared.apply(configurations.last!)
-//        for configuration in configurations {
-//            // this line is needed in iOS 13 because there is a reported bug with iOS 13.0 until 13.1.0, where joinOnce was default true
-//            // https://developer.apple.com/documentation/networkextension/nehotspotconfiguration/2887518-joinonce
-//            configuration.joinOnce = false
-//            // TODO: set to validity of client certificate
-//            // config.lifeTimeInDays = NSNumber(integerLiteral: 825)
-//
-//            try await NEHotspotConfigurationManager.shared.apply(configurations.last)
-//        }
+        guard let last = configurations.last else {
+            throw EAPConfiguratorError.noConfigurations
+        }
+        try await NEHotspotConfigurationManager.shared.apply(last)
     }
-   
-    ///  Create network configuration objects
-    /// - Parameter accessPoint: Parsed EAP configuration
-    /// - Returns:  Network configurations to apply
-    func createNetworkConfigurations(accessPoint: AccessPoint) throws -> [NEHotspotConfiguration] {
-        guard !accessPoint.oids.isEmpty || !accessPoint.ssids.isEmpty else {
+    
+    /// Create network configuration object
+    /// - Parameter identityProvider: The Identity Provider
+    /// - Returns: Network configurations to apply
+    private func createNetworkConfigurations(identityProvider: EAPIdentityProvider) throws -> [NEHotspotConfiguration] {
+        let oids = identityProvider
+            .credentialApplicability
+            .IEEE80211
+            .compactMap {
+                $0.consortiumOID
+            }
+        
+        let ssids = identityProvider
+            .credentialApplicability
+            .IEEE80211
+            .compactMap {
+                $0.ssid
+            }
+        
+        guard !oids.isEmpty || !ssids.isEmpty else {
             NSLog("☠️ createNetworkConfigurations: No OID or SSID in configuration")
             throw EAPConfiguratorError.noOIDOrSSID
         }
         
-        let eapSettings = try buildSettings(accessPoint: accessPoint)
-        
-        if let outerIdentity = accessPoint.outerIdentity, outerIdentity != "" {
-            // only works with EAP-TTLS, EAP-PEAP, and EAP-FAST
-            // https://developer.apple.com/documentation/networkextension/nehotspoteapsettings/2866691-outeridentity
-            eapSettings.outerIdentity = outerIdentity
-        }
-        
-        if !accessPoint.serverNames.isEmpty {
-            eapSettings.trustedServerNames = accessPoint.serverNames
-        }
-        if !accessPoint.caCertificates.isEmpty {
-            var caImportStatus: Bool
-            if #available(iOS 15, *) {
-                // iOS 15.0.* and iOS 15.1.* have a bug where we cannot call setTrustedServerCertificates,
-                // or the profile will be deemed invalid.
-                // Not calling it makes the profile trust the CA bundle from the OS,
-                // so only server name validation is performed.
-                if #available(iOS 15.2, *) {
-                    // The bug was fixed in iOS 15.2, business as usual:
-                    caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: accessPoint.caCertificates))
-                } else {
-                    NSLog("😡 createNetworkConfigurations: iOS 15.0 and 15.1 do not accept setTrustedServerCertificates - continuing")
-                    
-                    // On iOS 15.0 and 15.1 we pretend everything went fine while in reality we don't even attempt; it would have crashed later on
-                    caImportStatus = true
-                }
-            } else {
-                // We are on iOS 14 or older.
-                // The bug was not yet present prior to iOS 15, so business as usual:
-                caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: accessPoint.caCertificates))
-            }
-            guard caImportStatus else {
-                NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
-                throw EAPConfiguratorError.failedToSetTrustedServerCertificates
-            }
-        }
-        guard !accessPoint.serverNames.isEmpty || !accessPoint.caCertificates.isEmpty else {
-            NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
-            throw EAPConfiguratorError.unableToVerifyNetwork
-        }
-        
-        eapSettings.isTLSClientCertificateRequired = false
+        let eapSettings = try buildSettings(identityProvider: identityProvider)
         
         var configurations: [NEHotspotConfiguration] = []
         
-        if accessPoint.oids.count != 0 {
+        if !oids.isEmpty {
+            let domain = identityProvider.id
+
             let hs20 = NEHotspotHS20Settings(
-                domainName: accessPoint.domain,
+                domainName: domain,
                 roamingEnabled: true)
-            hs20.roamingConsortiumOIs = accessPoint.oids
+            hs20.roamingConsortiumOIs = oids
             configurations.append(NEHotspotConfiguration(hs20Settings: hs20, eapSettings: eapSettings))
         }
         
-        for ssid in accessPoint.ssids {
+        for ssid in ssids {
             configurations.append(NEHotspotConfiguration(ssid: ssid, eapSettings: eapSettings))
         }
         
@@ -150,13 +78,140 @@ public class EAPConfigurator {
         
         return configurations
     }
+
+    ///  Create a Hotspot EAP settings object
+    /// - Parameter identityProvider: The Identity Provider
+    /// - Returns: Hotspot EAP settings object
+    func buildSettings(identityProvider: EAPIdentityProvider) throws -> NEHotspotEAPSettings {
+        let settings = try identityProvider
+            .authenticationMethods
+            .methods
+            .compactMap { authenticationMethod -> NEHotspotEAPSettings? in
+                let eapSettings = try buildSettings(identityProvider: identityProvider, authenticationMethod: authenticationMethod)
+                
+                let trustedServerNames = authenticationMethod.serverSideCredential?.serverIDs
+                if let eapSettings, let trustedServerNames, !trustedServerNames.isEmpty {
+                    eapSettings.trustedServerNames = trustedServerNames
+                }
+                
+                let caCertificates = authenticationMethod.serverSideCredential?.certificates.compactMap { certificateData -> String? in
+                    guard certificateData.encoding == "base64", certificateData.format == "X.509" else {
+                        return nil
+                    }
+                    return certificateData.value
+                }
+                if let eapSettings, let caCertificates, !caCertificates.isEmpty {
+                    let caImportStatus: Bool
+                    if #available(iOS 15, *) {
+                        // iOS 15.0.* and iOS 15.1.* have a bug where we cannot call setTrustedServerCertificates,
+                        // or the profile will be deemed invalid.
+                        // Not calling it makes the profile trust the CA bundle from the OS,
+                        // so only server name validation is performed.
+                        if #available(iOS 15.2, *) {
+                            // The bug was fixed in iOS 15.2, business as usual:
+                            caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: caCertificates))
+                        } else {
+                            NSLog("😡 createNetworkConfigurations: iOS 15.0 and 15.1 do not accept setTrustedServerCertificates - continuing")
+                            
+                            // On iOS 15.0 and 15.1 we pretend everything went fine while in reality we don't even attempt; it would have crashed later on
+                            caImportStatus = true
+                        }
+                    } else {
+                        // We are on iOS 14 or older.
+                        // The bug was not yet present prior to iOS 15, so business as usual:
+                        caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: caCertificates))
+                    }
+                    guard caImportStatus else {
+//                        NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
+//                        throw EAPConfiguratorError.failedToSetTrustedServerCertificates
+                        return nil
+                    }
+                }
+              
+                guard let trustedServerNames, let caCertificates, !trustedServerNames.isEmpty || !caCertificates.isEmpty else {
+//                    NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
+//                    throw EAPConfiguratorError.unableToVerifyNetwork
+                    return nil
+                }
+                
+                if let eapSettings {
+                    eapSettings.isTLSClientCertificateRequired = false
+                }
+                
+                return eapSettings
+            }
+            .first
+        
+        guard let settings else {
+            throw EAPConfiguratorError.noOuterEAPType
+        }
+        
+        return settings
+    }
+
+    /// Create a Hotspot EAP settings object for a specific authentication method
+    /// - Parameters:
+    ///   - identityProvider: The Identity Provider
+    ///   - authenticationMethod: The authentication method
+    /// - Returns: Hotspot EAP settings object
+    private func buildSettings(identityProvider: EAPIdentityProvider, authenticationMethod: AuthenticationMethod) throws -> NEHotspotEAPSettings? {
+        guard let outerEapType = Self.getOuterEapType(outerEapType: authenticationMethod.EAPMethod.type) else {
+            return nil
+        }
+        switch outerEapType {
+        case .EAPTLS:
+            guard let clientSideCredential = authenticationMethod.clientSideCredential,
+                  let clientCertificate = clientSideCredential.clientCertificate,
+                  let passphrase = clientSideCredential.passphrase,
+                  clientCertificate.encoding == "base64",
+                  clientCertificate.format == "PKCS12"
+            else {
+                return nil
+            }
+            
+            let clientCertificateData = clientCertificate.value
+            return try buildSettingsWithClientCertificate(
+                pkcs12: clientCertificateData,
+                passphrase: passphrase
+            )
+            
+        case .EAPTTLS, .EAPFAST, .EAPPEAP:
+            guard let clientSideCredential = authenticationMethod.clientSideCredential,
+                  let username = clientSideCredential.userName,
+                  let password = clientSideCredential.password
+            else {
+                return nil
+            }
+            let outerEapTypes = identityProvider
+                .authenticationMethods
+                .methods
+                .compactMap {
+                    Self.getOuterEapType(outerEapType: $0.EAPMethod.type)
+                }
+            let outerIdentity = clientSideCredential.outerIdentity
+            let innerAuthType =  Self.getInnerAuthMethod(innerAuthMethod: 0)
+            return try buildSettingsWithUsernamePassword(
+                outerEapTypes: outerEapTypes,
+                outerIdentity: outerIdentity,
+                innerAuthType: innerAuthType,
+                username: username,
+                password: password
+            )
+            
+        @unknown default:
+            return nil
+        }
+    }
     
     ///  Create NEHotspotEAPSettings object for client certificate authentication
     /// - Parameters:
     ///   - pkcs12: Base64 encoded client certificate
     ///   - passphrase: Passphrase to decrypt the pkcs12, Apple doesn't like password-less
     /// - Returns: NEHotspotEAPSettings configured with the provided credentials
-    func buildSettingsWithClientCertificate(pkcs12: String, passphrase: String) throws -> NEHotspotEAPSettings {
+    private func buildSettingsWithClientCertificate(
+        pkcs12: String,
+        passphrase: String
+    ) throws -> NEHotspotEAPSettings {
         let eapSettings = NEHotspotEAPSettings()
         eapSettings.supportedEAPTypes = [NSNumber(value: NEHotspotEAPSettings.EAPType.EAPTLS.rawValue)]
         
@@ -172,52 +227,17 @@ public class EAPConfigurator {
         return eapSettings
     }
     
-    ///  Build a Hotspot EAP settings object
-    /// - Parameter accessPoint:  Parsed EAP configuration
-    /// - Returns: Hotspot EAP settings object
-    func buildSettings(accessPoint: AccessPoint) throws -> NEHotspotEAPSettings {
-        let outerEapTypes = accessPoint.outerEapTypes.compactMap(Self.getOuterEapType(outerEapType:))
-        let innerAuthType = Self.getInnerAuthMethod(innerAuthMethod: accessPoint.innerAuthType)
-        for outerEapType in outerEapTypes {
-            switch outerEapType {
-            case NEHotspotEAPSettings.EAPType.EAPTLS:
-                guard let clientCertificate = accessPoint.clientCertificate, let passphrase = accessPoint.passphrase else {
-                    NSLog("☠️ buildSettings: Failed precondition for EAPTLS")
-                    throw EAPConfiguratorError.failedEAPTLSPrecondition
-                }
-                return try buildSettingsWithClientCertificate(
-                    pkcs12: clientCertificate,
-                    passphrase: passphrase
-                )
-                
-            case NEHotspotEAPSettings.EAPType.EAPTTLS, NEHotspotEAPSettings.EAPType.EAPFAST, NEHotspotEAPSettings.EAPType.EAPPEAP:
-                guard let username = accessPoint.username, let password = accessPoint.password else {
-                    NSLog("☠️ buildSettings: Failed precondition for EAPPEAP/EAPFAST")
-                    throw EAPConfiguratorError.failedEAPPEAPEAPFASTPrecondition
-                }
-                return try buildSettingsWithUsernamePassword(
-                    outerEapTypes: outerEapTypes,
-                    innerAuthType: innerAuthType,
-                    username: username,
-                    password: password
-                )
-                
-            @unknown default:
-                break
-            }
-        }
-        throw EAPConfiguratorError.noOuterEAPType
-    }
-    
     /// Create NEHotspotEAPSettings object for username/pass authentication
     /// - Parameters:
-    ///   - outerEapTypes: Outer identity
+    ///   - outerEapTypes: Outer EAP Types
+    ///   - outerIdentity: Outer identity
     ///   - innerAuthType: Inner auth types
     ///   - username: username for PEAP/TTLS authentication
     ///   - password: password for PEAP/TTLS authentication
     /// - Returns:  NEHotspotEAPSettings configured with the provided credentials
-    func buildSettingsWithUsernamePassword(
+    private func buildSettingsWithUsernamePassword(
         outerEapTypes: [NEHotspotEAPSettings.EAPType],
+        outerIdentity: String?,
         innerAuthType: NEHotspotEAPSettings.TTLSInnerAuthenticationType?,
         username: String,
         password: String
@@ -235,6 +255,10 @@ public class EAPConfigurator {
         eapSettings.username = username
         eapSettings.password = password
         //NSLog("🦊 buildSettingsWithUsernamePassword: eapSettings.ttlsInnerAuthenticationType = " + String(eapSettings.ttlsInnerAuthenticationType.rawValue))
+        
+        if let outerIdentity {
+            eapSettings.outerIdentity = outerIdentity
+        }
         return eapSettings
     }
     
@@ -485,6 +509,52 @@ public class EAPConfigurator {
         }
         for domain in domains {
             NEHotspotConfigurationManager.shared.removeConfiguration(forHS20DomainName: domain)
+        }
+    }
+    
+    /**
+     @function getInnerAuthMethod
+     @abstract Convert inner auth method integer to NEHotspotEAPSettings.TTLSInnerAuthenticationType enum
+     @param innerAuthMethod Integer representing an auth method
+     @result NEHotspotEAPSettings.TTLSInnerAuthenticationType representing the given auth method
+     */
+    class func getInnerAuthMethod(innerAuthMethod: Int?) -> NEHotspotEAPSettings.TTLSInnerAuthenticationType? {
+        switch innerAuthMethod {
+        case -1: // Non-EAP PAP
+            return .eapttlsInnerAuthenticationPAP
+        case -2: // Non-EAP MSCHAP
+            return .eapttlsInnerAuthenticationMSCHAP
+        case -3: // Non-EAP MSCHAPv2
+            return .eapttlsInnerAuthenticationMSCHAPv2
+            /*
+             case _: // not in XSD
+             return .eapttlsInnerAuthenticationCHAP
+             */
+        case 26: // EAP-MSCHAPv2 (Apple supports only this inner EAP type)
+            return .eapttlsInnerAuthenticationEAP
+        default:
+            return nil
+        }
+    }
+    
+    /**
+     @function getOuterEapType
+     @abstract Convert outer EAP type integer to NEHotspotEAPSettings enum
+     @param outerEapType Integer representing an EAP type
+     @result NEHotspotEAPSettings.EAPType representing the given EAP type
+     */
+    class func getOuterEapType(outerEapType: Int) -> NEHotspotEAPSettings.EAPType? {
+        switch outerEapType {
+        case 13:
+            return NEHotspotEAPSettings.EAPType.EAPTLS
+        case 21:
+            return NEHotspotEAPSettings.EAPType.EAPTTLS
+        case 25:
+            return NEHotspotEAPSettings.EAPType.EAPPEAP
+        case 43:
+            return NEHotspotEAPSettings.EAPType.EAPFAST
+        default:
+            return nil
         }
     }
 }
