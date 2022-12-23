@@ -9,11 +9,15 @@ public struct InstitutionRowView: View {
     let institution: Institution
     
     public var body: some View {
-        VStack(alignment: .leading) {
-            Text(institution.name)
-                .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
-            Text(institution.country)
-                .font(Font.custom("OpenSans-Regular", size: 11, relativeTo: .footnote))
+        HStack(alignment: .center) {
+            VStack(alignment: .leading) {
+                Text(institution.name)
+                    .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                Text(institution.country)
+                    .font(Font.custom("OpenSans-Regular", size: 11, relativeTo: .footnote))
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
         }
     }
 }

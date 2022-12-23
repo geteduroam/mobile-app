@@ -16,16 +16,8 @@ public struct MainView: View {
     public var body: some View {
         WithViewStore(store) { viewStore in
             NavigationView {
-                switch viewStore.loadingState {
-                case .initial:
-                    EmptyView()
-                    
-                case .isLoading:
-                    ProgressView()
-                    
-                case .success:
-                    VStack(alignment: .leading, spacing: 4) {
-
+                VStack(alignment: .leading, spacing: 4) {
+                    if viewStore.loadingState == .success {
                         VStack(spacing: 8) {
                             HStack {
                                 Image(systemName: "magnifyingglass")
@@ -45,94 +37,83 @@ public struct MainView: View {
                                 .opacity(searchFieldIsFocused && viewStore.searchQuery.isEmpty == false ? 1 : 0)
                             }
                             Rectangle()
-                                .background(Color.white)
                                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 1, maxHeight: 1)
-                             
+                                
                         }
                         .padding(16)
-                        
-                        if searchFieldIsFocused == false && viewStore.isSearching == false && viewStore.searchQuery.isEmpty && viewStore.searchResults.isEmpty {
-                            
-                        } else {
-                            if #available(iOS 16.0, *) {
-                                List {
-                                    if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
-                                        Text("No matches found")
-                                    } else {
-                                        ForEach(viewStore.searchResults) { institution in
-                                            Button {
-                                                viewStore.send(.select(institution))
-                                            } label: {
-                                                InstitutionRowView(institution: institution)
-                                            }
-                                        }
-                                    }
-                                }
-                                .scrollContentBackground(.hidden)
-                                .background(Color.yellow)
-                                .listStyle(.plain)
-                            } else {
-                                // Fallback on earlier versions
-                            }
-//                            .listRowBackground(Color("Launch Screen/Background"))
-//                            .background(Color.clear)
-                        }
-                       Spacer()
-                    }
-                  
-                    .background {
-                        ZStack {
-                            Color("Launch Screen/Background")
-                                
-                            
-                            VStack(alignment: .trailing) {
-                                Spacer()
-                                Image("Launch Screen/Eduroam")
-                                    .resizable()
-                                    .frame(width: 160, height: 74)
-                                    .padding(.bottom, 80)
-                                
-                            }
-                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .trailing)
-                            if searchFieldIsFocused == false && viewStore.isSearching == false && viewStore.searchQuery.isEmpty && viewStore.searchResults.isEmpty {
-                                VStack(spacing: 0) {
-                                    Image("Launch Screen/Heart")
-                                        .resizable()
-                                        .frame(width: 200, height: 200)
-                                        .transition(.scale)
-                                    Spacer()
-                                        .frame(width: 200, height: 200)
-                                }
-                            
-                                
-                            }
-                        }
-                        .edgesIgnoringSafeArea(.all)
-                        
-                        
-                    }
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
-                    .task(id: viewStore.searchQuery) {
-                        do {
-                            try await Task.sleep(nanoseconds: NSEC_PER_SEC / 4)
-                            await viewStore.send(.searchQueryChangeDebounced).finish()
-                        } catch {}
                     }
                     
-                case .failure:
-                    VStack {
-                        Image(systemName: "exclamationmark.triangle")
-                        Text("Failed to load institutions")
-                        Button {
-                            viewStore.send(.tryAgainTapped)
-                        } label: {
-                            Text("Try Again")
+                    if viewStore.loadingState == .failure {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle")
+                            Text("Failed to load institutions")
+                                .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                            Button {
+                                viewStore.send(.tryAgainTapped)
+                            } label: {
+                                Image(systemName: "arrow.clockwise")
+                            }
                         }
+                        .padding(16)
+                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+                        
+                    } else {
+                        List {
+                            if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
+                                Text("No matches found")
+                                    .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
+                                    .listRowSeparatorTint(Color.clear)
+                                    .listRowBackground(Color("Background"))
+                            } else if viewStore.searchResults.isEmpty {
+                                Text("")
+                                    .listRowSeparatorTint(Color.clear)
+                                    .listRowBackground(Color.clear)
+                            } else {
+                                ForEach(viewStore.searchResults) { institution in
+                                    Button {
+                                        viewStore.send(.select(institution))
+                                    } label: {
+                                        InstitutionRowView(institution: institution)
+                                    }
+                                    .listRowSeparatorTint(Color("ListSeparator"))
+                                    .listRowBackground(Color("Background"))
+                                }
+                            }
+                        }
+                        .listStyle(.plain)
                     }
                 }
-               
+                .background {
+                    ZStack {
+                        Color("Background")
+                        
+                        VStack(alignment: .trailing) {
+                            Spacer()
+                            Image("Eduroam")
+                                .resizable()
+                                .frame(width: 160, height: 74)
+                                .padding(.bottom, 80)
+                            
+                        }
+                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .trailing)
+                        VStack(spacing: 0) {
+                            Image("Heart")
+                                .resizable()
+                                .frame(width: 200, height: 200)
+                            Spacer()
+                                .frame(width: 200, height: 200)
+                        }
+                    }
+                    .edgesIgnoringSafeArea(.all)
+                }
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
+                .task(id: viewStore.searchQuery) {
+                    do {
+                        try await Task.sleep(nanoseconds: NSEC_PER_SEC / 4)
+                        await viewStore.send(.searchQueryChangeDebounced).finish()
+                    } catch {}
+                }
             }
-
             .navigationViewStyle(.stack)
             .onAppear {
                 // TODO: To focus or not to focus? searchFieldIsFocused = true
@@ -143,7 +124,7 @@ public struct MainView: View {
                     NavigationView {
                         ConnectView(store: store)
                             .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
+                                ToolbarItem(placement: .navigationBarTrailing) {
                                     Button {
                                         viewStore.send(.dismissSheet)
                                     } label: {
@@ -155,8 +136,8 @@ public struct MainView: View {
                 }
             }
             .alert(
-              self.store.scope(state: \.alert),
-              dismiss: .dismissErrorTapped
+                self.store.scope(state: \.alert),
+                dismiss: .dismissErrorTapped
             )
         }
     }

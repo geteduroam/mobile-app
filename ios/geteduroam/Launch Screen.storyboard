@@ -17,14 +17,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Launch Screen/Heart" translatesAutoresizingMaskIntoConstraints="NO" id="j4X-x2-v2v">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Heart" translatesAutoresizingMaskIntoConstraints="NO" id="j4X-x2-v2v">
                                 <rect key="frame" x="96.666666666666686" y="226" width="200" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="3DR-PG-ktb"/>
                                     <constraint firstAttribute="height" constant="200" id="C7e-J1-rQD"/>
                                 </constraints>
                             </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" semanticContentAttribute="spatial" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Launch Screen/Eduroam" translatesAutoresizingMaskIntoConstraints="NO" id="7sK-0e-xH9">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" semanticContentAttribute="spatial" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Eduroam" translatesAutoresizingMaskIntoConstraints="NO" id="7sK-0e-xH9">
                                 <rect key="frame" x="233" y="698" width="160" height="74"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="7sK-0e-xH9" secondAttribute="height" multiplier="82:38" id="STH-gc-S6r"/>
@@ -33,7 +33,7 @@
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" name="Launch Screen/Background"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="7sK-0e-xH9" secondAttribute="trailing" id="Jhp-SR-AO9"/>
                             <constraint firstAttribute="bottom" secondItem="7sK-0e-xH9" secondAttribute="bottom" constant="80" id="Vhz-fb-1mR"/>
@@ -48,9 +48,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Launch Screen/Eduroam" width="82" height="38"/>
-        <image name="Launch Screen/Heart" width="87" height="87"/>
-        <namedColor name="Launch Screen/Background">
+        <image name="Eduroam" width="82" height="38"/>
+        <image name="Heart" width="87" height="87"/>
+        <namedColor name="Background">
             <color red="0.98199999332427979" green="0.92799997329711914" blue="0.93699997663497925" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
