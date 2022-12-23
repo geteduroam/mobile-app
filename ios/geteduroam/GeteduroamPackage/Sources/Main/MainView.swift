@@ -83,6 +83,8 @@ public struct MainView: View {
                         .listStyle(.plain)
                     }
                 }
+                .backport
+                .readableContentWidthPadding()
                 .background {
                     ZStack {
                         Color("Background")
