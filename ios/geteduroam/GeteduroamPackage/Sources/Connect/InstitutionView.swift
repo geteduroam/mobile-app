@@ -24,6 +24,8 @@ public struct ConnectView: View {
                                 } label: {
                                     ProfileRowView(profile: profile, isSelected: selectedProfile == profile)
                                 }
+                                .listRowSeparatorTint(Color("ListSeparator"))
+                                .listRowBackground(Color("Background"))
                             }
                         } header: {
                             Text("Profiles")
@@ -38,6 +40,7 @@ public struct ConnectView: View {
                                 .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
                         }
                     }
+                    .listStyle(.plain)
                     
                 case .isLoading:
                     ProgressView()

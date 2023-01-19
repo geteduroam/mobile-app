@@ -80,7 +80,7 @@ public struct Main: ReducerProtocol {
                 return .task {
                     await .discoveryResponse(TaskResult {
                         do {
-                            let (value, _response) = try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self)
+                            let (value, _) = try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self)
                             cacheClient.cacheInstitutions(value)
                             return value
                         } catch {

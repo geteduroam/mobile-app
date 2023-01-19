@@ -15,7 +15,7 @@ public struct MainView: View {
     
     public var body: some View {
         WithViewStore(store) { viewStore in
-            NavigationView {
+//            NavigationView {
                 VStack(alignment: .leading, spacing: 4) {
                     if viewStore.loadingState == .success {
                         VStack(spacing: 8) {
@@ -115,8 +115,8 @@ public struct MainView: View {
                         await viewStore.send(.searchQueryChangeDebounced).finish()
                     } catch {}
                 }
-            }
-            .navigationViewStyle(.stack)
+//            }
+//            .navigationViewStyle(.stack)
             .onAppear {
                 // TODO: To focus or not to focus? searchFieldIsFocused = true
                 viewStore.send(.onAppear)

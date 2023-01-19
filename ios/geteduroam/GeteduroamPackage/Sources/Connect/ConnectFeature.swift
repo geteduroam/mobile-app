@@ -196,7 +196,7 @@ public struct Connect: ReducerProtocol {
         
         let info = SSID.fetchNetworkInfo()
         
-        print("Info: \(info)")
+        print("Info: \(String(describing: info))")
         // TODO: Check if connection works?
     }
     
