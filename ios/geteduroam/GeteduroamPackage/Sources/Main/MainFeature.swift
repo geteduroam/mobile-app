@@ -139,7 +139,7 @@ public struct Main: ReducerProtocol {
                 state.selectedInstitutionState = .init(institution: institution)
                 return .none
                 
-            case .institution(.startAgainTapped), .dismissSheet:
+            case .institution(.dismissTapped), .institution(.startAgainTapped), .dismissSheet:
                 state.selectedInstitutionState = nil
                 return .none
                 

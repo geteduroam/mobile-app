@@ -17,6 +17,7 @@
 		C74A11F1294CCAF600ECC19A /* institutions.json in Resources */ = {isa = PBXBuildFile; fileRef = C74A11F0294CCAF600ECC19A /* institutions.json */; };
 		C7AF862A2931150A00BDEB69 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = C7AF86292931150A00BDEB69 /* Documentation.docc */; };
 		C7BE4BFA291EA9CB007AA0C2 /* Main in Frameworks */ = {isa = PBXBuildFile; productRef = C7BE4BF9291EA9CB007AA0C2 /* Main */; };
+		C7F45A42297A94610005508D /* AuthClient in Frameworks */ = {isa = PBXBuildFile; productRef = C7F45A41297A94610005508D /* AuthClient */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C7BE4BFA291EA9CB007AA0C2 /* Main in Frameworks */,
+				C7F45A42297A94610005508D /* AuthClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,6 +140,7 @@
 			name = geteduroam;
 			packageProductDependencies = (
 				C7BE4BF9291EA9CB007AA0C2 /* Main */,
+				C7F45A41297A94610005508D /* AuthClient */,
 			);
 			productName = ios;
 			productReference = 7555FF7B242A565900829871 /* geteduroam.app */;
@@ -339,6 +342,7 @@
 				INFOPLIST_FILE = geteduroam/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = geteduroam;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -370,6 +374,7 @@
 				INFOPLIST_FILE = geteduroam/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = geteduroam;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -413,6 +418,10 @@
 		C7BE4BF9291EA9CB007AA0C2 /* Main */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Main;
+		};
+		C7F45A41297A94610005508D /* AuthClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthClient;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
