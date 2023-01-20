@@ -10,6 +10,11 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* GeteduroamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* GeteduroamApp.swift */; };
+		C74A11E8294C9FB600ECC19A /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C74A11E7294C9FB600ECC19A /* Launch Screen.storyboard */; };
+		C74A11ED294CA56100ECC19A /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C74A11EA294CA56100ECC19A /* OpenSans-SemiBold.ttf */; };
+		C74A11EE294CA56100ECC19A /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C74A11EB294CA56100ECC19A /* OpenSans-Bold.ttf */; };
+		C74A11EF294CA56100ECC19A /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C74A11EC294CA56100ECC19A /* OpenSans-Regular.ttf */; };
+		C74A11F1294CCAF600ECC19A /* institutions.json in Resources */ = {isa = PBXBuildFile; fileRef = C74A11F0294CCAF600ECC19A /* institutions.json */; };
 		C7AF862A2931150A00BDEB69 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = C7AF86292931150A00BDEB69 /* Documentation.docc */; };
 		C7BE4BFA291EA9CB007AA0C2 /* Main in Frameworks */ = {isa = PBXBuildFile; productRef = C7BE4BF9291EA9CB007AA0C2 /* Main */; };
 /* End PBXBuildFile section */
@@ -20,6 +25,11 @@
 		2152FB032600AC8F00CF470E /* GeteduroamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeteduroamApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* geteduroam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = geteduroam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C74A11E7294C9FB600ECC19A /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		C74A11EA294CA56100ECC19A /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
+		C74A11EB294CA56100ECC19A /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Bold.ttf"; sourceTree = "<group>"; };
+		C74A11EC294CA56100ECC19A /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "OpenSans-Regular.ttf"; sourceTree = "<group>"; };
+		C74A11F0294CCAF600ECC19A /* institutions.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = institutions.json; sourceTree = "<group>"; };
 		C759A6DB291E800B009B30C1 /* geteduroam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = geteduroam.entitlements; sourceTree = "<group>"; };
 		C77F52042913F0430056530E /* Pods_geteduroam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_geteduroam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7AF86292931150A00BDEB69 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
@@ -69,12 +79,15 @@
 		7555FF7D242A565900829871 /* geteduroam */ = {
 			isa = PBXGroup;
 			children = (
+				C74A11E9294CA56100ECC19A /* Fonts */,
 				C759A6DB291E800B009B30C1 /* geteduroam.entitlements */,
+				C74A11F0294CCAF600ECC19A /* institutions.json */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				2152FB032600AC8F00CF470E /* GeteduroamApp.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				C7AF86292931150A00BDEB69 /* Documentation.docc */,
+				C74A11E7294C9FB600ECC19A /* Launch Screen.storyboard */,
 			);
 			path = geteduroam;
 			sourceTree = "<group>";
@@ -87,6 +100,16 @@
 				EB04B6747F28CF20C1B01502 /* Pods_geteduroam.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C74A11E9294CA56100ECC19A /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				C74A11EA294CA56100ECC19A /* OpenSans-SemiBold.ttf */,
+				C74A11EB294CA56100ECC19A /* OpenSans-Bold.ttf */,
+				C74A11EC294CA56100ECC19A /* OpenSans-Regular.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		C7D61036291EA763007C9D6B /* Packages */ = {
@@ -160,7 +183,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C74A11ED294CA56100ECC19A /* OpenSans-SemiBold.ttf in Resources */,
+				C74A11E8294C9FB600ECC19A /* Launch Screen.storyboard in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
+				C74A11F1294CCAF600ECC19A /* institutions.json in Resources */,
+				C74A11EE294CA56100ECC19A /* OpenSans-Bold.ttf in Resources */,
+				C74A11EF294CA56100ECC19A /* OpenSans-Regular.ttf in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -300,18 +328,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = geteduroam/geteduroam.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"geteduroam/Preview Content\"";
 				DEVELOPMENT_TEAM = ZYJ4TZX4UU;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = geteduroam/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = geteduroam;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.eduroam.geteduroam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -327,18 +359,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = geteduroam/geteduroam.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"geteduroam/Preview Content\"";
 				DEVELOPMENT_TEAM = ZYJ4TZX4UU;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = geteduroam/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = geteduroam;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.eduroam.geteduroam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

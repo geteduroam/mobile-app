@@ -114,6 +114,13 @@ public struct Connect: ReducerProtocol {
             
         case let .connectResponse(.failure(error)):
             state.loadingState = .failure
+            
+            let nserror = error as NSError
+            // Telling the user they cancelled isn't helping
+            if nserror.domain == OIDGeneralErrorDomain && nserror.code == -3 {
+                return .none
+            }
+            
             state.alert = AlertState(
                 title: .init("Failed to connect"),
                 message: .init((error as NSError).localizedDescription),
@@ -187,6 +194,9 @@ public struct Connect: ReducerProtocol {
         
         try await EAPConfigurator().configure(identityProvider: firstValidProvider)
         
+        let info = SSID.fetchNetworkInfo()
+        
+        print("Info: \(info)")
         // TODO: Check if connection works?
     }
     

@@ -2,10 +2,11 @@ import CoreLocation
 import Foundation
 import Models
 import NetworkExtension
+import SystemConfiguration.CaptiveNetwork
 
 public class EAPConfigurator {
     public init() { }
-  
+    
     // MARK: - Configuring Identity Provider
     
     /// Configure the network for an Identity Provider
@@ -60,7 +61,7 @@ public class EAPConfigurator {
         
         if !oids.isEmpty {
             let domain = identityProvider.id
-
+            
             let hs20 = NEHotspotHS20Settings(
                 domainName: domain,
                 roamingEnabled: true)
@@ -78,7 +79,7 @@ public class EAPConfigurator {
         
         return configurations
     }
-
+    
     ///  Create a Hotspot EAP settings object
     /// - Parameter identityProvider: The Identity Provider
     /// - Returns: Hotspot EAP settings object
@@ -122,15 +123,15 @@ public class EAPConfigurator {
                         caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: caCertificates))
                     }
                     guard caImportStatus else {
-//                        NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
-//                        throw EAPConfiguratorError.failedToSetTrustedServerCertificates
+                        //                        NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
+                        //                        throw EAPConfiguratorError.failedToSetTrustedServerCertificates
                         return nil
                     }
                 }
-              
+                
                 guard let trustedServerNames, let caCertificates, !trustedServerNames.isEmpty || !caCertificates.isEmpty else {
-//                    NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
-//                    throw EAPConfiguratorError.unableToVerifyNetwork
+                    //                    NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
+                    //                    throw EAPConfiguratorError.unableToVerifyNetwork
                     return nil
                 }
                 
@@ -148,7 +149,7 @@ public class EAPConfigurator {
         
         return settings
     }
-
+    
     /// Create a Hotspot EAP settings object for a specific authentication method
     /// - Parameters:
     ///   - identityProvider: The Identity Provider
@@ -481,28 +482,52 @@ public class EAPConfigurator {
         case missing
     }
     
+    
+    func fetchNetworkInfo() throws -> [NetworkInfo] {
+        guard let interfaces: NSArray = CNCopySupportedInterfaces() else {
+            throw EAPConfiguratorError.cannotCopySupportedInterfaces
+        }
+        
+        return interfaces.map { interface in
+            let interfaceName = interface as! String
+            let success: Bool
+            let ssid: String?
+            let bssid: String?
+            if let dict = CNCopyCurrentNetworkInfo(interfaceName as CFString) as NSDictionary? {
+                success = true
+                ssid = dict[kCNNetworkInfoKeySSID as String] as? String
+                bssid = dict[kCNNetworkInfoKeyBSSID as String] as? String
+            } else {
+                success = false
+                ssid = nil
+                bssid = nil
+            }
+            return NetworkInfo(interface: interfaceName, success: success, ssid: ssid, bssid: bssid)
+        }
+    }
+    
     /**
-    @function isNetworkAssociated
-    @abstract Capacitor call to check if SSID is connect, doesn't work for HS20
-    @param call Capacitor call object containing array "ssid"
-    */
+     @function isNetworkAssociated
+     @abstract Capacitor call to check if SSID is connect, doesn't work for HS20
+     @param call Capacitor call object containing array "ssid"
+     */
     func isNetworkAssociated(ssid: String) async -> NetworkAssociationResult {
         let configuredSSIDs = await NEHotspotConfigurationManager.shared.configuredSSIDs()
         
         guard !configuredSSIDs.isEmpty else { return .noNetworksFound }
-
+        
         if configuredSSIDs.contains(ssid) {
             return .associated
         } else {
             return .missing
         }
     }
-
+    
     /**
-    @function removeConfiguration
-    @abstract Capacitor call to remove a network
-    @param call Capacitor call object containing array "ssid" and/or string "domain"
-    */
+     @function removeConfiguration
+     @abstract Capacitor call to remove a network
+     @param call Capacitor call object containing array "ssid" and/or string "domain"
+     */
     func removeNetwork(ssids: [String] = [], domains: [String] = []) {
         for ssid in ssids {
             NEHotspotConfigurationManager.shared.removeConfiguration(forSSID: ssid)
@@ -557,58 +582,4 @@ public class EAPConfigurator {
             return nil
         }
     }
-}
-
-public enum EAPConfiguratorError: Error {
-    /// NSLog("☠️ createNetworkConfigurations: No OID or SSID in configuration")
-    case noOIDOrSSID
-    
-    /// NSLog("☠️ createNetworkConfigurations: Unable to build a working NEHotspotEAPSettings")
-    case noWorkingNEHotspotEAPSettings
-    
-    /// NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
-    case failedToSetTrustedServerCertificates
-    
-    /// NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
-    case unableToVerifyNetwork
-    
-    /// NSLog("☠️ configureAP: buildSettingsWithClientCertificate: addClientCertificate: returned nil")
-    case noClientCertificate
-    
-    /// NSLog("☠️ configureAP: buildSettingsWithClientCertificate: cannot set identity")
-    case cannotSetIdentity
-    
-    // NSLog("☠️ buildSettingsWithUsernamePassword: empty user/pass")
-    case emptyUsernameOrPassword
-    
-    case noOuterEAPType
-    
-    /// NSLog("☠️ buildSettings: Unknown EAPType")
-    case unknownEAPType
-    
-    /// NSLog("☠️ buildSettings: Failed precondition for EAPTLS")
-    case failedEAPTLSPrecondition
-    
-    /// NSLog("☠️ buildSettings: Failed precondition for EAPPEAP/EAPFAST")
-    case failedEAPPEAPEAPFASTPrecondition
-    
-    /// NSLog("☠️ addClientCertificate: SecPKCS12Import: " + String(statusImport))
-    case failedSecPKCS12Import(String)
-    
-    /// NSLog("☠️ addClientCertificate: SecItemAdd: %d", status)
-    case failedSecItemAdd(OSStatus, commonName: String? = nil)
-    
-    /// NSLog("☠️ addClientCertificate: SecItemCopyMatching: retrieving identity returned %d", status)
-    case failedSecItemCopyMatching(OSStatus)
-    
-    /// NSLog("☠️ Unable to base64 decode certificate data")
-    case failedToBase64DecodeCertificate
-    
-    /// NSLog("☠️ addCertificate: SecCertificateCreateWithData: false")
-    case failedToCreateCertificateFromData
-    
-    /// NSLog("☠️ addCertificate: unable to get common name")
-    case failedToCopyCommonName
-    
-    case noConfigurations
 }

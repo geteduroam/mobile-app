@@ -1,4 +1,5 @@
 import AuthClient
+import CacheClient
 import ComposableArchitecture
 import Connect
 import DiscoveryClient
@@ -7,6 +8,7 @@ import Models
 
 public struct Main: ReducerProtocol {
     public let authClient: AuthClient
+    @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.discoveryClient) var discoveryClient
     
     public init(authClient: AuthClient = FailingAuthClient()) {
@@ -22,6 +24,7 @@ public struct Main: ReducerProtocol {
         }
         
         var searchQuery: String
+        var isSearching: Bool = false
         var institutions: IdentifiedArrayOf<Institution>
         
         var selectedInstitutionState: Connect.State?
@@ -63,7 +66,9 @@ public struct Main: ReducerProtocol {
             return .init(uniqueElements: [])
         }
         return .init(uniqueElements: institutions
-            .filter( { $0.name.localizedCaseInsensitiveContains(query) })
+            // Apple recommends this, but that seems to be diacritic sensitive
+            // .filter({ $0.name.localizedCaseInsensitiveContains(query) })
+            .filter({ $0.name.range(of: query, options: [.caseInsensitive, .diacriticInsensitive], locale: Locale.current) != nil })
             .sorted(by: { $0.name < $1.name }))
     }
 
@@ -73,7 +78,16 @@ public struct Main: ReducerProtocol {
             case .onAppear, .tryAgainTapped:
                 state.loadingState = .isLoading
                 return .task {
-                    await .discoveryResponse(TaskResult { try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self).value })
+                    await .discoveryResponse(TaskResult {
+                        do {
+                            let (value, _response) = try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self)
+                            cacheClient.cacheInstitutions(value)
+                            return value
+                        } catch {
+                            let restoredValue = try cacheClient.restoreInstitutions()
+                            return restoredValue
+                        }
+                    })
                 }
 
             case let .discoveryResponse(.success(response)):
@@ -92,12 +106,14 @@ public struct Main: ReducerProtocol {
                 
             case let .searchQueryChanged(query):
                 state.searchQuery = query
+                state.isSearching = true
                 
                 // When the query is cleared we can clear the search results, but we have to make sure to cancel
                 // any in-flight search requests too, otherwise we may get data coming in later.
                 guard !query.isEmpty else {
-                  state.searchResults = []
-                  return .cancel(id: SearchID.self)
+                    state.searchResults = []
+                    state.isSearching = false
+                    return .cancel(id: SearchID.self)
                 }
                 return .none
                 
@@ -112,9 +128,11 @@ public struct Main: ReducerProtocol {
                 
             case let .searchResponse(.success(searchResults)):
                 state.searchResults = searchResults
+                state.isSearching = false
                 return .none
                 
             case .searchResponse(.failure):
+                state.isSearching = false
                 return .none
                 
             case let .select(institution):
