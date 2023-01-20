@@ -98,9 +98,9 @@ public struct Main: ReducerProtocol {
             case let .discoveryResponse(.failure(error)):
                 state.loadingState = .failure
                 state.alert = AlertState(
-                    title: .init("Failed to load institutions"),
+                    title: .init(NSLocalizedString("Failed to load institutions", bundle: .module, comment: "")),
                     message: .init((error as NSError).localizedDescription),
-                    dismissButton: .default(.init("OK"), action: .send(.dismissErrorTapped))
+                    dismissButton: .default(.init(NSLocalizedString("OK", bundle: .module, comment: "OK")), action: .send(.dismissErrorTapped))
                 )
                 return .none
                 

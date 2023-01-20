@@ -8,8 +8,8 @@ struct ConnectButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding()
-            .background(Color("Pink"))
-            .foregroundColor(.white)
+            .background(Color("ConnectButton/Background"))
+            .foregroundColor(Color("ConnectButton/Foreground"))
             .font(theme.connectButtonFont)
             .clipShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.95 : 1)

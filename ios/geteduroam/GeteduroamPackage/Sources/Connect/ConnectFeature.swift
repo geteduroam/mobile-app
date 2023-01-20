@@ -153,9 +153,9 @@ public struct Connect: ReducerProtocol {
             }
             
             state.alert = AlertState(
-                title: .init("Failed to connect"),
+                title: .init(NSLocalizedString("Failed to connect", bundle: .module, comment: "Failed to connect")),
                 message: .init((error as NSError).localizedDescription),
-                dismissButton: .default(.init("OK"), action: .send(.dismissErrorTapped))
+                dismissButton: .default(.init(NSLocalizedString("OK", bundle: .module, comment: "")), action: .send(.dismissErrorTapped))
             )
             return .none
             

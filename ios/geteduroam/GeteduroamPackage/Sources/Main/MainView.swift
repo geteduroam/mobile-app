@@ -22,7 +22,7 @@ public struct MainView: View {
                         HStack {
                             Image(systemName: "magnifyingglass")
                             TextField(
-                                "Search for your institution",
+                                NSLocalizedString("Search for your institution", bundle: .module, comment: ""),
                                 text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged))
                             .font(theme.searchFont)
                             .focused($searchFieldIsFocused)
@@ -35,6 +35,7 @@ public struct MainView: View {
                             }
                             .buttonStyle(.plain)
                             .opacity(searchFieldIsFocused && viewStore.searchQuery.isEmpty == false ? 1 : 0)
+                            .accessibility(label: Text("Clear", bundle: .module))
                         }
                         Rectangle()
                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0.33, maxHeight: 0.33)
@@ -49,7 +50,7 @@ public struct MainView: View {
                 if viewStore.loadingState == .failure {
                     HStack {
                         Image(systemName: "exclamationmark.triangle")
-                        Text("Failed to load institutions")
+                        Text("Failed to load institutions", bundle: .module)
                             .font(theme.errorFont)
                         Button {
                             viewStore.send(.tryAgainTapped)
@@ -63,12 +64,13 @@ public struct MainView: View {
                 } else {
                     List {
                         if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
-                            Text("No matches found")
+                            Text("No matches found", bundle: .module)
                                 .font(theme.errorFont)
                                 .listRowSeparatorTint(Color.clear)
                                 .listRowBackground(Color("Background"))
                         } else if viewStore.searchResults.isEmpty {
                             Text("")
+                                .accessibility(hidden: true)
                                 .listRowSeparatorTint(Color.clear)
                                 .listRowBackground(Color.clear)
                         } else {
@@ -105,6 +107,7 @@ public struct MainView: View {
                         Image("Heart")
                             .resizable()
                             .frame(width: 200, height: 200)
+                            .accessibility(hidden: true)
                         Spacer()
                             .frame(width: 200, height: 200)
                     }

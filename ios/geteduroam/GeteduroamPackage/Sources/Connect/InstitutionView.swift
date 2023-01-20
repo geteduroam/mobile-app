@@ -46,7 +46,7 @@ public struct ConnectView: View {
                                 .listRowBackground(Color("Background"))
                             }
                         } header: {
-                            Text("Profiles")
+                            Text("Profiles", bundle: .module)
                                 .font(theme.profilesHeaderFont)
                         }
                     }
@@ -59,13 +59,17 @@ public struct ConnectView: View {
                     VStack(alignment: .center) {
                         if viewStore.isConnected {
                             Spacer()
-                            Label("Connected", systemImage: "checkmark")
+                            Label(title: {
+                                Text("Connected", bundle: .module)
+                            }, icon: {
+                                Image(systemName: "checkmark")
+                            })
                                 .font(theme.connectedFont)
                         } else {
                             Button {
                                 viewStore.send(.connect)
                             } label: {
-                                Text("CONNECT")
+                                Text("CONNECT", bundle: .module)
                                     .multilineTextAlignment(.center)
                             }
                             .disabled(viewStore.isLoading)
@@ -86,6 +90,7 @@ public struct ConnectView: View {
                         Image("Heart")
                             .resizable()
                             .frame(width: 200, height: 200)
+                            .accessibility(hidden: true)
                         Spacer()
                             .frame(width: 200, height: 200)
                     }
