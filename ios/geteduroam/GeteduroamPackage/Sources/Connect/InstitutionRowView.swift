@@ -8,13 +8,15 @@ public struct InstitutionRowView: View {
     
     let institution: Institution
     
+    @EnvironmentObject var theme: Theme
+    
     public var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .leading) {
                 Text(institution.name)
-                    .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                    .font(theme.institutionNameFont)
                 Text(institution.country)
-                    .font(Font.custom("OpenSans-Regular", size: 11, relativeTo: .footnote))
+                    .font(theme.institutionCountryFont)
             }
             Spacer()
             Image(systemName: "chevron.right")

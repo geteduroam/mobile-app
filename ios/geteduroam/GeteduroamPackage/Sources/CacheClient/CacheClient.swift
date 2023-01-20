@@ -49,22 +49,30 @@ extension CacheClient {
                 return
             }
             try? data.write(to: cacheURL)
+            #if DEBUG
             print("Cached to \(cacheURL)")
+            #endif
         },
         restoreInstitutions: {
             do {
                 let cacheURL = try Self.cacheURLForInstitutions()
                 let data = try Data(contentsOf: cacheURL)
                 let institutions = try JSONDecoder().decode(InstitutionsResponse.self, from: data)
+                #if DEBUG
                 print("Restored from \(cacheURL)")
+                #endif
                 return institutions
             } catch {
+                #if DEBUG
                 print("No cache found, using bundled cache")
+                #endif
                 guard let cacheURL = Bundle.main.url(forResource: "institutions", withExtension: "json") else {
                     throw CacheClientError.noCacheInBundle
                 }
                 let data = try Data(contentsOf: cacheURL)
+                #if DEBUG
                 print("Restored from \(cacheURL)")
+                #endif
                 let institutions = try JSONDecoder().decode(InstitutionsResponse.self, from: data)
                 return institutions
             }

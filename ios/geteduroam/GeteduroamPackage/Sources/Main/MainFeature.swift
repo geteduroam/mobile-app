@@ -80,7 +80,7 @@ public struct Main: ReducerProtocol {
                 return .task {
                     await .discoveryResponse(TaskResult {
                         do {
-                            let (value, _response) = try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self)
+                            let (value, _) = try await discoveryClient.decodedResponse(for: .discover, as: InstitutionsResponse.self)
                             cacheClient.cacheInstitutions(value)
                             return value
                         } catch {
@@ -98,9 +98,9 @@ public struct Main: ReducerProtocol {
             case let .discoveryResponse(.failure(error)):
                 state.loadingState = .failure
                 state.alert = AlertState(
-                    title: .init("Failed to load institutions"),
+                    title: .init(NSLocalizedString("Failed to load institutions", bundle: .module, comment: "")),
                     message: .init((error as NSError).localizedDescription),
-                    dismissButton: .default(.init("OK"), action: .send(.dismissErrorTapped))
+                    dismissButton: .default(.init(NSLocalizedString("OK", bundle: .module, comment: "OK")), action: .send(.dismissErrorTapped))
                 )
                 return .none
                 
@@ -139,7 +139,7 @@ public struct Main: ReducerProtocol {
                 state.selectedInstitutionState = .init(institution: institution)
                 return .none
                 
-            case .institution(.startAgainTapped), .dismissSheet:
+            case .institution(.dismissTapped), .institution(.startAgainTapped), .dismissSheet:
                 state.selectedInstitutionState = nil
                 return .none
                 

@@ -9,12 +9,30 @@ public struct ConnectView: View {
     }
     
     let store: StoreOf<Connect>
-
+    
+    @EnvironmentObject var theme: Theme
+    
     public var body: some View {
         WithViewStore(store) { viewStore in
-            Group {
-                switch viewStore.loadingState {
-                case .initial, .failure:
+            VStack(alignment: .leading) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading) {
+                        Text(viewStore.institution.name)
+                            .font(theme.institutionNameFont)
+                        Text(viewStore.institution.country)
+                            .font(theme.institutionCountryFont)
+                    }
+                    Spacer()
+                    Button(action: {
+                        viewStore.send(.dismissTapped)
+                    }, label: {
+                        Image(systemName: "xmark")
+                    })
+                    .buttonStyle(.plain)
+                }
+                .padding(20)
+                
+                if viewStore.isConnected == false {
                     List {
                         Section {
                             let selectedProfile = viewStore.selectedProfile
@@ -24,44 +42,65 @@ public struct ConnectView: View {
                                 } label: {
                                     ProfileRowView(profile: profile, isSelected: selectedProfile == profile)
                                 }
+                                .listRowSeparatorTint(Color("ListSeparator"))
+                                .listRowBackground(Color("Background"))
                             }
                         } header: {
-                            Text("Profiles")
-                                .font(Font.custom("OpenSans-SemiBold", size: 12, relativeTo: .body))
-                        }
-                        
-                        Button {
-                            viewStore.send(.connect)
-                        } label: {
-                            Text("Connect")
-                                .multilineTextAlignment(.center)
-                                .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                            Text("Profiles", bundle: .module)
+                                .font(theme.profilesHeaderFont)
                         }
                     }
-                    
-                case .isLoading:
-                    ProgressView()
-                    
-                case .success:
-                    VStack {
-                        Image(systemName: "checkmark")
-                        Text("Connected")
-                        Button {
-                            viewStore.send(.startAgainTapped)
-                        } label: {
-                            Text("Start Again")
-                        }
-                    }
+                    .listStyle(.plain)
+                    .disabled(viewStore.canSelectProfile == false)
                 }
+                
+                HStack {
+                    Spacer()
+                    VStack(alignment: .center) {
+                        if viewStore.isConnected {
+                            Spacer()
+                            Label(title: {
+                                Text("Connected", bundle: .module)
+                            }, icon: {
+                                Image(systemName: "checkmark")
+                            })
+                                .font(theme.connectedFont)
+                        } else {
+                            Button {
+                                viewStore.send(.connect)
+                            } label: {
+                                Text("CONNECT", bundle: .module)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .disabled(viewStore.isLoading)
+                            .buttonStyle(ConnectButtonStyle())
+                        }
+                    }
+                    Spacer()
+                }
+                Spacer()
             }
             .onAppear {
                 viewStore.send(.onAppear)
             }
-            .navigationTitle(viewStore.institution.name)
-            .navigationBarTitleDisplayMode(.inline)
+            .background {
+                ZStack {
+                    Color("Background")
+                    VStack(spacing: 0) {
+                        Image("Heart")
+                            .resizable()
+                            .frame(width: 200, height: 200)
+                            .accessibility(hidden: true)
+                        Spacer()
+                            .frame(width: 200, height: 200)
+                    }
+                }
+                .edgesIgnoringSafeArea(.all)
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
             .alert(
-              self.store.scope(state: \.alert),
-              dismiss: .dismissErrorTapped
+                self.store.scope(state: \.alert),
+                dismiss: .dismissErrorTapped
             )
         }
     }
@@ -84,7 +123,16 @@ struct ConnectView_Previews: PreviewProvider {
                             eapconfig_endpoint: nil,
                             oauth: false,
                             authorization_endpoint: nil,
-                            token_endpoint: nil)],
+                            token_endpoint: nil),
+                        .init(
+                            id: "3",
+                            name: "Other Profile",
+                            default: false,
+                            eapconfig_endpoint: nil,
+                            oauth: false,
+                            authorization_endpoint: nil,
+                            token_endpoint: nil)
+                    ],
                     geo: [.init(lat: 0, lon: 0)])),
             reducer: Connect()))
     }

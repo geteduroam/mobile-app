@@ -114,6 +114,7 @@ final class ModelsTests: XCTestCase {
         
         XCTAssertNoDifference(decoded, EAPIdentityProviderList(providers: [
             .init(
+                id: "moreelsepark.geteduroam.nl",
                 validUntil: ISO8601DateFormatter().date(from: "2023-11-25T08:01:26Z")!,
                 authenticationMethods: .init(methods: [.init(
                     EAPMethod: .init(type: 13),

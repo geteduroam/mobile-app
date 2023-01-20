@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "GeteduroamPackage",
+    defaultLocalization: "en",
     platforms: [.iOS(.v15), .macCatalyst(.v15)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -37,6 +38,7 @@ let package = Package(
         .package(url: "https://github.com/openid/AppAuth-iOS.git", from: "1.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.0"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.0.1"),
         .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.0.0"),
         .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.0.0"),
         .package(url: "https://github.com/CoreOffice/XMLCoder.git", .upToNextMajor(from: "0.15.0"))
@@ -51,6 +53,7 @@ let package = Package(
                 "Backport",
                 "CacheClient",
                 "Connect",
+                .product(name: "Dependencies", package: "swift-dependencies"),
                 "DiscoveryClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]),
@@ -61,7 +64,7 @@ let package = Package(
             name: "AuthClient",
             dependencies: [
                 .product(name: "AppAuth", package: "AppAuth-iOS"),
-                .product(name: "Dependencies", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
             ]),
         .target(
@@ -71,13 +74,13 @@ let package = Package(
             name: "CacheClient",
             dependencies: [
                 "Models",
-                .product(name: "Dependencies", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ]),
         .target(
             name: "DiscoveryClient",
             dependencies: [
                 "Models",
-                .product(name: "Dependencies", package: "swift-composable-architecture"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
                 .product(name: "URLRouting", package: "swift-url-routing")
             ]),
         .target(

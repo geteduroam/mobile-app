@@ -123,15 +123,17 @@ public class EAPConfigurator {
                         caImportStatus = eapSettings.setTrustedServerCertificates(importCACertificates(certificateStrings: caCertificates))
                     }
                     guard caImportStatus else {
-                        //                        NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
-                        //                        throw EAPConfiguratorError.failedToSetTrustedServerCertificates
+                        // This code used to throw at this point, but now we choose to continue instead to see if another method works.
+                        // NSLog("☠️ createNetworkConfigurations: setTrustedServerCertificates: returned false")
+                        // throw EAPConfiguratorError.failedToSetTrustedServerCertificates
                         return nil
                     }
                 }
                 
                 guard let trustedServerNames, let caCertificates, !trustedServerNames.isEmpty || !caCertificates.isEmpty else {
-                    //                    NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
-                    //                    throw EAPConfiguratorError.unableToVerifyNetwork
+                    // This code used to throw at this point, but now we choose to continue instead to see if another method works.
+                    // NSLog("😱 createNetworkConfigurations: No server names and no custom CAs set; there is no way to verify this network")
+                    // throw EAPConfiguratorError.unableToVerifyNetwork
                     return nil
                 }
                 

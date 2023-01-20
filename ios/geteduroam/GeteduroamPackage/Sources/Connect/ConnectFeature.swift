@@ -38,6 +38,33 @@ public struct Connect: ReducerProtocol {
             }
         }
         
+        public var canSelectProfile: Bool {
+            switch loadingState {
+            case .initial, .failure:
+                return true
+            case .isLoading, .success:
+                return false
+            }
+        }
+        
+        public var isLoading: Bool {
+            switch loadingState {
+            case .initial, .failure, .success:
+                return false
+            case .isLoading:
+                return true
+            }
+        }
+        
+        public var isConnected: Bool {
+            switch loadingState {
+            case .initial, .failure, .isLoading:
+                return false
+            case .success:
+                return true
+            }
+        }
+        
         public enum LoadingState: Equatable {
             case initial
             case isLoading
@@ -68,6 +95,7 @@ public struct Connect: ReducerProtocol {
         }
         
         case onAppear
+        case dismissTapped
         case select(Profile.ID)
         case connect
         case connectResponse(TaskResult<Void>)
@@ -94,6 +122,9 @@ public struct Connect: ReducerProtocol {
             return .task {
                 await Action.connectResponse(TaskResult<Void> { try await connect(profile: profile, authClient: authClient) })
             }
+            
+        case .dismissTapped:
+            return .none
             
         case let .select(profileId):
             state.selectedProfileId = profileId
@@ -122,9 +153,9 @@ public struct Connect: ReducerProtocol {
             }
             
             state.alert = AlertState(
-                title: .init("Failed to connect"),
+                title: .init(NSLocalizedString("Failed to connect", bundle: .module, comment: "Failed to connect")),
                 message: .init((error as NSError).localizedDescription),
-                dismissButton: .default(.init("OK"), action: .send(.dismissErrorTapped))
+                dismissButton: .default(.init(NSLocalizedString("OK", bundle: .module, comment: "")), action: .send(.dismissErrorTapped))
             )
             return .none
             
@@ -196,7 +227,7 @@ public struct Connect: ReducerProtocol {
         
         let info = SSID.fetchNetworkInfo()
         
-        print("Info: \(info)")
+        print("Info: \(String(describing: info))")
         // TODO: Check if connection works?
     }
     
