@@ -12,6 +12,7 @@ public struct MainView: View {
     public let store: StoreOf<Main>
     
     @FocusState var searchFieldIsFocused: Bool
+    @EnvironmentObject var theme: Theme
     
     public var body: some View {
         WithViewStore(store) { viewStore in
@@ -23,7 +24,7 @@ public struct MainView: View {
                             TextField(
                                 "Search for your institution",
                                 text: viewStore.binding(get: \.searchQuery, send: Main.Action.searchQueryChanged))
-                            .font(Font.custom("OpenSans-Regular", size: 20, relativeTo: .body))
+                            .font(theme.searchFont)
                             .focused($searchFieldIsFocused)
                             .textInputAutocapitalization(.never)
                             
@@ -49,21 +50,21 @@ public struct MainView: View {
                     HStack {
                         Image(systemName: "exclamationmark.triangle")
                         Text("Failed to load institutions")
-                            .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                            .font(theme.errorFont)
                         Button {
                             viewStore.send(.tryAgainTapped)
                         } label: {
                             Image(systemName: "arrow.clockwise")
                         }
                     }
-                    .padding(16)
+                    .padding(20)
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
                     
                 } else {
                     List {
                         if viewStore.isSearching == false && viewStore.searchQuery.isEmpty == false && viewStore.searchResults.isEmpty {
                             Text("No matches found")
-                                .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
+                                .font(theme.errorFont)
                                 .listRowSeparatorTint(Color.clear)
                                 .listRowBackground(Color("Background"))
                         } else if viewStore.searchResults.isEmpty {

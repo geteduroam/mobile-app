@@ -53,6 +53,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>DiscoveryURL</key>
-	<string>https://discovery.eduroam.app/v1/</string>
+	<string>https://discovery.govroam.app/v1/</string>
 </dict>
 </plist>

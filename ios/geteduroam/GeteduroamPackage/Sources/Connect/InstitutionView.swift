@@ -10,15 +10,17 @@ public struct ConnectView: View {
     
     let store: StoreOf<Connect>
     
+    @EnvironmentObject var theme: Theme
+    
     public var body: some View {
         WithViewStore(store) { viewStore in
             VStack(alignment: .leading) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading) {
                         Text(viewStore.institution.name)
-                            .font(Font.custom("OpenSans-Bold", size: 16, relativeTo: .body))
+                            .font(theme.institutionNameFont)
                         Text(viewStore.institution.country)
-                            .font(Font.custom("OpenSans-Regular", size: 11, relativeTo: .footnote))
+                            .font(theme.institutionCountryFont)
                     }
                     Spacer()
                     Button(action: {
@@ -45,7 +47,7 @@ public struct ConnectView: View {
                             }
                         } header: {
                             Text("Profiles")
-                                .font(Font.custom("OpenSans-SemiBold", size: 12, relativeTo: .body))
+                                .font(theme.profilesHeaderFont)
                         }
                     }
                     .listStyle(.plain)
@@ -58,7 +60,7 @@ public struct ConnectView: View {
                         if viewStore.isConnected {
                             Spacer()
                             Label("Connected", systemImage: "checkmark")
-                                .font(Font.custom("OpenSans-Bold", size: 14, relativeTo: .body))
+                                .font(theme.connectedFont)
                         } else {
                             Button {
                                 viewStore.send(.connect)

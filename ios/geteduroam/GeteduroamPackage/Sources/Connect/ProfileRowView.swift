@@ -5,11 +5,13 @@ struct ProfileRowView: View {
     let profile: Profile
     let isSelected: Bool
     
+    @EnvironmentObject var theme: Theme
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
                 Text(profile.name)
-                    .font(Font.custom("OpenSans-Regular", size: 16, relativeTo: .body))
+                    .font(theme.profileNameFont)
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")
