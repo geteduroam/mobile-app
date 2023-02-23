@@ -8,7 +8,6 @@ This is the repository for the a geteduroam KMP project.
 The following software is expected to be available:
 
 - [Android Studio](https://developer.android.com/studio/) (version 4.0 or newer)
-- [Xcode](https://developer.apple.com/download/release/) (version 11.6 or newer)
 - [Visual Studio Code](https://code.visualstudio.com) (version 1.48 or newer)
 
 # Getting Started
@@ -84,5 +83,3 @@ NB:
 w.r.t. `public void addOrUpdatePasspointConfiguration (PasspointConfiguration config)`
 "Compatibility Note: For applications targeting Build.VERSION_CODES.R or above, this API will always
 fail and throw IllegalArgumentException."
-
-## iOS
