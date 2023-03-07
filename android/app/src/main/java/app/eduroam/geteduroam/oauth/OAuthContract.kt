@@ -57,7 +57,7 @@ class OAuthContract(
             Log.e("OAuthContract", "Did not receive valid OAuth intent back")
             return ""
         }
-        handleResponse(service, intentData)
+//        handleResponse(service, intentData)
         return ""
     }
 }
