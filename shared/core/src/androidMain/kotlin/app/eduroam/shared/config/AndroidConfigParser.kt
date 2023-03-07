@@ -1,7 +1,10 @@
 package app.eduroam.shared.config
 
+import app.eduroam.shared.config.model.EAPIdentityProvider
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.simpleframework.xml.core.Persister
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
@@ -9,89 +12,36 @@ import java.io.InputStreamReader
 import java.io.Reader
 import javax.xml.xpath.XPath
 import javax.xml.xpath.XPathConstants
-import javax.xml.xpath.XPathFactory
 
 
 class AndroidConfigParser : ConfigParser {
-    private val xmlRootPath = "/EAPIdentityProviderList/EAPIdentityProvider"
-    private val ieee80211path = "$xmlRootPath/CredentialApplicability/IEEE80211"
-    private val authenticationMethod = "$xmlRootPath/AuthenticationMethods/AuthenticationMethod"
-    private val authMethodType = "$authenticationMethod/EAPMethod/Type"
-    private val innerAuthMethodType =
-        "$authenticationMethod/InnerAuthenticationMethod/EAPMethod/Type"
-    private val serverSideCredentialPath =
-        "$xmlRootPath/AuthenticationMethods/AuthenticationMethod/ServerSideCredential"
-    private val clientSideCredentialPath =
-        "$xmlRootPath/AuthenticationMethods/AuthenticationMethod/ClientSideCredential"
-
     override suspend fun parse(source: ByteArray): WifiConfigData = withContext(Dispatchers.IO) {
-        val xPath: XPath = XPathFactory.newInstance().newXPath()
+
+        val persister = Persister()
+        val eapIdentityProviderList = persister.read(EAPIdentityProviderList::class.java, source.inputStream())
+        val eapIdentityProvider = eapIdentityProviderList?.eapIdentityProvider?.first()
+        val clientCertificate = getClientCertificate(eapIdentityProvider)
 
         WifiConfigData(
-            ssids = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$ieee80211path/SSID/text()"
-            ).distinct(),
-            oids = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$ieee80211path/ConsortiumOID/text()"
-            ).map { it.toLong(16) }.distinct(),
-            clientCertificate = getClientCertificate(xPath, source),
-            anonymousIdentity = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$clientSideCredentialPath/OuterIdentity/text()"
-            ).firstOrNull(),
-            caCertificates = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$serverSideCredentialPath/CA/text()"
-            ).distinct(),
-            serverNames = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$serverSideCredentialPath/ServerID/text()"
-            ).distinct(),
-            username = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$clientSideCredentialPath/UserName/text()"
-            ).firstOrNull(),
-            password = xPath.nodeValues(
-                reader = getReader(source),
-                expression = "$clientSideCredentialPath/Password/text()"
-            ).firstOrNull()
+            ssids = eapIdentityProvider?.credentialApplicability?.map { it.ssid } ?: listOf(),
+            oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf(),
+            clientCertificate = clientCertificate,
+            anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity,
+            caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.value }?.filterNotNull(),
+            serverNames = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }?.filterNotNull(),
+            username = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName,
+            password = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password,
         )
     }
 
-    private fun getReader(source: ByteArray) = InputStreamReader(ByteArrayInputStream(source))
-
-    private fun getClientCertificate(xPath: XPath, source: ByteArray): ClientCertificate? {
-        val passphrase = xPath.nodeValues(
-            reader = getReader(source), expression = "$clientSideCredentialPath/Passphrase/text()"
-        ).firstOrNull()
-        val clientCertificate = xPath.nodeValues(
-            reader = getReader(source),
-            expression = "$clientSideCredentialPath/ClientCertificate/text()"
-        ).firstOrNull()
-
+    private fun getClientCertificate(eapIdentityProvider: EAPIdentityProvider?): ClientCertificate? {
+        val passphrase = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.passphrase
+        val clientCertificate = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.clientCertificate?.value
         return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
             null
         else ClientCertificate(
             passphrase = passphrase,
             pkcs12StoreB64 = clientCertificate
         )
-    }
-
-    private fun XPath.nodeValues(reader: Reader, expression: String): List<String> = (this.evaluate(
-        expression,
-        InputSource(reader),
-        XPathConstants.NODESET
-    ) as NodeList).nodeValues()
-
-    private fun NodeList.nodeValues(): List<String> {
-        val list = mutableListOf<String>()
-
-        for (i in 0 until this.length) {
-            list.add(this.item(i).nodeValue)
-        }
-
-        return list
     }
 }

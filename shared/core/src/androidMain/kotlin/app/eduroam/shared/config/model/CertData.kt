@@ -1,0 +1,16 @@
+package app.eduroam.shared.config.model
+
+import org.simpleframework.xml.Attribute
+import org.simpleframework.xml.Text
+
+class CertData {
+
+    @field:Text
+    var value: String? = null
+
+    @field:Attribute
+    var format: String? = null
+
+    @field:Attribute
+    var encoding: String? = null
+}
