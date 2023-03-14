@@ -8,14 +8,12 @@ import androidx.core.view.WindowCompat
 import app.eduroam.geteduroam.oauth.OAuthViewModel
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import app.eduroam.shared.BuildConfig
-import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.injectLogger
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.select.SelectInstitutionViewModel
 import co.touchlab.kermit.Logger
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
-import org.simpleframework.xml.core.Persister
 
 class MainActivity : ComponentActivity(), KoinComponent {
     private val log: Logger by injectLogger("MainActivity")
@@ -26,7 +24,6 @@ class MainActivity : ComponentActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }

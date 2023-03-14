@@ -41,5 +41,5 @@ dependencies {
     implementation Libs.AndroidX.Lifecycle.viewModelKtx
     implementation Libs.SqlDelight.androidDriver
     implementation Libs.scribejava
-    api('org.simpleframework:simple-xml:2.7.1')
+    implementation Libs.simplexml
 }

@@ -5,13 +5,6 @@ import app.eduroam.shared.config.model.EAPIdentityProviderList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simpleframework.xml.core.Persister
-import org.w3c.dom.NodeList
-import org.xml.sax.InputSource
-import java.io.ByteArrayInputStream
-import java.io.InputStreamReader
-import java.io.Reader
-import javax.xml.xpath.XPath
-import javax.xml.xpath.XPathConstants
 
 
 class AndroidConfigParser : ConfigParser {
