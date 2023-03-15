@@ -38,5 +38,4 @@ class MainActivity : ComponentActivity(), KoinComponent {
             }
         }
     }
-
 }

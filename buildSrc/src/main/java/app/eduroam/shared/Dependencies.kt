@@ -9,6 +9,7 @@ object Libs {
     const val timberLog = "com.jakewharton.timber:timber:5.0.1"
     const val desugaring = "com.android.tools:desugar_jdk_libs:1.1.5"
     const val scribejava = "com.github.scribejava:scribejava-core:8.3.1"
+    const val simplexml = "org.simpleframework:simple-xml:2.7.1"
 
     object AndroidX {
         const val core = "androidx.core:core-ktx:1.9.0"
