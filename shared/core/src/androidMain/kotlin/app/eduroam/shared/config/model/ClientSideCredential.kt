@@ -10,6 +10,9 @@ class ClientSideCredential {
     @field:Element(name = "InnerIdentityPrefix", required = false)
     var innerIdentityPrefix: String? = null
 
+    @field:Element(name = "InnerIdentityHint", required = false)
+    var innerIdentityHint: String? = null
+
     @field:Element(name = "OuterIdentity", required = false)
     var outerIdentity: String? = null
 
