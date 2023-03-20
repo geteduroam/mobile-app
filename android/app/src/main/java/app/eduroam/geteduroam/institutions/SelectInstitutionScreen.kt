@@ -2,16 +2,25 @@ package app.eduroam.geteduroam.institutions
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
@@ -67,6 +76,51 @@ fun SelectInstitutionScreen(
         searchText = uiDataState.data?.filterOn.orEmpty(),
         onSearchTextChange = { viewModel.onSearchTextChange(it) },
     )
+}
+
+@Composable
+fun LoginDialog(
+    onConfirmClicked: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Login Required")
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .weight(weight = 1f, fill = false)
+                        .padding(vertical = 16.dp)
+                ) {
+                    Text(
+                        text = "Please enter your username and password"
+                    )
+
+                    OutlinedTextField(value = "", onValueChange = {
+                    }, Modifier.padding(top = 8.dp), label = { Text(text = "Username") })
+
+                    OutlinedTextField(value = "", onValueChange = {
+                    }, Modifier.padding(top = 8.dp), label = { Text(text = "Password") })
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onDismiss) {
+                        Text(text = "Cancel")
+                    }
+                    TextButton(onClick = onConfirmClicked) {
+                        Text(text = "Log in")
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

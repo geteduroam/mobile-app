@@ -1,8 +1,10 @@
 package app.eduroam.shared.config.model
 
 import org.simpleframework.xml.Attribute
+import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
 
+@Root(name = "CA")
 class CertData {
 
     @field:Text

@@ -20,7 +20,7 @@ class AndroidConfigParser : ConfigParser {
             oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf(),
             clientCertificate = clientCertificate,
             anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity,
-            caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.value }?.filterNotNull(),
+            caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }?.filterNotNull(),
             serverNames = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }?.filterNotNull(),
             username = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName,
             password = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password,
