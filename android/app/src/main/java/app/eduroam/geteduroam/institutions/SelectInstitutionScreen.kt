@@ -124,6 +124,46 @@ fun LoginDialog(
 }
 
 @Composable
+fun TermsOfUseDialog(
+    onConfirmClicked: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Terms of use")
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .weight(weight = 1f, fill = false)
+                        .padding(vertical = 16.dp)
+                ) {
+                    Text(
+                        text = "You must agree with to the terms of use before you can use this network"
+                    )
+                    TextButton(onClick = onDismiss) {
+                        Text(text = "Agree")
+                    }
+                    TextButton(onClick = onConfirmClicked) {
+                        Text(text = "Read Terms of Use")
+                    }
+                    TextButton(onClick = onConfirmClicked) {
+                        Text(text = "Disagree")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
 fun SelectInstitutionContent(
     institutionsState: DataState<ItemDataSummary>,
     onSelectInstitution: (Institution) -> Unit,
