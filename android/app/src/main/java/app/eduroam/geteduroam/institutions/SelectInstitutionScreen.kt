@@ -3,6 +3,7 @@ package app.eduroam.geteduroam.institutions
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
@@ -20,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -100,7 +104,7 @@ fun LoginDialog(
                 shape = MaterialTheme.shapes.medium
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Login Required")
+                    Text(text = stringResource(R.string.login_dialog_title))
 
                     Column(
                         modifier = Modifier
@@ -110,17 +114,20 @@ fun LoginDialog(
                             .padding(vertical = 16.dp)
                     ) {
                         Text(
-                            text = "Please enter your username and password"
+                            text = stringResource(R.string.login_dialog_text)
                         )
 
                         OutlinedTextField(value = username.value, onValueChange = {
                             username.value = it
-                        }, Modifier.padding(top = 8.dp), label = { Text(text = "Username") },  textStyle = TextStyle(color = Color.White))
+                        }, Modifier.padding(top = 8.dp), label = { Text(text = stringResource(R.string.login_dialog_username)) },  textStyle = TextStyle(color = Color.White))
 
                         OutlinedTextField(value = password.value, onValueChange = {
                             password.value = it
                         }, Modifier.padding(top = 8.dp),
-                            label = { Text(text = "Password") }, textStyle = TextStyle(color = Color.White)
+                            label = { Text(text = stringResource(R.string.login_dialog_password)) },
+                            textStyle = TextStyle(color = Color.White),
+                            visualTransformation = PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password)
                         )
                     }
 
@@ -129,14 +136,14 @@ fun LoginDialog(
                             openDialog.value = false
                             onDismiss()
                         }) {
-                            Text(text = "Cancel")
+                            Text(text = stringResource(R.string.login_dialog_cancel))
                         }
                         TextButton(onClick = {
                             openDialog.value = false
                             onDismiss()
                             onConfirmClicked(username.value, password.value)
                         }) {
-                            Text(text = "Log in")
+                            Text(text = stringResource(R.string.login_dialog_login))
                         }
                     }
                 }
@@ -157,7 +164,7 @@ fun TermsOfUseDialog(
             shape = MaterialTheme.shapes.medium
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Terms of use")
+                Text(text = stringResource(R.string.terms_of_use_dialog_title))
 
                 Column(
                     modifier = Modifier
@@ -167,16 +174,16 @@ fun TermsOfUseDialog(
                         .padding(vertical = 16.dp)
                 ) {
                     Text(
-                        text = "You must agree with to the terms of use before you can use this network"
+                        text = stringResource(R.string.terms_of_use_dialog_text)
                     )
                     TextButton(onClick = onDismiss) {
-                        Text(text = "Agree")
+                        Text(text = stringResource(R.string.terms_of_use_dialog_agree))
                     }
                     TextButton(onClick = onConfirmClicked) {
-                        Text(text = "Read Terms of Use")
+                        Text(text = stringResource(R.string.terms_of_use_dialog_read_tou))
                     }
                     TextButton(onClick = onConfirmClicked) {
-                        Text(text = "Disagree")
+                        Text(text = stringResource(R.string.terms_of_use_dialog_disagree))
                     }
                 }
             }
