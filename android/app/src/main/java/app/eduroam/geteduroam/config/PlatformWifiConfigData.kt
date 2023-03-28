@@ -26,14 +26,6 @@ fun EAPIdentityProviderList.buildAllNetworkSuggestions(): List<WifiNetworkSugges
 
 }
 
-private fun getClientCertificate(eapIdentityProvider: EAPIdentityProvider?): ClientCertificate? {
-    val passphrase = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.passphrase
-    val clientCertificate = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.clientCertificate?.value
-    return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
-        null
-    else ClientCertificate(passphrase, clientCertificate)
-}
-
 /**
  * Create SSID-based network suggestions for this profile
  *
@@ -104,8 +96,8 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     val enterpriseConfig = WifiEnterpriseConfig()
     enterpriseConfig.anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
 
-    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
-    enterpriseConfig.eapMethod = enterpriseEAP
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
+    enterpriseConfig.eapMethod = enterpriseEAP ?: 0
 
     val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }?.filterNotNull()
     enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
@@ -147,7 +139,7 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
 
     enterpriseConfig.password = ""
     enterpriseConfig.phase2Method = WifiEnterpriseConfig.Phase2.NONE
-    val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
+    val clientCert = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
     enterpriseConfig.setClientKeyEntry(
         clientCert!!.key, clientCert.value[0]
     )
@@ -218,11 +210,11 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     }
     cred.realm = fqdn
 
-    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
     when (enterpriseEAP) {
         WifiEnterpriseConfig.Eap.TLS -> {
             val certCred = Credential.CertificateCredential()
-            val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
+            val clientCert = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
             certCred.certType = "x509v3"
             cred.clientPrivateKey = clientCert?.key!!
             cred.clientCertificateChain = clientCert.value

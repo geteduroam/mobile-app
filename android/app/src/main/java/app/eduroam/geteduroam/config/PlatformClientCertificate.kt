@@ -2,6 +2,7 @@ package app.eduroam.geteduroam.config
 
 import android.util.Base64
 import android.util.Log
+import app.eduroam.shared.config.model.ClientSideCredential
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -27,10 +28,10 @@ import java.util.*
     NoSuchAlgorithmException::class,
     UnrecoverableKeyException::class
 )
-fun ClientCertificate.getClientCertificate(
+fun ClientSideCredential.getClientCertificate(
 ): Map.Entry<PrivateKey, Array<X509Certificate>> {
     try {
-        val bytes = Base64.decode(pkcs12StoreB64, Base64.NO_WRAP)
+        val bytes = Base64.decode(clientCertificate?.value, Base64.NO_WRAP)
         val passphraseBytes = passphrase?.toCharArray() ?: CharArray(0)
         val pkcs12ks = KeyStore.getInstance("pkcs12")
         val b = ByteArrayInputStream(bytes)
