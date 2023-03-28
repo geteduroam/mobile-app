@@ -96,8 +96,8 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     val enterpriseConfig = WifiEnterpriseConfig()
     enterpriseConfig.anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
 
-    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
-    enterpriseConfig.eapMethod = enterpriseEAP
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
+    enterpriseConfig.eapMethod = enterpriseEAP ?: 0
 
     val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }?.filterNotNull()
     enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
@@ -210,7 +210,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     }
     cred.realm = fqdn
 
-    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
     when (enterpriseEAP) {
         WifiEnterpriseConfig.Eap.TLS -> {
             val certCred = Credential.CertificateCredential()
