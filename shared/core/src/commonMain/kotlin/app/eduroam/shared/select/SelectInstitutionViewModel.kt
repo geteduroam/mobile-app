@@ -22,6 +22,8 @@ class SelectInstitutionViewModel(
         DataState(loading = true)
     )
 
+    val creds: MutableStateFlow<Pair<String?,String?>> = MutableStateFlow(Pair<String?,String?>(null, null))
+
     //There is no end point that allows searching so we have to get all the institutions once and cache the result
     private lateinit var allInstitutions: List<Institution>
     private val log = log.withTag("SelectInstitutionViewModel")
@@ -41,6 +43,10 @@ class SelectInstitutionViewModel(
                 }
             }
         }
+    }
+
+    fun clearDialog() {
+        (uiDataState as MutableStateFlow).value = uiDataState.value.copy(showDialog = false)
     }
 
     override fun onCleared() {

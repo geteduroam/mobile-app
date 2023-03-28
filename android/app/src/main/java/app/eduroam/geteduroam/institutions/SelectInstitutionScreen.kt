@@ -3,11 +3,11 @@ package app.eduroam.geteduroam.institutions
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,7 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -75,11 +80,80 @@ fun SelectInstitutionScreen(
         },
         searchText = uiDataState.data?.filterOn.orEmpty(),
         onSearchTextChange = { viewModel.onSearchTextChange(it) },
+        onClearDialog = viewModel::clearDialog,
+        onCredsAvailable = { username, password ->
+            viewModel.creds.value = Pair(username, password)
+        }
     )
 }
 
 @Composable
 fun LoginDialog(
+    onConfirmClicked: (String, String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val openDialog = remember { mutableStateOf(true) }
+    val username = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+
+    if (openDialog.value) {
+        Dialog(
+            onDismissRequest = onDismiss,
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = stringResource(R.string.login_dialog_title))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .weight(weight = 1f, fill = false)
+                            .padding(vertical = 16.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.login_dialog_text)
+                        )
+
+                        OutlinedTextField(value = username.value, onValueChange = {
+                            username.value = it
+                        }, Modifier.padding(top = 8.dp), label = { Text(text = stringResource(R.string.login_dialog_username)) },  textStyle = TextStyle(color = Color.White))
+
+                        OutlinedTextField(value = password.value, onValueChange = {
+                            password.value = it
+                        }, Modifier.padding(top = 8.dp),
+                            label = { Text(text = stringResource(R.string.login_dialog_password)) },
+                            textStyle = TextStyle(color = Color.White),
+                            visualTransformation = PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password)
+                        )
+                    }
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        TextButton(onClick = {
+                            openDialog.value = false
+                            onDismiss()
+                        }) {
+                            Text(text = stringResource(R.string.login_dialog_cancel))
+                        }
+                        TextButton(onClick = {
+                            openDialog.value = false
+                            onDismiss()
+                            onConfirmClicked(username.value, password.value)
+                        }) {
+                            Text(text = stringResource(R.string.login_dialog_login))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TermsOfUseDialog(
     onConfirmClicked: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -90,7 +164,7 @@ fun LoginDialog(
             shape = MaterialTheme.shapes.medium
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Login Required")
+                Text(text = stringResource(R.string.terms_of_use_dialog_title))
 
                 Column(
                     modifier = Modifier
@@ -100,22 +174,16 @@ fun LoginDialog(
                         .padding(vertical = 16.dp)
                 ) {
                     Text(
-                        text = "Please enter your username and password"
+                        text = stringResource(R.string.terms_of_use_dialog_text)
                     )
-
-                    OutlinedTextField(value = "", onValueChange = {
-                    }, Modifier.padding(top = 8.dp), label = { Text(text = "Username") })
-
-                    OutlinedTextField(value = "", onValueChange = {
-                    }, Modifier.padding(top = 8.dp), label = { Text(text = "Password") })
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onDismiss) {
-                        Text(text = "Cancel")
+                        Text(text = stringResource(R.string.terms_of_use_dialog_agree))
                     }
                     TextButton(onClick = onConfirmClicked) {
-                        Text(text = "Log in")
+                        Text(text = stringResource(R.string.terms_of_use_dialog_read_tou))
+                    }
+                    TextButton(onClick = onConfirmClicked) {
+                        Text(text = stringResource(R.string.terms_of_use_dialog_disagree))
                     }
                 }
             }
@@ -123,69 +191,80 @@ fun LoginDialog(
     }
 }
 
+
 @Composable
 fun SelectInstitutionContent(
     institutionsState: DataState<ItemDataSummary>,
     onSelectInstitution: (Institution) -> Unit,
     searchText: String,
     onSearchTextChange: (String) -> Unit = {},
+    onClearDialog: () -> Unit = {},
+    onCredsAvailable: (String, String) -> Unit = { _, _ -> }
 ) = Scaffold(topBar = {
     EduTopAppBar(stringResource(R.string.name))
 }) { paddingValues ->
-    Column(
-        Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .systemBarsPadding()
-            .padding(horizontal = 16.dp)
-    ) {
-        LazyColumn {
-            item {
-                InstitutionSearchHeader(
-                    searchText = searchText,
-                    onSearchTextChange = onSearchTextChange,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (institutionsState.loading) {
+    if (institutionsState.showDialog == true) {
+        LoginDialog({ username, password ->
+            onCredsAvailable(username, password)
+            onClearDialog()
+        }, {})
+    } else {
+        Column(
+            Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(horizontal = 16.dp)
+        ) {
+            LazyColumn {
                 item {
-                    LinearProgressIndicator(
+                    InstitutionSearchHeader(
+                        searchText = searchText,
+                        onSearchTextChange = onSearchTextChange,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
-            } else if (institutionsState.exception != null) {
-                item {
-                    Text(
-                        text = institutionsState.exception.orEmpty(),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-            } else {
-                if (institutionsState.empty) {
-                    item {
-                        Text(stringResource(id = R.string.institutions_no_results))
-                    }
-                } else {
 
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                if (institutionsState.loading) {
+                    item {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else if (institutionsState.exception != null) {
                     item {
                         Text(
-                            text = stringResource(id = R.string.institutions_choose_one),
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = institutionsState.exception.orEmpty(),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge,
                         )
-                        Spacer(Modifier.height(8.dp))
                     }
-
-                    institutionsState.data?.institutions?.forEach { institution ->
+                } else {
+                    if (institutionsState.empty) {
                         item {
-                            InstitutionRow(institution, onSelectInstitution)
+                            Text(stringResource(id = R.string.institutions_no_results))
+                        }
+                    } else {
+
+                        item {
+                            Text(
+                                text = stringResource(id = R.string.institutions_choose_one),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        institutionsState.data?.institutions?.forEach { institution ->
+                            item {
+                                InstitutionRow(institution, onSelectInstitution)
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 }

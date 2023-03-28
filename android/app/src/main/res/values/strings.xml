@@ -11,4 +11,15 @@
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Canceled</string>
     <string name="configuration_completed">Completed</string>
+    <string name="login_dialog_title">Login Required</string>
+    <string name="login_dialog_text">Please enter your username and password</string>
+    <string name="login_dialog_username">Username</string>
+    <string name="login_dialog_password">Password</string>
+    <string name="login_dialog_cancel">Cancel</string>
+    <string name="login_dialog_login">Log in</string>
+    <string name="terms_of_use_dialog_title">Terms of use</string>
+    <string name="terms_of_use_dialog_text">You must agree with to the terms of use before you can use this network</string>
+    <string name="terms_of_use_dialog_agree">Agree</string>
+    <string name="terms_of_use_dialog_read_tou">Read Terms of Use</string>
+    <string name="terms_of_use_dialog_disagree">Disagree</string>
 </resources>
