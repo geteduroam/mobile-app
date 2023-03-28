@@ -26,14 +26,6 @@ fun EAPIdentityProviderList.buildAllNetworkSuggestions(): List<WifiNetworkSugges
 
 }
 
-private fun getClientCertificate(eapIdentityProvider: EAPIdentityProvider?): ClientCertificate? {
-    val passphrase = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.passphrase
-    val clientCertificate = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.clientCertificate?.value
-    return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
-        null
-    else ClientCertificate(passphrase, clientCertificate)
-}
-
 /**
  * Create SSID-based network suggestions for this profile
  *
@@ -147,7 +139,7 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
 
     enterpriseConfig.password = ""
     enterpriseConfig.phase2Method = WifiEnterpriseConfig.Phase2.NONE
-    val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
+    val clientCert = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
     enterpriseConfig.setClientKeyEntry(
         clientCert!!.key, clientCert.value[0]
     )
@@ -222,7 +214,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     when (enterpriseEAP) {
         WifiEnterpriseConfig.Eap.TLS -> {
             val certCred = Credential.CertificateCredential()
-            val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
+            val clientCert = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
             certCred.certType = "x509v3"
             cred.clientPrivateKey = clientCert?.key!!
             cred.clientCertificateChain = clientCert.value
