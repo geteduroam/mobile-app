@@ -7,7 +7,6 @@ import app.eduroam.geteduroam.util.CrashlyticsTree
 import app.eduroam.shared.AppInfo
 import app.eduroam.shared.BuildConfig
 import app.eduroam.shared.config.AndroidConfigParser
-import app.eduroam.shared.config.ConfigParser
 import app.eduroam.shared.initKoin
 import app.eduroam.shared.profile.SelectProfileViewModel
 import app.eduroam.shared.select.SelectInstitutionViewModel
@@ -38,7 +37,7 @@ class AndroidApp : Application() {
                     get { parametersOf("OAuthViewModel") })
             }
             single<AppInfo> { AndroidAppInfo }
-            single<ConfigParser> { AndroidConfigParser() }
+            single<AndroidConfigParser> { AndroidConfigParser() }
             single {
                 { Timber.tag("Startup").i("Hello from Android/Kotlin!") }
             }

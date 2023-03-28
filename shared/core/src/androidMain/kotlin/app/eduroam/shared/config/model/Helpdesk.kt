@@ -1,7 +1,9 @@
 package app.eduroam.shared.config.model
 
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Element
 
+@Serializable
 class Helpdesk {
 
     @field:Element(name = "EmailAddress", required = false)

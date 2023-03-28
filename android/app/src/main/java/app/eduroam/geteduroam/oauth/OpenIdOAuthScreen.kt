@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.response.Profile
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
@@ -23,7 +23,7 @@ fun OpenIdOAuthScreen(
     institutionId: String,
     profile: Profile,
     viewModel: OAuthViewModel,
-    goToConfigScreen: (WifiConfigData) -> Unit,
+    goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
 
     Scaffold(topBar = {

@@ -10,11 +10,12 @@ import android.os.Build
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProvider
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import java.nio.charset.Charset
 
 
-fun WifiConfigData.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
+fun EAPIdentityProviderList.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
     val suggestions = buildSSIDSuggestions()
     val passpointSuggestions = buildPasspointSuggestion()
     return if (passpointSuggestions != null) {
@@ -23,6 +24,14 @@ fun WifiConfigData.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
         suggestions
     }
 
+}
+
+private fun getClientCertificate(eapIdentityProvider: EAPIdentityProvider?): ClientCertificate? {
+    val passphrase = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.passphrase
+    val clientCertificate = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.clientCertificate?.value
+    return if (passphrase.isNullOrEmpty() || clientCertificate.isNullOrEmpty())
+        null
+    else ClientCertificate(passphrase, clientCertificate)
 }
 
 /**
@@ -35,7 +44,9 @@ fun WifiConfigData.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
  * @see this.buildPasspointSuggestion
  * @see this.buildNetworkRequests
  */
-fun WifiConfigData.buildSSIDSuggestions(): List<WifiNetworkSuggestion> {
+fun EAPIdentityProviderList.buildSSIDSuggestions(): List<WifiNetworkSuggestion> {
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val ssids = eapIdentityProvider?.credentialApplicability?.map { it.ssid } ?: listOf()
     // Initial capacity = amount of SSIDs + 1, to keep room for a a Passpoint configuration
     val enterpriseConfig = buildEnterpriseConfig()
     return ssids.filterNotNull().map { ssid ->
@@ -57,7 +68,7 @@ fun WifiConfigData.buildSSIDSuggestions(): List<WifiNetworkSuggestion> {
  * @see this.buildNetworkRequests
  */
 @RequiresApi(api = Build.VERSION_CODES.R)
-fun WifiConfigData.buildPasspointSuggestion(): WifiNetworkSuggestion? {
+fun EAPIdentityProviderList.buildPasspointSuggestion(): WifiNetworkSuggestion? {
     val passpointConfig = buildPasspointConfig()
     return if (passpointConfig != null) {
         WifiNetworkSuggestion.Builder().setPasspointConfig(passpointConfig).build()
@@ -72,7 +83,9 @@ fun WifiConfigData.buildPasspointSuggestion(): WifiNetworkSuggestion? {
  * @return List of Wi-Fi configurations
  */
 @Suppress("DEPRECATION")
-fun WifiConfigData.buildWifiConfigurations(): List<WifiConfiguration> {
+fun EAPIdentityProviderList.buildWifiConfigurations(): List<WifiConfiguration> {
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val ssids = eapIdentityProvider?.credentialApplicability?.map { it.ssid } ?: listOf()
     val enterpriseConfig = buildEnterpriseConfig()
     return ssids.map { ssid ->
         val config = WifiConfiguration()
@@ -86,11 +99,18 @@ fun WifiConfigData.buildWifiConfigurations(): List<WifiConfiguration> {
     }
 }
 
-private fun WifiConfigData.buildEnterpriseConfig(): WifiEnterpriseConfig {
+private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfig {
+    val eapIdentityProvider = eapIdentityProvider?.first()
     val enterpriseConfig = WifiEnterpriseConfig()
-    enterpriseConfig.anonymousIdentity = anonymousIdentity
+    enterpriseConfig.anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
+
+    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
     enterpriseConfig.eapMethod = enterpriseEAP
+
+    val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }?.filterNotNull()
     enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
+
+    val serverNames = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }?.filterNotNull()
     assert(
         (serverNames?.size != 0) // Checked in WifiProfile constructor
     )
@@ -110,17 +130,24 @@ private fun WifiConfigData.buildEnterpriseConfig(): WifiEnterpriseConfig {
     return enterpriseConfig
 }
 
-private fun WifiConfigData.handleOtherEap(enterpriseConfig: WifiEnterpriseConfig) {
+private fun EAPIdentityProviderList.handleOtherEap(enterpriseConfig: WifiEnterpriseConfig) {
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val username = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName
+    val password = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password
+    val enterprisePhase2Auth: Int = 0 // TODO fixme!!! is always 0
+
     enterpriseConfig.identity = username
     enterpriseConfig.password = password
     enterpriseConfig.phase2Method = enterprisePhase2Auth
 }
 
-private fun WifiConfigData.handleEapTLS(enterpriseConfig: WifiEnterpriseConfig) {
+private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpriseConfig) {
     // Explicitly unset unused field
+    val eapIdentityProvider = eapIdentityProvider?.first()
+
     enterpriseConfig.password = ""
     enterpriseConfig.phase2Method = WifiEnterpriseConfig.Phase2.NONE
-    val clientCert = clientCertificate?.getClientCertificate()
+    val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
     enterpriseConfig.setClientKeyEntry(
         clientCert!!.key, clientCert.value[0]
     )
@@ -128,6 +155,7 @@ private fun WifiConfigData.handleEapTLS(enterpriseConfig: WifiEnterpriseConfig) 
     // while for PEAP/TTLS, "identity" is the inner identity,
     // and anonymousIdentity is the outer identity
     // - so we have to do some weird shuffling here.
+    val anonymousIdentity = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
     enterpriseConfig.identity = anonymousIdentity
 }
 
@@ -144,7 +172,9 @@ private fun WifiConfigData.handleEapTLS(enterpriseConfig: WifiEnterpriseConfig) 
  *
  * @return The server name
  */
-private fun WifiConfigData.getServerNamesDomainDependentOnAndroidVersion(): String? {
+private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersion(): String? {
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val serverNames = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }?.filterNotNull()
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         serverNames?.joinToString(";")
     } else {
@@ -152,14 +182,19 @@ private fun WifiConfigData.getServerNamesDomainDependentOnAndroidVersion(): Stri
     }
 }
 
-
 /**
  * Create the configuration necessary to configure a passpoint and returns it
  *
  * @return Passpoint configuration for this profile
  * @see this.buildEnterpriseConfig
  */
-fun WifiConfigData.buildPasspointConfig(): PasspointConfiguration? {
+fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }?.filterNotNull()
+    val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf()
+    val enterprisePhase2Auth: Int = 0 // TODO fixme!!! is always 0
+    val fqdn: String? = null // TODO fixme!!! is always null
+
     if (oids.isEmpty()) {
         Log.i(TAG, "Not creating Passpoint configuration due to no OIDs set")
         return null
@@ -182,10 +217,12 @@ fun WifiConfigData.buildPasspointConfig(): PasspointConfiguration? {
         return null
     }
     cred.realm = fqdn
+
+    val enterpriseEAP = 0 // TODO fixme!!! was always 0 in previous code
     when (enterpriseEAP) {
         WifiEnterpriseConfig.Eap.TLS -> {
             val certCred = Credential.CertificateCredential()
-            val clientCert = clientCertificate?.getClientCertificate()
+            val clientCert = getClientCertificate(eapIdentityProvider)?.getClientCertificate()
             certCred.certType = "x509v3"
             cred.clientPrivateKey = clientCert?.key!!
             cred.clientCertificateChain = clientCert.value
@@ -200,6 +237,8 @@ fun WifiConfigData.buildPasspointConfig(): PasspointConfiguration? {
             return null // known but unsupported EAP method
         }
         WifiEnterpriseConfig.Eap.PEAP, WifiEnterpriseConfig.Eap.TTLS -> {
+            val username = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName
+            val password = eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password
             val passwordBytes =
                 password!!.toByteArray(Charset.defaultCharset()) // TODO explicitly use UTF-8?
             val base64 = Base64.encodeToString(passwordBytes, Base64.DEFAULT)
@@ -221,14 +260,39 @@ fun WifiConfigData.buildPasspointConfig(): PasspointConfiguration? {
     return passpointConfig
 }
 
-private fun WifiConfigData.setupHomeSp(): HomeSp {
+private fun EAPIdentityProviderList.setupHomeSp(): HomeSp {
     val homeSp = HomeSp()
+    val eapIdentityProvider = eapIdentityProvider?.first()
+    val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf()
+
     // The FQDN in this case is the server names being used to verify the server certificate
     // Passpoint also has a domain, which is set later with Credential.setRealm(fqdn)
     homeSp.fqdn = getServerNamesDomainDependentOnAndroidVersion()
+    val fqdn: String? = null // TODO fixme!!! is always null
     homeSp.friendlyName = "$fqdn via Passpoint"
     homeSp.roamingConsortiumOis = oids.toLongArray()
     return homeSp
+}
+
+fun getLongestSuffix(strings: List<String?>?): String? {
+    if (strings.isNullOrEmpty()) return ""
+    if (strings.size == 1) return strings[0]
+    var longest = strings[0]
+    for (candidate: String? in strings) {
+        var pos = candidate!!.length
+        do {
+            pos = candidate.lastIndexOf('.', pos - 2) + 1
+        } while (pos > 0 && longest!!.endsWith(candidate.substring(pos)))
+        if (!longest!!.endsWith(candidate.substring(pos))) {
+            pos = candidate.indexOf('.', pos)
+        }
+        if (pos == -1) {
+            longest = ""
+        } else if (longest.endsWith(candidate.substring(pos))) {
+            longest = candidate.substring(if (pos == 0) 0 else pos + 1)
+        }
+    }
+    return longest
 }
 
 

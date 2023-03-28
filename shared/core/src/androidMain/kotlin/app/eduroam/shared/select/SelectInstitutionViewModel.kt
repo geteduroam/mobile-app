@@ -1,8 +1,7 @@
 package app.eduroam.shared.select
 
 import app.eduroam.shared.OAuth2
-import app.eduroam.shared.config.ConfigParser
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.AndroidConfigParser
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.models.ViewModel
@@ -14,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SelectInstitutionViewModel(
     private val institutionRepository: InstitutionsRepository,
-    private val configParser: ConfigParser,
+    private val configParser: AndroidConfigParser,
     log: Logger,
 ) : ViewModel() {
     val step: MutableStateFlow<Step> = MutableStateFlow(Step.Start)

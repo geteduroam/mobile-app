@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.response.Institution
 import app.eduroam.shared.response.Profile
 import io.ktor.http.*
@@ -96,18 +96,18 @@ sealed class Screens(val route: String) {
             defaultValue = ""
         })
 
-        fun encodeArguments(wifiConfigData: WifiConfigData): String {
-            val wifiConfigDataJson = Json.encodeToString(wifiConfigData)
+        fun encodeArguments(eapIdentityProviderList: EAPIdentityProviderList): String {
+            val wifiConfigDataJson = Json.encodeToString(eapIdentityProviderList)
             val encodedWifiConfig = URLEncoder.encode(
                 wifiConfigDataJson, Charsets.UTF_8.toString()
             )
             return "$route/$encodedWifiConfig"
         }
 
-        fun decodeUrlArgument(arguments: Bundle?): WifiConfigData {
-            val encodedWifiConfigData = arguments?.getString(wifiConfigDataArg).orEmpty()
+        fun decodeUrlArgument(arguments: Bundle?): EAPIdentityProviderList {
+            val encodedEAPIdentityProviderList = arguments?.getString(wifiConfigDataArg).orEmpty()
             val decodedWifiConfigDataJson =
-                URLDecoder.decode(encodedWifiConfigData, Charsets.UTF_8.toString())
+                URLDecoder.decode(encodedEAPIdentityProviderList, Charsets.UTF_8.toString())
             return Json.decodeFromString(decodedWifiConfigDataJson)
         }
     }

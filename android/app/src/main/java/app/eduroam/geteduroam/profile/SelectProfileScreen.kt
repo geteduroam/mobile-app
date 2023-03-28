@@ -21,7 +21,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.SelectProfileSummary
 import app.eduroam.shared.profile.SelectProfileViewModel
@@ -35,11 +35,11 @@ fun SelectProfileScreen(
         viewModel
     ),
     goToOAuth: (String, Profile) -> Unit,
-    goToConfigScreen: (WifiConfigData) -> Unit,
+    goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
     val uiDataState: DataState<SelectProfileSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
     val authorizationUrl by viewModel.authorizationUrl.collectAsStateWithLifecycle(null)
-    val configData by viewModel.configData.collectAsStateWithLifecycle(null)
+    val configData by viewModel.eapIdentityProviderListMutableStateFlow.collectAsStateWithLifecycle(null)
 
     authorizationUrl?.let {
         LaunchedEffect(it) {

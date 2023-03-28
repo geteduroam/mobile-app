@@ -12,7 +12,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.response.Profile
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -25,7 +25,7 @@ fun OAuthScreen(
     url: String,
     profile: Profile,
     viewModel: OAuthViewModel,
-    goToConfigScreen: (WifiConfigData) -> Unit,
+    goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
     val state = rememberWebViewState(url = url)
     val configData by viewModel.configData.collectAsStateWithLifecycle(null)

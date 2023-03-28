@@ -4,8 +4,8 @@ import android.content.Intent
 import android.util.Log
 import app.eduroam.geteduroam.Screens
 import app.eduroam.shared.OAuth2Android
-import app.eduroam.shared.config.ConfigParser
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.AndroidConfigParser
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.ViewModel
 import app.eduroam.shared.response.Profile
 import app.eduroam.shared.select.InstitutionsRepository
@@ -16,10 +16,10 @@ import net.openid.appauth.*
 
 class OAuthViewModel(
     private val institutionsRepository: InstitutionsRepository,
-    private val configParser: ConfigParser,
+    private val configParser: AndroidConfigParser,
     private val log: Logger,
 ) : ViewModel() {
-    val configData: MutableStateFlow<WifiConfigData?> = MutableStateFlow(null)
+    val configData: MutableStateFlow<EAPIdentityProviderList?> = MutableStateFlow(null)
     private var contract: OAuthContract? = null
 
     fun onNavigatedToRedirectUri(
