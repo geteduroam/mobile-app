@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Screens
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.response.Institution
@@ -45,7 +45,7 @@ fun SelectInstitutionScreen(
     viewModel: SelectInstitutionViewModel,
     goToOAuth: (String, Profile) -> Unit,
     gotToProfileSelection: (Institution) -> Unit,
-    goToConfigScreen: (WifiConfigData) -> Unit,
+    goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
     val uiDataState: DataState<ItemDataSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
     val step by viewModel.step.collectAsStateWithLifecycle(Step.Start)
@@ -59,7 +59,7 @@ fun SelectInstitutionScreen(
             }
             is Step.DoConfig -> {
                 viewModel.onStepCompleted()
-                goToConfigScreen((step as Step.DoConfig).wifiConfigData)
+                goToConfigScreen((step as Step.DoConfig).eapIdentityProviderList)
             }
             is Step.PickProfileFrom -> {
                 viewModel.onStepCompleted()

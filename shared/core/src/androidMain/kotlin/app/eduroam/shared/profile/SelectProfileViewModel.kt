@@ -1,8 +1,8 @@
 package app.eduroam.shared.profile
 
 import app.eduroam.shared.OAuth2
-import app.eduroam.shared.config.ConfigParser
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.AndroidConfigParser
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.SelectProfileSummary
 import app.eduroam.shared.models.ViewModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class SelectProfileViewModel(
     private val institutionRepository: InstitutionsRepository,
-    private val configParser: ConfigParser,
+    private val configParser: AndroidConfigParser,
     log: Logger,
 ) : ViewModel() {
 
@@ -27,7 +27,7 @@ class SelectProfileViewModel(
         DataState(loading = true)
     )
     val authorizationUrl: MutableStateFlow<String?> = MutableStateFlow(null)
-    val configData: MutableStateFlow<WifiConfigData?> = MutableStateFlow(null)
+    val eapIdentityProviderListMutableStateFlow: MutableStateFlow<EAPIdentityProviderList?> = MutableStateFlow(null)
 
     override fun onCleared() {
         log.v("Clearing SelectInstitutionViewModel")
@@ -70,7 +70,7 @@ class SelectProfileViewModel(
                             eapconfigEndpoint = selectedProfile.eapconfig_endpoint.orEmpty()
                         )
                         log.d("Downloaded EAP file for profile with no authentication")
-                        configData.emit(configParser.parse(eapData))
+                        eapIdentityProviderListMutableStateFlow.emit(configParser.parse(eapData))
                     } catch (e: Exception) {
                         log.e("Failed to download anon EAP config file", e)
                     } finally {
@@ -86,7 +86,7 @@ class SelectProfileViewModel(
     }
 
     fun clearWifiConfigData() {
-        configData.value = null
+        eapIdentityProviderListMutableStateFlow.value = null
     }
 
     fun handledAuthorization() {

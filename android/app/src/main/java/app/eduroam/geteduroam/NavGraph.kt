@@ -67,10 +67,10 @@ fun NavGraph(
                         )
                     )
                 },
-                goToConfigScreen = { wifiConfigData ->
+                goToConfigScreen = { eapIdentityProviderList ->
                     navController.navigate(
                         Screens.ConfigureWifi.encodeArguments(
-                            wifiConfigData
+                            eapIdentityProviderList
                         )
                     )
                 })

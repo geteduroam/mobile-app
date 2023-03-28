@@ -1,9 +1,10 @@
 package app.eduroam.shared.config.model
 
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Root
 import org.simpleframework.xml.Text
-
+@Serializable
 @Root(name = "CA")
 class CertData {
 

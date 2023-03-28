@@ -11,12 +11,12 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import androidx.core.content.ContextCompat
-import app.eduroam.shared.config.WifiConfigData
+import app.eduroam.shared.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewModel() {
+class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProviderList) : ViewModel() {
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage: MutableStateFlow<String> = MutableStateFlow("")
@@ -52,7 +52,7 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
     }
 
     private fun handleAndroid11AndOver() {
-        val suggestions = wifiConfigData.buildAllNetworkSuggestions()
+        val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val intent = createSuggestionsIntent(suggestions = suggestions)
         intentWithSuggestions.value = intent
     }
@@ -61,7 +61,7 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
      * Requires CHANGE_WIFI_STATE permission
      * */
     fun handleAndroid10WifiConfig(context: Context) {
-        val suggestions = wifiConfigData.buildAllNetworkSuggestions()
+        val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val wifiManager: WifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -87,8 +87,8 @@ class WifiConfigViewModel(private val wifiConfigData: WifiConfigData) : ViewMode
 
     @Suppress("DEPRECATION")
     private fun handleAndroid9AndLower(context: Context) {
-        val wifiConfigs = wifiConfigData.buildWifiConfigurations()
-        val passpointConfig = wifiConfigData.buildPasspointConfig()
+        val wifiConfigs = eapIdentityProviderList.buildWifiConfigurations()
+        val passpointConfig = eapIdentityProviderList.buildPasspointConfig()
 
         val wifiManager: WifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
