@@ -1,4 +1,0 @@
-rootProject.name = 'geteduroam'
-
-include 'shared:core'
-include 'android:app'

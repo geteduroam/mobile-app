@@ -1,209 +1,115 @@
 package app.eduroam.geteduroam.institutions
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TextButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
-import app.eduroam.geteduroam.Screens
-import app.eduroam.shared.config.model.EAPIdentityProviderList
-import app.eduroam.shared.models.DataState
-import app.eduroam.shared.models.ItemDataSummary
-import app.eduroam.shared.response.Institution
-import app.eduroam.shared.response.Profile
-import app.eduroam.shared.select.SelectInstitutionViewModel
-import app.eduroam.shared.select.Step
+import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.models.Institution
+import app.eduroam.geteduroam.models.Profile
+import app.eduroam.geteduroam.ui.ErrorData
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun SelectInstitutionScreen(
     viewModel: SelectInstitutionViewModel,
-    goToOAuth: (String, Profile) -> Unit,
-    gotToProfileSelection: (Institution) -> Unit,
+    openProfileModal: (String) -> Unit,
+    goToOAuth: (Profile) -> Unit,
     goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
-    val uiDataState: DataState<ItemDataSummary> by viewModel.uiDataState.collectAsStateWithLifecycle()
-    val step by viewModel.step.collectAsStateWithLifecycle(Step.Start)
+    val step: Step by remember { mutableStateOf(Step.Start) }
+    var waitForVmEvent by rememberSaveable { mutableStateOf(false) }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     LaunchedEffect(step) {
         when (step) {
             is Step.DoOAuthFor -> {
                 viewModel.onStepCompleted()
                 val doAuth = step as Step.DoOAuthFor
-                goToOAuth(doAuth.authorizationUrl, doAuth.profile)
+                goToOAuth(doAuth.profile)
             }
+
             is Step.DoConfig -> {
                 viewModel.onStepCompleted()
                 goToConfigScreen((step as Step.DoConfig).eapIdentityProviderList)
             }
+
             is Step.PickProfileFrom -> {
                 viewModel.onStepCompleted()
-                gotToProfileSelection((step as Step.PickProfileFrom).institution)
             }
+
             Step.Start -> {
                 //Do nothing
             }
         }
     }
+    if (waitForVmEvent) {
+        val currentOpenProfileModal by rememberUpdatedState(newValue = openProfileModal)
+        LaunchedEffect(viewModel, lifecycle) {
+            snapshotFlow { viewModel.uiState }.distinctUntilChanged()
+                .filter { it.selectedInstitution != null }.flowWithLifecycle(lifecycle).collect {
+                    waitForVmEvent = false
+                    currentOpenProfileModal(
+                        it.selectedInstitution?.id.orEmpty(),
+                    )
+                    viewModel.clearSelection()
+                }
+        }
+    }
 
-    SelectInstitutionContent(
-        institutionsState = uiDataState,
+    SelectInstitutionContent(institutions = viewModel.uiState.institutions,
         onSelectInstitution = { institution ->
-            viewModel.onInstitutionSelect(
-                institution, Screens.OAuth.redirectUrl, Screens.OAuth.APP_ID
-            )
+            waitForVmEvent = true
+            viewModel.onInstitutionSelect(institution)
         },
-        searchText = uiDataState.data?.filterOn.orEmpty(),
+        searchText = viewModel.uiState.filter,
         onSearchTextChange = { viewModel.onSearchTextChange(it) },
         onClearDialog = viewModel::clearDialog,
         onCredsAvailable = { username, password ->
             viewModel.creds.value = Pair(username, password)
-        }
-    )
-}
-
-@Composable
-fun LoginDialog(
-    onConfirmClicked: (String, String) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val openDialog = remember { mutableStateOf(true) }
-    val username = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-
-    if (openDialog.value) {
-        Dialog(
-            onDismissRequest = onDismiss,
-        ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.login_dialog_title))
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
-                            .weight(weight = 1f, fill = false)
-                            .padding(vertical = 16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.login_dialog_text)
-                        )
-
-                        OutlinedTextField(value = username.value, onValueChange = {
-                            username.value = it
-                        }, Modifier.padding(top = 8.dp), label = { Text(text = stringResource(R.string.login_dialog_username)) },  textStyle = TextStyle(color = Color.White))
-
-                        OutlinedTextField(value = password.value, onValueChange = {
-                            password.value = it
-                        }, Modifier.padding(top = 8.dp),
-                            label = { Text(text = stringResource(R.string.login_dialog_password)) },
-                            textStyle = TextStyle(color = Color.White),
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password)
-                        )
-                    }
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = {
-                            openDialog.value = false
-                            onDismiss()
-                        }) {
-                            Text(text = stringResource(R.string.login_dialog_cancel))
-                        }
-                        TextButton(onClick = {
-                            openDialog.value = false
-                            onDismiss()
-                            onConfirmClicked(username.value, password.value)
-                        }) {
-                            Text(text = stringResource(R.string.login_dialog_login))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun TermsOfUseDialog(
-    onConfirmClicked: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    Dialog(
-        onDismissRequest = onDismiss,
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = stringResource(R.string.terms_of_use_dialog_title))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                        .weight(weight = 1f, fill = false)
-                        .padding(vertical = 16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.terms_of_use_dialog_text)
-                    )
-                    TextButton(onClick = onDismiss) {
-                        Text(text = stringResource(R.string.terms_of_use_dialog_agree))
-                    }
-                    TextButton(onClick = onConfirmClicked) {
-                        Text(text = stringResource(R.string.terms_of_use_dialog_read_tou))
-                    }
-                    TextButton(onClick = onConfirmClicked) {
-                        Text(text = stringResource(R.string.terms_of_use_dialog_disagree))
-                    }
-                }
-            }
-        }
-    }
+        })
 }
 
 
 @Composable
 fun SelectInstitutionContent(
-    institutionsState: DataState<ItemDataSummary>,
+    institutions: List<Institution> = emptyList(),
+    isLoading: Boolean = false,
+    showDialog: Boolean = false,
+    errorData: ErrorData? = null,
     onSelectInstitution: (Institution) -> Unit,
     searchText: String,
     onSearchTextChange: (String) -> Unit = {},
     onClearDialog: () -> Unit = {},
-    onCredsAvailable: (String, String) -> Unit = { _, _ -> }
-) = Scaffold(topBar = {
-    EduTopAppBar(stringResource(R.string.name))
-}) { paddingValues ->
-    if (institutionsState.showDialog == true) {
+    onCredsAvailable: (String, String) -> Unit = { _, _ -> },
+) = EduTopAppBar(withBackIcon = false) { paddingValues ->
+    val context = LocalContext.current
+    if (showDialog) {
         LoginDialog({ username, password ->
             onCredsAvailable(username, password)
             onClearDialog()
@@ -227,22 +133,22 @@ fun SelectInstitutionContent(
                     Spacer(Modifier.height(8.dp))
                 }
 
-                if (institutionsState.loading) {
+                if (isLoading) {
                     item {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                } else if (institutionsState.exception != null) {
+                } else if (errorData != null) {
                     item {
                         Text(
-                            text = institutionsState.exception.orEmpty(),
+                            text = errorData.title(context),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 } else {
-                    if (institutionsState.empty) {
+                    if (institutions.isEmpty()) {
                         item {
                             Text(stringResource(id = R.string.institutions_no_results))
                         }
@@ -256,7 +162,7 @@ fun SelectInstitutionContent(
                             Spacer(Modifier.height(8.dp))
                         }
 
-                        institutionsState.data?.institutions?.forEach { institution ->
+                        institutions.forEach { institution ->
                             item {
                                 InstitutionRow(institution, onSelectInstitution)
                             }
@@ -266,5 +172,4 @@ fun SelectInstitutionContent(
             }
         }
     }
-
 }

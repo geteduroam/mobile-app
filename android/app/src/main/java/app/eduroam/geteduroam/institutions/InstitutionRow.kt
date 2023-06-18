@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import app.eduroam.shared.response.Institution
+import app.eduroam.geteduroam.models.Institution
 
 
 @Composable

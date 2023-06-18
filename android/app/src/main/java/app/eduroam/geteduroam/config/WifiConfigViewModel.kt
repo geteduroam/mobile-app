@@ -11,12 +11,14 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import androidx.core.content.ContextCompat
-import app.eduroam.shared.config.model.EAPIdentityProviderList
-import app.eduroam.shared.models.ViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProviderList) : ViewModel() {
+class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProviderList) :
+    ViewModel() {
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage: MutableStateFlow<String> = MutableStateFlow("")

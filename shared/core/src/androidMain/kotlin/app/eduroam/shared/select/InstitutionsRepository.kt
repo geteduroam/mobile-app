@@ -1,6 +1,6 @@
 package app.eduroam.shared.select
 
-import app.eduroam.shared.ktor.InstitutionApi
+import app.eduroam.shared.ktor.InstitutionApi2
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.response.TokenResponse
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 
 class InstitutionsRepository(
-    private val institutionApi: InstitutionApi,
+    private val institutionApi: InstitutionApi2,
     driverFactory: DriverFactory,
     log: Logger,
 ) {

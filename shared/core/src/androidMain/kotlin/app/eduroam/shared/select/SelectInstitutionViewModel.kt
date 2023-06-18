@@ -5,7 +5,7 @@ import app.eduroam.shared.config.AndroidConfigParser
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.ItemDataSummary
 import app.eduroam.shared.models.ViewModel
-import app.eduroam.shared.response.Institution
+import app.eduroam.geteduroam.models.Institution
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

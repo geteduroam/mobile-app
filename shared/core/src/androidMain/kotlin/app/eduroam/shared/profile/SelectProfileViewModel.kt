@@ -2,11 +2,11 @@ package app.eduroam.shared.profile
 
 import app.eduroam.shared.OAuth2
 import app.eduroam.shared.config.AndroidConfigParser
-import app.eduroam.shared.config.model.EAPIdentityProviderList
+package app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.shared.models.DataState
 import app.eduroam.shared.models.SelectProfileSummary
 import app.eduroam.shared.models.ViewModel
-import app.eduroam.shared.response.Institution
+import app.eduroam.geteduroam.models.Institution
 import app.eduroam.shared.response.Profile
 import app.eduroam.shared.select.InstitutionsRepository
 import co.touchlab.kermit.Logger

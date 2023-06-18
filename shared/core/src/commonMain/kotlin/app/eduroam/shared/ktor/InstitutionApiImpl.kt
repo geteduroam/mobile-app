@@ -1,6 +1,6 @@
 package app.eduroam.shared.ktor
 
-import app.eduroam.shared.response.InstitutionResult
+import app.eduroam.geteduroam.models.InstitutionResult
 import app.eduroam.shared.response.TokenResponse
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
-class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : InstitutionApi {
+class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : InstitutionApi2 {
 
     private val client = HttpClient(engine) {
         install(ContentNegotiation) {

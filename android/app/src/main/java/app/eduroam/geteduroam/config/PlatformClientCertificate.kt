@@ -2,7 +2,7 @@ package app.eduroam.geteduroam.config
 
 import android.util.Base64
 import android.util.Log
-import app.eduroam.shared.config.model.ClientSideCredential
+import app.eduroam.geteduroam.config.model.ClientSideCredential
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
