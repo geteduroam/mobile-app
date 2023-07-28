@@ -5,22 +5,14 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
-import app.eduroam.geteduroam.oauth.OAuthViewModel
 import app.eduroam.geteduroam.ui.theme.AppTheme
-import app.eduroam.shared.BuildConfig
-import app.eduroam.shared.injectLogger
-import app.eduroam.shared.profile.SelectProfileViewModel
-import app.eduroam.shared.select.SelectInstitutionViewModel
-import co.touchlab.kermit.Logger
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.component.KoinComponent
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : ComponentActivity(), KoinComponent {
-    private val log: Logger by injectLogger("MainActivity")
-    private val institutionViewModel: SelectInstitutionViewModel by viewModel()
-    private val profileViewModel: SelectProfileViewModel by viewModel()
-    private val oAuthViewModel: OAuthViewModel by viewModel()
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
 
+    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -29,14 +21,8 @@ class MainActivity : ComponentActivity(), KoinComponent {
         }
         setContent {
             AppTheme {
-                NavGraph(
-                    viewModel = institutionViewModel,
-                    profileViewModel = profileViewModel,
-                    oauthViewModel = oAuthViewModel,
-                    log = log
-                )
+                MainGraph()
             }
         }
     }
-
 }

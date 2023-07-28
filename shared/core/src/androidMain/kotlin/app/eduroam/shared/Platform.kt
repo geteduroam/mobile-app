@@ -9,6 +9,17 @@ actual class Platform actual constructor() {
 
 object OAuth2Android {
     private lateinit var pkce: PKCE
+    /**
+     *
+    response_type (set to code)
+    code_challenge_method (set to S256)
+    scope (choose between eap-metadata and mobileconfig)
+    code_challenge (a code challenge, as documented in RFC7636 section 4)
+    redirect_uri (where the user should be redirected after accepting or rejecting your application, GET parameters will added to this URL by the server)
+    client_id (your client ID as known by the server)
+    state (a random string that will be set in a GET parameter to the redirect_uri, for you to verify it's the same flow)
+
+     */
     fun getAuthorizationUrl(
         institutionId: String,
         authorizationEndpoint: String?,

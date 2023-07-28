@@ -5,4 +5,5 @@ data class DataState<out T>(
     val exception: String? = null,
     val empty: Boolean = false,
     val loading: Boolean = false,
+    val showDialog: Boolean? = false
 )

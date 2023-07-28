@@ -1,6 +1,6 @@
 package app.eduroam.shared.ktor
 
-import app.eduroam.shared.response.InstitutionResult
+import app.eduroam.geteduroam.models.InstitutionResult
 import app.eduroam.shared.response.TokenResponse
 import co.touchlab.stately.ensureNeverFrozen
 import io.ktor.client.*
@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
-class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : InstitutionApi {
+class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : InstitutionApi2 {
 
     private val client = HttpClient(engine) {
         install(ContentNegotiation) {
@@ -38,7 +38,7 @@ class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine
                 }
             }
 
-            level = LogLevel.INFO
+            level = LogLevel.ALL
         }
         install(HttpTimeout) {
             this.socketTimeoutMillis = 80_000L
@@ -59,28 +59,23 @@ class InstitutionApiImpl(private val log: KermitLogger, engine: HttpClientEngine
     }
 
     override suspend fun postToken(
-        tokenUrl: String,
-        code: String,
-        redirectUri: String,
-        clientId: String,
-        codeVerifier: String
+        tokenUrl: String, code: String, redirectUri: String, clientId: String, codeVerifier: String
     ): TokenResponse {
-        log.d { "Fetching token via POST" }
+        log.d { "Fetching token via POST on $tokenUrl" }
         return client.post {
             tokenEndpoint(tokenUrl)
-            setBody(formData {
-                append("grant_type", "code")
-                append("authorization_code", code)
+            setBody(FormDataContent(Parameters.build {
+                append("grant_type", "authorization_code")
+                append("code", code)
                 append("redirect_uri", redirectUri)
                 append("client_id", clientId)
                 append("code_verifier", codeVerifier)
-            })
+            }))
         }.body()
     }
 
     override suspend fun downloadEapFile(
-        eapConfigEndpoint: String,
-        accessToken: String?
+        eapConfigEndpoint: String, accessToken: String?
     ): ByteArray {
         log.d("Download EAP file")
         val response = if (accessToken == null) {

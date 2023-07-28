@@ -1,10 +1,21 @@
 package app.eduroam.geteduroam.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val LightThemeColors = lightColorScheme(
 
@@ -67,18 +78,37 @@ private val DarkThemeColors = darkColorScheme(
 
 @Composable
 fun AppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
     content: @Composable() () -> Unit,
 ) {
-    val colors = if (!useDarkTheme) {
-        LightThemeColors
-    } else {
-        DarkThemeColors
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> DarkThemeColors
+        else -> LightThemeColors
+    }
+    val view = LocalView.current
+    val context = LocalContext.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(
+                context.findActivity().window, view
+            ).isAppearanceLightStatusBars = false
+        }
     }
 
     MaterialTheme(
-        colorScheme = colors,
-        typography = AppTypography,
-        content = content
+        colorScheme = colorScheme, typography = AppTypography, content = content
     )
+}
+
+tailrec fun Context.findActivity(): Activity = when (this) {
+    is Activity -> this
+    is ContextWrapper -> this.baseContext.findActivity()
+    else -> throw IllegalArgumentException("Could not find activity!")
 }

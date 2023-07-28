@@ -3,15 +3,27 @@ package app.eduroam.geteduroam.config
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -19,76 +31,67 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
 @Composable
 fun WifiConfigScreen(
-    viewModel: WifiConfigViewModel, snackbarHostState: SnackbarHostState = SnackbarHostState()
-) {
-    val hostState = remember(snackbarHostState) { snackbarHostState }
-    Scaffold(
-        topBar = {
-            EduTopAppBar(stringResource(R.string.name))
-        },
-        snackbarHost = { SnackbarHost(hostState) },
-    ) { paddingValues ->
-        val launch by viewModel.launch.collectAsStateWithLifecycle(null)
-        val processing by viewModel.processing.collectAsStateWithLifecycle(true)
-        val message by viewModel.progressMessage.collectAsStateWithLifecycle("")
-        val suggestionIntent by viewModel.intentWithSuggestions.collectAsStateWithLifecycle(null)
-        val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsStateWithLifecycle(
-            false
+    viewModel: WifiConfigViewModel, snackbarHostState: SnackbarHostState = SnackbarHostState(),
+) = EduTopAppBar(withBackIcon = false) { paddingValues ->
+    val launch by viewModel.launch.collectAsState(null)
+    val processing by viewModel.processing.collectAsState(true)
+    val message by viewModel.progressMessage.collectAsState("")
+    val suggestionIntent by viewModel.intentWithSuggestions.collectAsState(null)
+    val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(
+        false
+    )
+    val context = LocalContext.current
+    launch?.let {
+        LaunchedEffect(it) {
+            viewModel.launchConfiguration(context)
+        }
+    }
+    val activityLauncher = rememberLauncherForSuggestionIntent(snackbarHostState, viewModel)
+    suggestionIntent?.let { intent ->
+        LaunchedEffect(intent) {
+            viewModel.consumeSuggestionIntent()
+            activityLauncher.launch(intent)
+        }
+    }
+
+    Column(
+        Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+            .systemBarsPadding()
+            .padding(horizontal = 16.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.configuration_progress),
+            style = MaterialTheme.typography.bodyMedium,
         )
-        val context = LocalContext.current
-        launch?.let {
-            LaunchedEffect(it) {
-                viewModel.launchConfiguration(context)
-            }
+        Spacer(Modifier.height(8.dp))
+        if (processing) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-        val activityLauncher = rememberLauncherForSuggestionIntent(snackbarHostState, viewModel)
-        suggestionIntent?.let { intent ->
-            LaunchedEffect(intent) {
-                viewModel.consumeSuggestionIntent()
-                activityLauncher.launch(intent)
-            }
-        }
+        Text(
+            text = stringResource(id = R.string.configuration_logs),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Spacer(Modifier.height(8.dp))
 
-        Column(
-            Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .systemBarsPadding()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.configuration_progress),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(Modifier.height(8.dp))
-            if (processing) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Text(
-                text = stringResource(id = R.string.configuration_logs),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            if (askNetworkPermission) {
-                AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
-            }
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        if (askNetworkPermission) {
+            AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
         }
     }
 }
 
 @Composable
 private fun rememberLauncherForSuggestionIntent(
-    snackbarHostState: SnackbarHostState, viewModel: WifiConfigViewModel
+    snackbarHostState: SnackbarHostState, viewModel: WifiConfigViewModel,
 ): ManagedActivityResultLauncher<Intent, WifiConfigResponse> {
     val coroutineScope = rememberCoroutineScope()
     val cancel = stringResource(R.string.configuration_progress)
@@ -102,6 +105,7 @@ private fun rememberLauncherForSuggestionIntent(
                     snackbarHostState.showSnackbar(cancel)
                 }
             }
+
             is WifiConfigResponse.Success -> {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(completed)
@@ -115,7 +119,7 @@ private fun rememberLauncherForSuggestionIntent(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun AskForWiFiPermissions(
-    onPermissionGranted: () -> Unit
+    onPermissionGranted: () -> Unit,
 ) {
     val multiplePermissionsState = rememberMultiplePermissionsState(
         listOf(
@@ -142,7 +146,7 @@ private fun AskForWiFiPermissions(
 
 @OptIn(ExperimentalPermissionsApi::class)
 private fun getTextToShowGivenPermissions(
-    permissions: List<PermissionState>, shouldShowRationale: Boolean
+    permissions: List<PermissionState>, shouldShowRationale: Boolean,
 ): String {
     val revokedPermissionsSize = permissions.size
     if (revokedPermissionsSize == 0) return ""
@@ -157,9 +161,11 @@ private fun getTextToShowGivenPermissions(
             revokedPermissionsSize > 1 && i == revokedPermissionsSize - 2 -> {
                 textToShow.append(", and ")
             }
+
             i == revokedPermissionsSize - 1 -> {
                 textToShow.append(" ")
             }
+
             else -> {
                 textToShow.append(", ")
             }

@@ -1,5 +1,3 @@
-import app.eduroam.shared.Libs
-
 apply plugin: 'kotlin-multiplatform'
 apply plugin: 'kotlin-native-cocoapods'
 apply plugin: 'kotlinx-serialization'
@@ -24,23 +22,6 @@ kotlin {
 
     targets {
         fromPreset(presets.android, 'android')
-
-        def sdkName = System.getenv("SDK_NAME") ?: ""
-        // Add platform switching to have IDE support.
-        if (sdkName.startsWith("iphoneos")) {
-            iosArm64("ios") {
-                compilations.main {
-                    kotlinOptions.freeCompilerArgs += "-Xobjc-generics"
-                }
-            }
-        } else {
-            iosX64("ios") {
-                compilations.main {
-                    kotlinOptions.freeCompilerArgs += "-Xobjc-generics"
-                }
-            }
-        }
-
     }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
@@ -72,13 +53,6 @@ kotlin {
             dependencies {
                 kotlin "org.jetbrains.kotlin:test"
 //                implementation "org.jetbrains.kotlin:test"
-            }
-        }
-
-        iosMain {
-            dependencies {
-                implementation Libs.Ktor.clientiOS
-                implementation Libs.SqlDelight.iOsDriver
             }
         }
 

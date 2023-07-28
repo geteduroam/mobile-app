@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="name">geteduroam</string>
 
     <string name="welcome">Welcome</string>
@@ -6,9 +6,44 @@
     <string name="institution_search_text">Search for an institution</string>
     <string name="institution_select_title">Select an institution</string>
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
-    <string name="profile_select_profile">Select profile</string>
+    <string name="profiles_title">Profiles</string>
     <string name="configuration_progress">Establishing WiFi connection</string>
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Canceled</string>
     <string name="configuration_completed">Completed</string>
+    <string name="login_dialog_title">Login Required</string>
+    <string name="login_dialog_text">Please enter your username and password</string>
+    <string name="login_dialog_username">Username</string>
+    <string name="login_dialog_password">Password</string>
+    <string name="login_dialog_cancel">Cancel</string>
+    <string name="login_dialog_login">Log in</string>
+    <string name="terms_of_use_dialog_title">Terms of use</string>
+    <string name="terms_of_use_dialog_text">You must agree with to the terms of use before you can use this network</string>
+    <string name="terms_of_use_dialog_agree">Agree</string>
+    <string name="terms_of_use_dialog_read_tou">Read Terms of Use</string>
+    <string name="terms_of_use_dialog_disagree">Disagree</string>
+
+    <string name="err_title_auth_unexpected_fail">Unexpected error</string>
+    <string name="err_msg_auth_init_fail">Failed to initialize AppData. Please retry.</string>
+    <string name="err_msg_auth_init_fail_arg">Failed to initialize AppData. Reason: %s</string>
+    <string name="err_title_auth_invalid">Authorization invalid</string>
+    <string name="err_msg_auth_invalid">Did not receive valid authentication.</string>
+    <string name="err_title_auth_failed">Authorization failed</string>
+    <string name="err_msg_auth_failed">No authorization state retained - reauthorization required.</string>
+    <string name="err_msg_auth_token_failed">Authorization token code exchange failed.</string>
+    <string name="err_msg_auth_code_failed_arg">Authorization code exchange failed: %s.</string>
+    <string name="err_title_generic_fail">Cannot complete request</string>
+    <string name="err_msg_generic_unexpected_with_arg">Unexpected error: %s, please retry.</string>
+    <string name="err_msg_invalid_institution_id">Invalid institution id. Cannot continue for selected institution.</string>
+    <string name="err_msg_cannot_find_institution">Cannot find institution with id %s.</string>
+    <string name="err_msg_missing_eap_endpoint">Selected profile is missing EAP endpoint.</string>
+    <string name="err_msg_no_valid_provider">No valid EAP provider was found.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Authenticate</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Authenticate with your account in order to get your wifi configuration.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Processing…</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Retry</string>
+    <string name="button_back">Back</string>
 </resources>
