@@ -20,18 +20,15 @@
             android:value="false" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.App.Starting">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name="net.openid.appauth.RedirectUriReceiverActivity"
