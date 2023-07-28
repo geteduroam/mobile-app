@@ -9,14 +9,19 @@ import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
+import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
 import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,9 +29,10 @@ import javax.inject.Inject
 class SelectProfileViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     val api: GetEduroamApi,
-    val repository: StorageRepository,
+    private val repository: StorageRepository,
 ) : ViewModel() {
-    val parser = AndroidConfigParser()
+
+    private val parser = AndroidConfigParser()
 
     var uiState by mutableStateOf(UiState())
         private set
@@ -54,9 +60,9 @@ class SelectProfileViewModel @Inject constructor(
             val selectedInstitution = institutionResult.instances.find { it.id == institutionId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
-                val presentProfiles = selectedInstitution.profiles.map {
+                val presentProfiles = selectedInstitution.profiles.mapIndexed { index, profile ->
                     PresentProfile(
-                        profile = it, isSelected = isSingleProfile
+                        profile = profile, isSelected = isSingleProfile || index == 0
                     )
                 }
                 uiState = uiState.copy(
@@ -73,7 +79,8 @@ class SelectProfileViewModel @Inject constructor(
             } else {
                 Timber.e("Could not find institution with id $institutionId")
                 uiState = uiState.copy(
-                    inProgress = false, errorData = ErrorData(
+                    inProgress = false,
+                    errorData = ErrorData(
                         titleId = R.string.err_title_generic_fail,
                         messageId = R.string.err_msg_cannot_find_institution,
                         messageArg = institutionId
@@ -86,7 +93,8 @@ class SelectProfileViewModel @Inject constructor(
             }"
             Timber.e("Failed to load institutions: $failReason")
             uiState = uiState.copy(
-                inProgress = false, errorData = ErrorData(
+                inProgress = false,
+                errorData = ErrorData(
                     titleId = R.string.err_title_generic_fail,
                     messageId = R.string.err_msg_generic_unexpected_with_arg,
                     messageArg = failReason
@@ -96,12 +104,21 @@ class SelectProfileViewModel @Inject constructor(
         }
     }
 
+    fun setProfileSelected(profile: PresentProfile) {
+        uiState = uiState.copy(
+            profiles = uiState.profiles.map {
+                it.copy(isSelected = it.profile == profile.profile)
+            }
+        )
+    }
+
     fun connectWithSelectedProfile() = viewModelScope.launch {
         val profile = uiState.profiles.first { it.isSelected }
         connectWithProfile(profile.profile)
     }
 
     private suspend fun connectWithProfile(profile: Profile) {
+        uiState = uiState.copy(inProgress = true)
         if (profile.eapconfigEndpoint != null) {
             if (profile.oauth) {
                 Timber.i("Selected profile requires authentication.")
@@ -115,7 +132,9 @@ class SelectProfileViewModel @Inject constructor(
                 if (repository.isAuthenticatedForConfig(configForProfile)) {
                     Timber.i("Already authenticated for this profile, continue with existing credentials")
                     val authState = repository.authState.first()
-                    getEapFrom(profile.eapconfigEndpoint, authState?.accessToken.orEmpty())
+                    viewModelScope.launch(Dispatchers.IO) {
+                        getEapFrom(profile.eapconfigEndpoint, authState?.accessToken.orEmpty())
+                    }
                 } else {
                     Timber.i("Prompt for authentication for selected profile.")
                     uiState = uiState.copy(
@@ -124,6 +143,9 @@ class SelectProfileViewModel @Inject constructor(
                 }
             } else {
                 Timber.i("Profile does not require OAuth")
+                viewModelScope.launch(Dispatchers.IO) {
+                    getEapFrom(profile.eapconfigEndpoint, null)
+                }
             }
         } else {
             Timber.e("Missing EAP endpoint in profile configuration. Cannot continue with selected profile.")
@@ -136,15 +158,36 @@ class SelectProfileViewModel @Inject constructor(
         }
     }
 
+    private suspend fun downloadEapConfig(url: String, authorizationHeader: String?): EAPIdentityProviderList? {
+        val client = OkHttpClient.Builder().build()
+        var requestBuilder = Request.Builder()
+            .url(url)
+        if (authorizationHeader != null) {
+            requestBuilder = requestBuilder.addHeader("Authorization", authorizationHeader)
+        }
+
+        val response = client.newCall(requestBuilder.build()).execute()
+        val bytes = response.body?.bytes()
+        response.close()
+        if (bytes == null) {
+            return null
+        }
+        return parser.parse(bytes)
+    }
+
     private suspend fun getEapFrom(eapEndpoint: String, authorizationHeader: String? = null) {
-        val bytes = api.downloadEapFile(eapEndpoint, authorizationHeader)
-        val providers = parser.parse(bytes)
+        val providers = downloadEapConfig(eapEndpoint, authorizationHeader)
+        if (providers == null) {
+            displayEapError()
+            return
+        }
         val firstProvider = providers.eapIdentityProvider?.firstOrNull()
         if (firstProvider != null) {
             val knownInstitution = uiState.institution
             val info = firstProvider.providerInfo
             uiState = uiState.copy(
-                inProgress = true, institution = PresentInstitution(
+                inProgress = true,
+                institution = PresentInstitution(
                     name = knownInstitution?.name,
                     location = knownInstitution?.location,
                     displayName = info?.displayName,
@@ -155,25 +198,20 @@ class SelectProfileViewModel @Inject constructor(
                 )
             )
         } else {
-            uiState = uiState.copy(
-                inProgress = false, errorData = ErrorData(
-                    titleId = R.string.err_title_generic_fail,
-                    messageId = R.string.err_msg_no_valid_provider
-                )
-            )
+            displayEapError()
         }
+    }
+
+    private fun displayEapError() {
+        uiState = uiState.copy(
+            inProgress = false, errorData = ErrorData(
+                titleId = R.string.err_title_generic_fail,
+                messageId = R.string.err_msg_no_valid_provider
+            )
+        )
     }
 
     fun errorDataShown() {
         uiState = uiState.copy(errorData = null)
     }
-
-    /**
-     *
-     *
-     * guard agreedToTerms || firstValidProvider.providerInfo?.termsOfUse?.localized() == nil else {
-     *     throw InstitutionSetupError.missingTermsAcceptance(firstValidProvider.providerInfo)
-     * }
-     *
-     * */
 }

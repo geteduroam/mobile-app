@@ -26,7 +26,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +76,9 @@ fun SelectProfileModal(
         institution = viewModel.uiState.institution,
         inProgress = viewModel.uiState.inProgress,
         errorData = viewModel.uiState.errorData,
-        errorDataShown = viewModel::errorDataShown
+        errorDataShown = viewModel::errorDataShown,
+        setProfileSelected = viewModel::setProfileSelected,
+        connectWithSelectedProfile = viewModel::connectWithSelectedProfile
     )
 }
 
@@ -84,6 +89,8 @@ fun SelectProfileContent(
     inProgress: Boolean = false,
     errorData: ErrorData? = null,
     errorDataShown: () -> Unit = {},
+    setProfileSelected: (PresentProfile) -> Unit = {},
+    connectWithSelectedProfile: () -> Unit = {}
 ) = Surface(
     modifier = Modifier
         .heightIn(min = 300.dp, max = 500.dp)
@@ -131,6 +138,7 @@ fun SelectProfileContent(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(2.dp))
             Divider(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
@@ -147,7 +155,9 @@ fun SelectProfileContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .sizeIn(minHeight = 48.dp)
-                        .clickable(onClick = { }), verticalAlignment = Alignment.CenterVertically
+                        .clickable(onClick = {
+                            setProfileSelected(profile)
+                        }), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = profile.profile.name,
@@ -169,9 +179,9 @@ fun SelectProfileContent(
             }
         }
         PrimaryButton(
-            text = stringResource(R.string.button_retry),
+            text = stringResource(R.string.button_connect),
             enabled = !inProgress,
-            onClick = {},
+            onClick = { connectWithSelectedProfile() },
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -183,12 +193,13 @@ fun SelectProfileContent(
 private fun Preview_SelectProfileModal() {
     AppTheme {
         SelectProfileContent(
-            profiles = profileList, institution = PresentInstitution("Uninett", "NO")
+            profiles = profileList,
+            institution = PresentInstitution("Uninett", "NO")
         )
     }
 }
 
-private val profileList = listOf<PresentProfile>(
+private val profileList = listOf(
     PresentProfile(Profile(id = "id", name = "First profile"), true),
     PresentProfile(Profile(id = "id", name = "Second profile"), false),
 )
