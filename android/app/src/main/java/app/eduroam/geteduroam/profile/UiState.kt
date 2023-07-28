@@ -10,6 +10,8 @@ data class UiState(
     val inProgress: Boolean = false,
     val errorData: ErrorData? = null,
     val promptForOAuth: Unit? = null,
+    val showTermsOfUseDialog: Boolean = false,
+    val showUsernameDialog: Boolean = false
 )
 
 data class PresentProfile(val profile: Profile, val isSelected: Boolean = false)

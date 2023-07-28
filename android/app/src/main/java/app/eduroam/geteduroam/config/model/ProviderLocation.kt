@@ -3,7 +3,7 @@ package app.eduroam.geteduroam.config.model
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 
-@Root
+@Root(name = "ProviderLocation")
 class ProviderLocation {
 
     @field:Element(name = "Longitude", required = false)

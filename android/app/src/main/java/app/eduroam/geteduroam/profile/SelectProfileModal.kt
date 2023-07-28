@@ -26,10 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.institutions.TermsOfUseDialog
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.ErrorData
@@ -80,6 +78,14 @@ fun SelectProfileModal(
         setProfileSelected = viewModel::setProfileSelected,
         connectWithSelectedProfile = viewModel::connectWithSelectedProfile
     )
+
+    if (viewModel.uiState.showTermsOfUseDialog) {
+        TermsOfUseDialog(onConfirmClicked = {
+            viewModel.didAgreeToTerms(true)
+        }, onDismiss = {
+            viewModel.didAgreeToTerms(false)
+        })
+    }
 }
 
 @Composable

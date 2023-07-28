@@ -37,6 +37,7 @@ class SelectProfileViewModel @Inject constructor(
     var uiState by mutableStateOf(UiState())
         private set
     private val institutionId: String
+    private var didAgreeToTerms = false
 
     init {
         institutionId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
@@ -197,8 +198,20 @@ class SelectProfileViewModel @Inject constructor(
                     helpDesk = info?.helpdesk
                 )
             )
+            if (info?.termsOfUse != null && !didAgreeToTerms) {
+                uiState = uiState.copy(showTermsOfUseDialog = true)
+            } else {
+                // TODO continue to next step
+            }
         } else {
             displayEapError()
+        }
+    }
+
+    fun didAgreeToTerms(agreed: Boolean) {
+        didAgreeToTerms = agreed
+        if (agreed) {
+            connectWithSelectedProfile()
         }
     }
 

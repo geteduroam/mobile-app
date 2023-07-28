@@ -20,7 +20,6 @@
     <string name="terms_of_use_dialog_title">Terms of use</string>
     <string name="terms_of_use_dialog_text">You must agree with to the terms of use before you can use this network</string>
     <string name="terms_of_use_dialog_agree">Agree</string>
-    <string name="terms_of_use_dialog_read_tou">Read Terms of Use</string>
     <string name="terms_of_use_dialog_disagree">Disagree</string>
 
     <string name="err_title_auth_unexpected_fail">Unexpected error</string>
