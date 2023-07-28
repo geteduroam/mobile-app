@@ -3,10 +3,25 @@ package app.eduroam.geteduroam.config
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.eduroam.geteduroam.EduTopAppBar
@@ -20,26 +35,26 @@ import kotlinx.coroutines.launch
 fun WifiConfigScreen(
     viewModel: WifiConfigViewModel, snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) = EduTopAppBar(withBackIcon = false) { paddingValues ->
-//        val launch by viewModel.launch.collectAsStateWithLifecycle(null)
-//        val processing by viewModel.processing.collectAsStateWithLifecycle(true)
-//        val message by viewModel.progressMessage.collectAsStateWithLifecycle("")
-//        val suggestionIntent by viewModel.intentWithSuggestions.collectAsStateWithLifecycle(null)
-//        val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsStateWithLifecycle(
-//            false
-//        )
-//        val context = LocalContext.current
-//        launch?.let {
-//            LaunchedEffect(it) {
-//                viewModel.launchConfiguration(context)
-//            }
-//        }
-//        val activityLauncher = rememberLauncherForSuggestionIntent(snackbarHostState, viewModel)
-//        suggestionIntent?.let { intent ->
-//            LaunchedEffect(intent) {
-//                viewModel.consumeSuggestionIntent()
-//                activityLauncher.launch(intent)
-//            }
-//        }
+    val launch by viewModel.launch.collectAsState(null)
+    val processing by viewModel.processing.collectAsState(true)
+    val message by viewModel.progressMessage.collectAsState("")
+    val suggestionIntent by viewModel.intentWithSuggestions.collectAsState(null)
+    val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(
+        false
+    )
+    val context = LocalContext.current
+    launch?.let {
+        LaunchedEffect(it) {
+            viewModel.launchConfiguration(context)
+        }
+    }
+    val activityLauncher = rememberLauncherForSuggestionIntent(snackbarHostState, viewModel)
+    suggestionIntent?.let { intent ->
+        LaunchedEffect(intent) {
+            viewModel.consumeSuggestionIntent()
+            activityLauncher.launch(intent)
+        }
+    }
 
     Column(
         Modifier
@@ -53,11 +68,11 @@ fun WifiConfigScreen(
             style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(Modifier.height(8.dp))
-//            if (processing) {
-//                LinearProgressIndicator(
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//            }
+        if (processing) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Text(
             text = stringResource(id = R.string.configuration_logs),
             style = MaterialTheme.typography.bodyMedium,
@@ -65,12 +80,12 @@ fun WifiConfigScreen(
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "message",
+            text = message,
             style = MaterialTheme.typography.bodyMedium,
         )
-//            if (askNetworkPermission) {
-//                AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
-//            }
+        if (askNetworkPermission) {
+            AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
+        }
     }
 }
 

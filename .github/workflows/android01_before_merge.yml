@@ -38,7 +38,7 @@ jobs:
             -   name: Configure Java for the runner
                 uses: actions/setup-java@v1
                 with:
-                    java-version: '15'
+                    java-version: '17'
 
             # Build debug, validate PR
             -   name: Build debug version of app

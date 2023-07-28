@@ -3,7 +3,7 @@ android-sdk-compile = "33"
 android-sdk-target = "33"
 android-sdk-min = "26"
 
-android-gradle-plugin = "8.1.0-beta05"
+android-gradle-plugin = "8.1.0"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
 google-services-plugin = "4.3.15"
