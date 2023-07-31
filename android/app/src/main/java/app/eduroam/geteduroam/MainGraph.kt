@@ -8,7 +8,10 @@ import androidx.compose.material.SwipeableDefaults
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -28,7 +31,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MainGraph(
     bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(skipHalfExpanded = true),
@@ -44,9 +47,12 @@ fun MainGraph(
         ) {
             composable(Route.SelectInstitution.route) { entry ->
                 val viewModel = hiltViewModel<SelectInstitutionViewModel>(entry)
+                val focusManager = LocalFocusManager.current
                 SelectInstitutionScreen(
                     viewModel = viewModel,
                     openProfileModal = { institutionId ->
+                        // Remove the focus from the search field (if it was there)
+                        focusManager.clearFocus(force = true)
                         navController.navigate(Route.SelectProfile.encodeArgument(institutionId))
                     },
                     goToOAuth = { profile ->

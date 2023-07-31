@@ -4,17 +4,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
-    </style>
-
-    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
         <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
-        <item name="postSplashScreenTheme">@style/Theme.AndroidApp</item>
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
     </style>
-
 </resources>

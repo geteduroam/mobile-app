@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.institutions.TermsOfUseDialog
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.ErrorData
@@ -73,8 +74,18 @@ fun SelectProfileModal(
         institution = viewModel.uiState.institution,
         inProgress = viewModel.uiState.inProgress,
         errorData = viewModel.uiState.errorData,
-        errorDataShown = viewModel::errorDataShown
+        errorDataShown = viewModel::errorDataShown,
+        setProfileSelected = viewModel::setProfileSelected,
+        connectWithSelectedProfile = viewModel::connectWithSelectedProfile
     )
+
+    if (viewModel.uiState.showTermsOfUseDialog) {
+        TermsOfUseDialog(onConfirmClicked = {
+            viewModel.didAgreeToTerms(true)
+        }, onDismiss = {
+            viewModel.didAgreeToTerms(false)
+        })
+    }
 }
 
 @Composable
@@ -84,6 +95,8 @@ fun SelectProfileContent(
     inProgress: Boolean = false,
     errorData: ErrorData? = null,
     errorDataShown: () -> Unit = {},
+    setProfileSelected: (PresentProfile) -> Unit = {},
+    connectWithSelectedProfile: () -> Unit = {}
 ) = Surface(
     modifier = Modifier
         .heightIn(min = 300.dp, max = 500.dp)
@@ -131,6 +144,7 @@ fun SelectProfileContent(
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(Modifier.height(2.dp))
             Divider(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
@@ -147,7 +161,9 @@ fun SelectProfileContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .sizeIn(minHeight = 48.dp)
-                        .clickable(onClick = { }), verticalAlignment = Alignment.CenterVertically
+                        .clickable(onClick = {
+                            setProfileSelected(profile)
+                        }), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = profile.profile.name,
@@ -169,9 +185,9 @@ fun SelectProfileContent(
             }
         }
         PrimaryButton(
-            text = stringResource(R.string.button_retry),
+            text = stringResource(R.string.button_connect),
             enabled = !inProgress,
-            onClick = {},
+            onClick = { connectWithSelectedProfile() },
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -183,12 +199,13 @@ fun SelectProfileContent(
 private fun Preview_SelectProfileModal() {
     AppTheme {
         SelectProfileContent(
-            profiles = profileList, institution = PresentInstitution("Uninett", "NO")
+            profiles = profileList,
+            institution = PresentInstitution("Uninett", "NO")
         )
     }
 }
 
-private val profileList = listOf<PresentProfile>(
+private val profileList = listOf(
     PresentProfile(Profile(id = "id", name = "First profile"), true),
     PresentProfile(Profile(id = "id", name = "Second profile"), false),
 )

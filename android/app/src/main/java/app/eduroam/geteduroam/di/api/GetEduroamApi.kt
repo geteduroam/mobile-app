@@ -10,10 +10,4 @@ import retrofit2.http.Url
 interface GetEduroamApi {
     @GET("v1/discovery.json")
     suspend fun getInstitutions(): Response<InstitutionResult>
-
-    @POST
-    suspend fun downloadEapFile(
-        @Url eapconfigEndpoint: String,
-        @Header("Authorization") accessToken: String?,
-    ): ByteArray
 }
