@@ -84,7 +84,9 @@ fun MainGraph(
                 route = Route.OAuth.routeWithArgs, arguments = Route.OAuth.arguments
             ) { entry ->
                 val viewModel = hiltViewModel<OAuthViewModel>()
-                OAuthScreen(viewModel = viewModel)
+                OAuthScreen(viewModel = viewModel, goToPrevious = {
+                    navController.popBackStack()
+                })
             }
             composable(
                 route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments

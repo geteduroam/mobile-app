@@ -24,4 +24,5 @@ data class PresentInstitution(
     val logo: String? = null,
     val termsOfUse: String? = null,
     val helpDesk: Helpdesk? = null,
+    val requiredSuffix: String? = null
 )

@@ -40,6 +40,7 @@ import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.institutions.TermsOfUseDialog
+import app.eduroam.geteduroam.institutions.UsernamePasswordDialog
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.ErrorData
@@ -85,6 +86,19 @@ fun SelectProfileModal(
         }, onDismiss = {
             viewModel.didAgreeToTerms(false)
         })
+    }
+    if (viewModel.uiState.showUsernameDialog) {
+        UsernamePasswordDialog(
+            requiredSuffix = viewModel.uiState.institution?.requiredSuffix,
+            cancel = {
+                // Just hide the dialog
+                viewModel.didCancelLogin()
+            },
+            logIn = { username, password ->
+                viewModel.didEnterLoginDetails(username = username, password = password)
+            }
+
+        )
     }
 }
 

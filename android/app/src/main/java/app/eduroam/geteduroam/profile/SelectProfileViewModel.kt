@@ -195,13 +195,14 @@ class SelectProfileViewModel @Inject constructor(
                     description = info?.description,
                     logo = info?.providerLogo?.value,
                     termsOfUse = info?.termsOfUse,
-                    helpDesk = info?.helpdesk
+                    helpDesk = info?.helpdesk,
+                    requiredSuffix = firstProvider.authenticationMethod?.firstOrNull()?.clientSideCredential?.innerIdentitySuffix
                 )
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
-                uiState = uiState.copy(showTermsOfUseDialog = true)
+                uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
             } else {
-                // TODO continue to next step
+                uiState = uiState.copy(inProgress = false, showUsernameDialog = true)
             }
         } else {
             displayEapError()
@@ -209,6 +210,7 @@ class SelectProfileViewModel @Inject constructor(
     }
 
     fun didAgreeToTerms(agreed: Boolean) {
+        uiState = uiState.copy(showTermsOfUseDialog = false)
         didAgreeToTerms = agreed
         if (agreed) {
             connectWithSelectedProfile()
@@ -226,5 +228,13 @@ class SelectProfileViewModel @Inject constructor(
 
     fun errorDataShown() {
         uiState = uiState.copy(errorData = null)
+    }
+
+    fun didCancelLogin() {
+        uiState = uiState.copy(showUsernameDialog = false)
+    }
+
+    fun didEnterLoginDetails(username: String, password: String) {
+        TODO("Not yet implemented")
     }
 }
