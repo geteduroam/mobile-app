@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
+import app.eduroam.geteduroam.config.model.ClientSideCredential
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
@@ -202,7 +203,7 @@ class SelectProfileViewModel @Inject constructor(
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
             } else {
-                uiState = uiState.copy(inProgress = false, showUsernameDialog = true)
+                uiState = uiState.copy(inProgress = false, showUsernameDialog = true, credentialsEnteredForProviderList = providers)
             }
         } else {
             displayEapError()
@@ -235,6 +236,16 @@ class SelectProfileViewModel @Inject constructor(
     }
 
     fun didEnterLoginDetails(username: String, password: String) {
-        TODO("Not yet implemented")
+        val profileList = uiState.credentialsEnteredForProviderList ?: throw RuntimeException("Profile list not found for entered credentials!")
+        profileList.eapIdentityProvider?.forEach { idp ->
+            idp.authenticationMethod?.forEach { authMethod ->
+                authMethod.clientSideCredential = ClientSideCredential().apply {
+                    userName = username
+                    passphrase = password
+                }
+            }
+        }
+        uiState = uiState.copy(credentialsEnteredForProviderList = null, goToConfigScreenWithProviderList = profileList)
+
     }
 }

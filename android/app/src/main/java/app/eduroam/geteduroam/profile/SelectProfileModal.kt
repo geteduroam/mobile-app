@@ -70,6 +70,15 @@ fun SelectProfileModal(
             }
     }
 
+    LaunchedEffect(viewModel, lifecycle) {
+        snapshotFlow { viewModel.uiState }.distinctUntilChanged()
+            .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
+                awaitFrame()
+                val providerList = state.goToConfigScreenWithProviderList!!
+                goToConfigScreen(providerList)
+            }
+    }
+
     SelectProfileContent(
         profiles = viewModel.uiState.profiles,
         institution = viewModel.uiState.institution,

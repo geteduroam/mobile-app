@@ -76,9 +76,15 @@ fun MainGraph(
                 route = Route.SelectProfile.routeWithArgs, arguments = Route.SelectProfile.arguments
             ) { entry ->
                 val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
-                SelectProfileModal(viewModel = viewModel, goToOAuth = { auth, token ->
-                    navController.navigate(Route.OAuth.encodeArguments(auth, token))
-                })
+                SelectProfileModal(viewModel = viewModel,
+                    goToOAuth = { auth, token ->
+                        navController.navigate(Route.OAuth.encodeArguments(auth, token))
+                    },
+                    goToConfigScreen = { provider ->
+                        navController.navigate(
+                            Route.ConfigureWifi.encodeArguments(provider),
+                        )
+                    })
             }
             composable(
                 route = Route.OAuth.routeWithArgs, arguments = Route.OAuth.arguments
