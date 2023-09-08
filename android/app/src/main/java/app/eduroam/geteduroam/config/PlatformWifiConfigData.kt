@@ -2,6 +2,7 @@ package app.eduroam.geteduroam.config
 
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiEnterpriseConfig
+import android.net.wifi.WifiEnterpriseConfig.Eap
 import android.net.wifi.WifiNetworkSuggestion
 import android.net.wifi.hotspot2.PasspointConfiguration
 import android.net.wifi.hotspot2.pps.Credential
@@ -14,6 +15,7 @@ import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import java.nio.charset.Charset
 
 
+@RequiresApi(Build.VERSION_CODES.R)
 fun EAPIdentityProviderList.buildAllNetworkSuggestions(): List<WifiNetworkSuggestion> {
     val suggestions = buildSSIDSuggestions()
     val passpointSuggestions = buildPasspointSuggestion()
@@ -35,6 +37,7 @@ fun EAPIdentityProviderList.buildAllNetworkSuggestions(): List<WifiNetworkSugges
  * @see this.buildPasspointSuggestion
  * @see this.buildNetworkRequests
  */
+@RequiresApi(Build.VERSION_CODES.Q)
 fun EAPIdentityProviderList.buildSSIDSuggestions(): List<WifiNetworkSuggestion> {
     val eapIdentityProvider = eapIdentityProvider?.first()
     val ssids = eapIdentityProvider?.credentialApplicability?.map { it.ssid } ?: listOf()
@@ -96,8 +99,8 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     enterpriseConfig.anonymousIdentity =
         eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
 
-    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
-    enterpriseConfig.eapMethod = enterpriseEAP ?: 0
+    val enterpriseEAP = convertEAPMethod(eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt())
+    enterpriseConfig.eapMethod = enterpriseEAP
 
     val caCertificates =
         eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }
@@ -115,17 +118,30 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     // Explicitly reset client certificate, will set later if needed
     enterpriseConfig.setClientKeyEntry(null, null)
     when (enterpriseEAP) {
-        WifiEnterpriseConfig.Eap.TLS -> {
+        Eap.TLS -> {
             handleEapTLS(enterpriseConfig)
         }
 
-        WifiEnterpriseConfig.Eap.PEAP, WifiEnterpriseConfig.Eap.TTLS, WifiEnterpriseConfig.Eap.PWD -> {
+        Eap.PEAP, Eap.TTLS, Eap.PWD -> {
             handleOtherEap(enterpriseConfig)
         }
 
         else -> throw IllegalArgumentException("Invalid EAP type $enterpriseEAP")
     }
     return enterpriseConfig
+}
+
+/**
+ * Converts an internal EAP method type to the one used by Android
+ */
+private fun convertEAPMethod(apiEapMethod: Int?): Int {
+    return when (apiEapMethod) {
+        13 -> Eap.TLS
+        21 -> Eap.TTLS
+        25 -> Eap.PEAP
+        43 -> Eap.TLS // EAP-FAST
+        else -> Eap.NONE
+    }
 }
 
 private fun EAPIdentityProviderList.handleOtherEap(enterpriseConfig: WifiEnterpriseConfig) {
