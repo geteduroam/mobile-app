@@ -167,14 +167,18 @@ class SelectProfileViewModel @Inject constructor(
         if (authorizationHeader != null) {
             requestBuilder = requestBuilder.addHeader("Authorization", authorizationHeader)
         }
-
-        val response = client.newCall(requestBuilder.build()).execute()
-        val bytes = response.body?.bytes()
-        response.close()
-        if (bytes == null) {
+        try {
+            val response = client.newCall(requestBuilder.build()).execute()
+            val bytes = response.body?.bytes()
+            response.close()
+            if (bytes == null) {
+                return null
+            }
+            return parser.parse(bytes)
+        } catch (ex: Exception) {
+            Timber.e(ex, "Unable to fetch EAP config from remote service")
             return null
         }
-        return parser.parse(bytes)
     }
 
     private suspend fun getEapFrom(eapEndpoint: String, authorizationHeader: String? = null) {
