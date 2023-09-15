@@ -73,7 +73,6 @@ fun SelectProfileModal(
     LaunchedEffect(viewModel, lifecycle) {
         snapshotFlow { viewModel.uiState }.distinctUntilChanged()
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
-                awaitFrame()
                 val providerList = state.goToConfigScreenWithProviderList!!
                 goToConfigScreen(providerList)
             }
@@ -99,10 +98,7 @@ fun SelectProfileModal(
     if (viewModel.uiState.showUsernameDialog) {
         UsernamePasswordDialog(
             requiredSuffix = viewModel.uiState.institution?.requiredSuffix,
-            cancel = {
-                // Just hide the dialog
-                viewModel.didCancelLogin()
-            },
+            cancel = viewModel::didCancelLogin, // Just hide the dialog
             logIn = { username, password ->
                 viewModel.didEnterLoginDetails(username = username, password = password)
             }
