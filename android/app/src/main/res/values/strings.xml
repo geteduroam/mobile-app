@@ -46,4 +46,16 @@
     <string name="button_retry">Retry</string>
     <string name="button_connect">CONNECT</string>
     <string name="button_back">Back</string>
+
+    <string name="username_password_login_required">Login required</string>
+    <string name="username_password_please_enter">Please enter your username and password.</string>
+    <string name="username_password_label_username">Username</string>
+    <string name="username_password_label_password">Password</string>
+    <string name="username_password_button_cancel">Cancel</string>
+    <string name="username_password_button_log_in">Log in</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">username</string>
+    <string name="username_password_accessibility_hide_password">Hide password</string>
+    <string name="username_password_accessibility_show_password">Show password</string>
 </resources>

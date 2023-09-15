@@ -42,10 +42,10 @@ fun TermsOfUseDialog(
                     .weight(weight = 1f, fill = false)
             ) {
 
-                TextButton(onClick = onDismiss) {
+                TextButton(onClick = onConfirmClicked) {
                     Text(text = stringResource(R.string.terms_of_use_dialog_agree))
                 }
-                TextButton(onClick = onConfirmClicked) {
+                TextButton(onClick = onDismiss) {
                     Text(text = stringResource(R.string.terms_of_use_dialog_disagree))
                 }
             }

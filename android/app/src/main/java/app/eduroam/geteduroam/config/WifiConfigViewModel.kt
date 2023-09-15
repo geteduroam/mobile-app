@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -53,6 +54,7 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun handleAndroid11AndOver() {
         val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val intent = createSuggestionsIntent(suggestions = suggestions)
@@ -62,6 +64,7 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
     /**
      * Requires CHANGE_WIFI_STATE permission
      * */
+    @RequiresApi(Build.VERSION_CODES.R)
     fun handleAndroid10WifiConfig(context: Context) {
         val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val wifiManager: WifiManager =

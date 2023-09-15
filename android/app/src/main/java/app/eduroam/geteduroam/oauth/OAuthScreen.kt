@@ -35,7 +35,7 @@ import app.eduroam.geteduroam.ui.PrimaryButton
 @Composable
 fun OAuthScreen(
     viewModel: OAuthViewModel,
-    goToPrevious: () -> Unit = {},
+    goToPrevious: () -> Unit,
 ) = EduTopAppBar(onBackClicked = goToPrevious) {
     var oAuthUiStages by rememberSaveable { mutableStateOf(OAuthUiStages()) }
     val context = LocalContext.current

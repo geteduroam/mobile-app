@@ -1,8 +1,10 @@
 package app.eduroam.geteduroam.config.model
 
 
+import com.squareup.moshi.JsonClass
 import org.simpleframework.xml.Element
 
+@JsonClass(generateAdapter = true)
 class ClientSideCredential {
 
     @field:Element(name = "InnerIdentitySuffix", required = false)

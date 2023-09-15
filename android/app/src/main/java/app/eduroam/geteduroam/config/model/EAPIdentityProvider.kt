@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.config.model
 
+import com.squareup.moshi.JsonClass
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
@@ -7,6 +8,7 @@ import org.simpleframework.xml.Root
 
 
 @Root(name = "EAPIdentityProvider")
+@JsonClass(generateAdapter = true)
 class EAPIdentityProvider {
 
     @field:ElementList(name = "AuthenticationMethods", entry = "AuthenticationMethod")
