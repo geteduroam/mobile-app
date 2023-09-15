@@ -3,8 +3,10 @@
     <style name="Theme.AndroidApp" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
         <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="android:windowBackground">@color/background</item>
     </style>
 </resources>
