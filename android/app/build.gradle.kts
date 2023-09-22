@@ -1,3 +1,5 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.protobuf") version (libs.versions.protobufPlugin)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
     id("com.google.firebase.appdistribution")
     kotlin("kapt")
 }
@@ -44,7 +47,6 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             firebaseAppDistribution {
-                appId = "app.eduroam.geteduroam.debug"
                 artifactType = "APK"
                 artifactPath = "${buildDir}/outputs/apk/debug/app-debug.apk"
                 releaseNotesFile = "${buildDir}/release_notes.txt"
