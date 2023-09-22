@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
@@ -119,8 +119,6 @@ fun SelectProfileContent(
 ) = Surface(
     modifier = Modifier
         .heightIn(min = 300.dp, max = 500.dp)
-        .systemBarsPadding(),
-    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
 ) {
     val context = LocalContext.current
     errorData?.let {
@@ -140,13 +138,14 @@ fun SelectProfileContent(
             .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             institution?.name?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = FontWeight.Bold
                 )
             }
             institution?.location?.let {
@@ -156,14 +155,14 @@ fun SelectProfileContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             Text(
                 text = stringResource(R.string.profiles_title),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(4.dp))
             Divider(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
@@ -207,7 +206,8 @@ fun SelectProfileContent(
             text = stringResource(R.string.button_connect),
             enabled = !inProgress,
             onClick = { connectWithSelectedProfile() },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.weight(1f, false)
+                .navigationBarsPadding()
         )
     }
 }

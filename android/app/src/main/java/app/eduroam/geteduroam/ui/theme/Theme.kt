@@ -22,13 +22,15 @@ private val LightThemeColors = lightColorScheme(
     primary = md_theme_light_primary,
     surface = md_theme_light_surface,
     onSurface = md_theme_light_onSurface,
-    secondary = md_theme_light_secondary
+    secondary = md_theme_light_secondary,
+    primaryContainer = md_theme_light_primaryContainer
 )
 private val DarkThemeColors = darkColorScheme(
     primary = md_theme_dark_primary,
     surface = md_theme_dark_surface,
     onSurface = md_theme_dark_onSurface,
-    secondary = md_theme_dark_secondary
+    secondary = md_theme_dark_secondary,
+    primaryContainer = md_theme_dark_primaryContainer
 )
 
 @Composable

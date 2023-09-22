@@ -10,4 +10,5 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.google.gms.gradle) apply false
     alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.firebase.appdistribution) apply false
 }

@@ -5,6 +5,7 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.protobuf") version (libs.versions.protobufPlugin)
     id("com.google.devtools.ksp")
+    id("com.google.firebase.appdistribution")
     kotlin("kapt")
 }
 
