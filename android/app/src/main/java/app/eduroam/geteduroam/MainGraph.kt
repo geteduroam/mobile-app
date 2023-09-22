@@ -3,6 +3,7 @@ package app.eduroam.geteduroam
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SwipeableDefaults
 import androidx.compose.material.rememberModalBottomSheetState
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ fun MainGraph(
     ModalBottomSheetLayout(
         modifier = Modifier,
         bottomSheetNavigator = bottomSheetNavigator,
+        sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
     ) {
         NavHost(
@@ -73,7 +76,8 @@ fun MainGraph(
                 )
             }
             bottomSheet(
-                route = Route.SelectProfile.routeWithArgs, arguments = Route.SelectProfile.arguments
+                route = Route.SelectProfile.routeWithArgs,
+                arguments = Route.SelectProfile.arguments,
             ) { entry ->
                 val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
                 SelectProfileModal(viewModel = viewModel,
