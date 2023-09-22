@@ -11,7 +11,7 @@ junit = "4.13.2"
 #NB: ksp version must be compatible with kotlin
 ksp-plugin = "1.8.20-1.0.11"
 kotlin-gradle-plugin = "1.8.20"
-firebase-appdistribution-gradle = "4.0.0"
+firebase-app-distribution-plugin = "4.0.0"
 firebase-crashlytics-gradle = "2.9.5"
 protobufPlugin = "0.9.3"
 protobufVersion = "3.23.0"
@@ -48,7 +48,6 @@ accompanist-permissions = { group = "com.google.accompanist", name = "accompanis
 accompanist-bottomsheet = { group = "com.google.accompanist", name = "accompanist-navigation-material", version.ref = "accompanist" }
 appauth = "net.openid:appauth:0.11.1"
 simpleframework-xml-parser = "org.simpleframework:simple-xml:2.7.1"
-firebase-appdistribution-gradle = { module = "com.google.firebase:firebase-appdistribution-gradle", version.ref = "firebase-appdistribution-gradle" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics-gradle" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-android" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
@@ -89,5 +88,6 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-plugin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-android" }
 google-gms-gradle = { id = "com.google.gms.google-services", version.ref = "google-services-plugin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebase-app-distribution-plugin" }
 
 [bundles]
