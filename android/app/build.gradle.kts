@@ -43,6 +43,12 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            firebaseAppDistribution {
+                appId = "app.eduroam.geteduroam.debug"
+                artifactType = "APK"
+                artifactPath = "${buildDir}/outputs/apk/debug/app-debug.apk"
+                releaseNotesFile = "${buildDir}/release_notes.txt"
+            }
         }
 
         release {
