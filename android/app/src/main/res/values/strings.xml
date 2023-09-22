@@ -2,9 +2,8 @@
     <string name="name">geteduroam</string>
 
     <string name="welcome">Welcome</string>
-    <string name="institutions_no_results">Could not retrieve any institutions.</string>
-    <string name="institution_search_text">Search for an institution</string>
-    <string name="institution_select_title">Select an institution</string>
+    <string name="institutions_no_results">Could not find any institutions.</string>
+    <string name="institution_search_text">Search for your organization</string>
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
     <string name="profiles_title">Profiles</string>
     <string name="configuration_progress">Establishing WiFi connection</string>

@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,42 +25,40 @@ fun InstitutionSearchHeader(
     searchText: String, onSearchTextChange: (String) -> Unit, modifier: Modifier = Modifier,
 ) = Column(modifier.fillMaxWidth()) {
     val focusManager = LocalFocusManager.current
-    Text(
-        text = stringResource(id = R.string.institution_select_title),
-        style = MaterialTheme.typography.headlineSmall,
-    )
-    Spacer(Modifier.height(8.dp))
-    OutlinedTextField(
+    Spacer(Modifier.height(16.dp))
+    TextField(
         value = searchText,
         onValueChange = onSearchTextChange,
         singleLine = true,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "",
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(30.dp)
+            )
+        },
         placeholder = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "",
-                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
+            Text(
                     text = stringResource(id = R.string.institution_search_text),
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.weight(1f),
-                    fontWeight = FontWeight.Light
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
         },
 
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done, keyboardType = KeyboardType.Text
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text
         ),
         keyboardActions = KeyboardActions {
             focusManager.clearFocus()
         },
         modifier = Modifier.fillMaxWidth(),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
+        )
     )
 }
 

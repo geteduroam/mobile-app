@@ -1,13 +1,24 @@
 package app.eduroam.geteduroam.institutions
 
+import android.view.Gravity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,18 +31,24 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.models.Institution
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
+import app.eduroam.geteduroam.ui.theme.AppTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
@@ -82,7 +99,9 @@ fun SelectInstitutionScreen(
         }
     }
 
-    SelectInstitutionContent(institutions = viewModel.uiState.institutions,
+    SelectInstitutionContent(
+        institutions = viewModel.uiState.institutions,
+        isLoading = viewModel.uiState.isLoading,
         onSelectInstitution = { institution ->
             waitForVmEvent = true
             viewModel.onInstitutionSelect(institution)
@@ -107,7 +126,7 @@ fun SelectInstitutionContent(
     onSearchTextChange: (String) -> Unit = {},
     onClearDialog: () -> Unit = {},
     onCredsAvailable: (String, String) -> Unit = { _, _ -> },
-) = EduTopAppBar(withBackIcon = false) { paddingValues ->
+) = Surface(color = MaterialTheme.colorScheme.surface) {
     val context = LocalContext.current
     if (showDialog) {
         LoginDialog({ username, password ->
@@ -115,53 +134,81 @@ fun SelectInstitutionContent(
             onClearDialog()
         }, {})
     } else {
+        // Center heart icon
         Column(
-            Modifier
-                .padding(paddingValues)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.fillMaxHeight(fraction = 0.3f))
+            Icon(
+                painterResource(R.drawable.ic_eduroam_logo),
+                contentDescription = "App logo",
+                tint = Color(0xFFBDD6E5),
+                modifier = Modifier.size(150.dp)
+            )
+        }
+        // Bottom right eduroam icon
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
+            Spacer(Modifier.fillMaxHeight(fraction = 0.8f))
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50))
+                    .background(Color.White)
+                    .padding(horizontal = 32.dp, vertical = 16.dp)
+            ) {
+                Image(
+                    painterResource(R.drawable.ic_eduroamtrans),
+                    contentDescription = "App logo",
+                    modifier = Modifier.width(120.dp)
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
-                .padding(horizontal = 16.dp)
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            InstitutionSearchHeader(
+                searchText = searchText,
+                onSearchTextChange = onSearchTextChange,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            )
+            if (isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    trackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                )
+            }
+            Spacer(Modifier.height(8.dp))
             LazyColumn {
-                item {
-                    InstitutionSearchHeader(
-                        searchText = searchText,
-                        onSearchTextChange = onSearchTextChange,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                if (isLoading) {
-                    item {
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                } else if (errorData != null) {
+                 if (errorData != null) {
                     item {
                         Text(
+                            modifier = Modifier.padding(16.dp),
                             text = errorData.title(context),
                             color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
-                } else {
+                } else if (!isLoading) {
                     if (institutions.isEmpty()) {
                         item {
-                            Text(stringResource(id = R.string.institutions_no_results))
+                            Text(
+                                modifier = Modifier.padding(16.dp),
+                                color = MaterialTheme.colorScheme.secondary,
+                                text = stringResource(id = R.string.institutions_no_results),
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     } else {
-
-                        item {
-                            Text(
-                                text = stringResource(id = R.string.institutions_choose_one),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Spacer(Modifier.height(8.dp))
-                        }
-
                         institutions.forEach { institution ->
                             item {
                                 InstitutionRow(institution, onSelectInstitution)
@@ -171,5 +218,16 @@ fun SelectInstitutionContent(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun Preview_SelectInstitutionContent() {
+    AppTheme {
+        SelectInstitutionContent(
+            onSelectInstitution = {},
+            searchText = ""
+        )
     }
 }
