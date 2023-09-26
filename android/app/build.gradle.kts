@@ -42,15 +42,16 @@ android {
         manifestPlaceholders += mapOf(
             "appAuthRedirectScheme" to "app.eduroam.geteduroam"
         )
+        firebaseAppDistribution {
+            artifactType = "APK"
+            releaseNotesFile = "${buildDir}/release_notes.txt"
+            groups = "All testers"
+        }
     }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            firebaseAppDistribution {
-                artifactType = "APK"
-                artifactPath = "${buildDir}/outputs/apk/debug/app-debug.apk"
-                releaseNotesFile = "${buildDir}/release_notes.txt"
-            }
         }
 
         release {
