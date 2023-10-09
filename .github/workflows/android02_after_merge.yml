@@ -67,13 +67,12 @@ jobs:
                 env:
                     GOOGLE_APPLICATION_CREDENTIALS: ./firebase.json
                     PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
+                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                 run: |
                     ./gradlew :android:app:assembleRelease :android:app:appDistributionUploadRelease
             -   name: Push tag for snapshot
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
-                    PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
                 run: |
                     git config user.name "github-actions"
                     git config user.email "github-actions@github.com"
