@@ -14,7 +14,7 @@ on:
 
 jobs:
     build:
-        name: Build debug version of the project
+        name: Build release version of the project
         runs-on: ubuntu-latest
         timeout-minutes: 10
         steps:
