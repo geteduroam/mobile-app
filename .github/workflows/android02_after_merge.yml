@@ -57,15 +57,23 @@ jobs:
                     echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > firebase.json
                 env:
                     GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-
-            -   name: Build & upload the debug version of the app
+            - name: Restore release keystore
+              run: |
+                  echo "${{ secrets.PRODUCTION_KEYSTORE }}" > release.keystore.asc
+                  gpg -d --passphrase "${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}" --batch release.keystore.asc > ./android/app/keystore/release.keystore
+                  rm release.keystore.asc
+            -   name: Build & upload the release version of the app to Firebase App Distribution
                 env:
                     GOOGLE_APPLICATION_CREDENTIALS: ./firebase.json
+                    PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
                 run: |
-                    ./gradlew :android:app:assembleDebug :android:app:appDistributionUploadDebug
+                    ./gradlew :android:app:assembleRelease :android:app:appDistributionUploadRelease
             -   name: Push tag for snapshot
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
+                    PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
+                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                 run: |
                     git config user.name "github-actions"
                     git config user.email "github-actions@github.com"

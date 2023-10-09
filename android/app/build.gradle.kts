@@ -49,6 +49,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore/release.keystore")
+            storePassword = System.getenv("PRODUCTION_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("PRODUCTION_KEYSTORE_ALIAS")
+            keyPassword = System.getenv("PRODUCTION_KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -57,6 +66,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
