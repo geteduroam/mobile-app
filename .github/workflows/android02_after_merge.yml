@@ -73,7 +73,6 @@ jobs:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                     PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
-                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                 run: |
                     git config user.name "github-actions"
                     git config user.email "github-actions@github.com"
