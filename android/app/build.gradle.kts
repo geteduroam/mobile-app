@@ -51,10 +51,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("keystore/release.keystore")
-            storePassword = System.getenv("PRODUCTION_KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("PRODUCTION_KEYSTORE_ALIAS")
-            keyPassword = System.getenv("PRODUCTION_KEYSTORE_PASSWORD")
+            storeFile = file("/Users/dzolnai/Documents/Work/Certs and passwords/Unknown/test123")
+            storePassword = "test123"
+            keyAlias = "test123"
+            keyPassword = "test123"
         }
     }
 
