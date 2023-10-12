@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Institution(
+data class Organization(
     @Json(name = "cat_idp")
     val catIdp: Int,
     val country: String,

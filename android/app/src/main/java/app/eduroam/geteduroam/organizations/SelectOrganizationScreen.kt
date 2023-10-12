@@ -1,6 +1,5 @@
-package app.eduroam.geteduroam.institutions
+package app.eduroam.geteduroam.organizations
 
-import android.view.Gravity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.models.Institution
+import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import app.eduroam.geteduroam.ui.theme.AppTheme
@@ -53,8 +52,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun SelectInstitutionScreen(
-    viewModel: SelectInstitutionViewModel,
+fun SelectOrganizationScreen(
+    viewModel: SelectOrganizationViewModel,
     openProfileModal: (String) -> Unit,
     goToOAuth: (Profile) -> Unit,
     goToConfigScreen: (EAPIdentityProviderList) -> Unit,
@@ -89,22 +88,22 @@ fun SelectInstitutionScreen(
         val currentOpenProfileModal by rememberUpdatedState(newValue = openProfileModal)
         LaunchedEffect(viewModel, lifecycle) {
             snapshotFlow { viewModel.uiState }.distinctUntilChanged()
-                .filter { it.selectedInstitution != null }.flowWithLifecycle(lifecycle).collect {
+                .filter { it.selectedOrganization != null }.flowWithLifecycle(lifecycle).collect {
                     waitForVmEvent = false
                     currentOpenProfileModal(
-                        it.selectedInstitution?.id.orEmpty(),
+                        it.selectedOrganization?.id.orEmpty(),
                     )
                     viewModel.clearSelection()
                 }
         }
     }
 
-    SelectInstitutionContent(
-        institutions = viewModel.uiState.institutions,
+    SelectOrganizationContent(
+        organizations = viewModel.uiState.organizations,
         isLoading = viewModel.uiState.isLoading,
-        onSelectInstitution = { institution ->
+        onSelectOrganization = { organization ->
             waitForVmEvent = true
-            viewModel.onInstitutionSelect(institution)
+            viewModel.onOrganizationSelect(organization)
         },
         searchText = viewModel.uiState.filter,
         onSearchTextChange = { viewModel.onSearchTextChange(it) },
@@ -116,12 +115,12 @@ fun SelectInstitutionScreen(
 
 
 @Composable
-fun SelectInstitutionContent(
-    institutions: List<Institution> = emptyList(),
+fun SelectOrganizationContent(
+    organizations: List<Organization> = emptyList(),
     isLoading: Boolean = false,
     showDialog: Boolean = false,
     errorData: ErrorData? = null,
-    onSelectInstitution: (Institution) -> Unit,
+    onSelectOrganization: (Organization) -> Unit,
     searchText: String,
     onSearchTextChange: (String) -> Unit = {},
     onClearDialog: () -> Unit = {},
@@ -174,7 +173,7 @@ fun SelectInstitutionContent(
                 .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            InstitutionSearchHeader(
+            OrganizationSearchHeader(
                 searchText = searchText,
                 onSearchTextChange = onSearchTextChange,
                 modifier = Modifier.fillMaxWidth()
@@ -199,19 +198,19 @@ fun SelectInstitutionContent(
                         )
                     }
                 } else if (!isLoading) {
-                    if (institutions.isEmpty() && searchText.isNotEmpty()) {
+                    if (organizations.isEmpty() && searchText.isNotEmpty()) {
                         item {
                             Text(
                                 modifier = Modifier.padding(16.dp),
                                 color = MaterialTheme.colorScheme.secondary,
-                                text = stringResource(id = R.string.institutions_no_results),
+                                text = stringResource(id = R.string.organizations_no_results),
                                 fontWeight = FontWeight.Medium
                             )
                         }
                     } else {
-                        institutions.forEach { institution ->
+                        organizations.forEach { organization ->
                             item {
-                                InstitutionRow(institution, onSelectInstitution)
+                                OrganizationRow(organization, onSelectOrganization)
                             }
                         }
                     }
@@ -223,10 +222,10 @@ fun SelectInstitutionContent(
 
 @Preview
 @Composable
-fun Preview_SelectInstitutionContent() {
+fun Preview_SelectOrganizationContent() {
     AppTheme {
-        SelectInstitutionContent(
-            onSelectInstitution = {},
+        SelectOrganizationContent(
+            onSelectOrganization = {},
             searchText = ""
         )
     }

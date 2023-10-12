@@ -20,7 +20,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
@@ -56,7 +55,7 @@ class SelectProfileViewModel @Inject constructor(
 
     private fun loadData() = viewModelScope.launch {
         uiState = uiState.copy(inProgress = true)
-        val response = api.getInstitutions()
+        val response = api.getOrganizations()
         val institutionResult = response.body()
         if (response.isSuccessful && institutionResult != null) {
             val selectedInstitution = institutionResult.instances.find { it.id == institutionId }

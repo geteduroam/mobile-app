@@ -1,4 +1,4 @@
-package app.eduroam.geteduroam.institutions
+package app.eduroam.geteduroam.organizations
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
