@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.di.api.GetEduroamApi
+import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
 import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,6 +79,7 @@ class SelectOrganizationViewModel @Inject constructor(
 
     fun onSearchTextChange(filter: String) {
         val filtered = if (filter.isNotBlank()) {
+            val normalizedFilter = filter.removeNonSpacingMarks()
             allOrganizations.filter { organization ->
                 organization.matchWords.any {
                     it.contains(filter, ignoreCase = true)

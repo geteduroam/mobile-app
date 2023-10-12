@@ -1,6 +1,7 @@
 package app.eduroam.geteduroam.models
 
 import android.os.Parcelable
+import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.IgnoredOnParcel
@@ -25,6 +26,6 @@ data class Organization(
         val abbreviation = words.map { it.first() }.joinToString()
         words += nameOrId
         words += abbreviation
-        matchWords = words
+        matchWords = words.map { it.removeNonSpacingMarks() }
     }
 }
