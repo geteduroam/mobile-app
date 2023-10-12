@@ -39,16 +39,15 @@ class SelectInstitutionViewModel @Inject constructor(
                 val institutionResult = response.body()
                 if (response.isSuccessful && institutionResult != null) {
                     allInstitutions = institutionResult.instances
-                    uiState = uiState.copy(
-                        isLoading = false, institutions = institutionResult.instances
-                    )
+                    uiState = uiState.copy(isLoading = false)
                 } else {
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
                     }"
                     Timber.e("Failed to load institutions: $failReason")
                     uiState = uiState.copy(
-                        isLoading = false, errorData = ErrorData(
+                        isLoading = false,
+                        errorData = ErrorData(
                             titleId = R.string.err_title_generic_fail,
                             messageId = R.string.err_msg_generic_unexpected_with_arg,
                             messageArg = failReason
@@ -58,7 +57,8 @@ class SelectInstitutionViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.e("Failed to get institutions", e)
                 uiState = uiState.copy(
-                    isLoading = false, errorData = ErrorData(
+                    isLoading = false,
+                    errorData = ErrorData(
                         titleId = R.string.err_title_generic_fail,
                         messageId = R.string.err_msg_generic_unexpected_with_arg,
                         messageArg = "${e.message}/${e.javaClass.name}"
@@ -78,9 +78,13 @@ class SelectInstitutionViewModel @Inject constructor(
 
     fun onSearchTextChange(filter: String) {
         val filtered = if (filter.isNotBlank()) {
-            allInstitutions.filter { it.name.contains(filter, ignoreCase = true) }
+            allInstitutions.filter { institution ->
+                institution.matchWords.any {
+                    it.contains(filter, ignoreCase = true)
+                }
+            }.sortedBy { it.nameOrId.lowercase() }
         } else {
-            allInstitutions
+            emptyList()
         }
         uiState = uiState.copy(filter = filter, institutions = filtered)
     }

@@ -199,7 +199,7 @@ fun SelectInstitutionContent(
                         )
                     }
                 } else if (!isLoading) {
-                    if (institutions.isEmpty()) {
+                    if (institutions.isEmpty() && searchText.isNotEmpty()) {
                         item {
                             Text(
                                 modifier = Modifier.padding(16.dp),

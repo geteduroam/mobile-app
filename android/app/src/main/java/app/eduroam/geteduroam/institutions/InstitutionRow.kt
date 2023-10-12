@@ -33,7 +33,7 @@ fun InstitutionRow(
         .clickable { onSelectInstitution(institution) }) {
         Spacer(Modifier.height(8.dp))
         Text(
-            text = institution.name,
+            text = institution.nameOrId,
             style = MaterialTheme.typography.titleMedium,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
