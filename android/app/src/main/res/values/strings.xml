@@ -17,7 +17,7 @@
     <string name="login_dialog_cancel">Cancel</string>
     <string name="login_dialog_login">Log in</string>
     <string name="terms_of_use_dialog_title">Terms of use</string>
-    <string name="terms_of_use_dialog_text">You must agree with to the terms of use before you can use this network</string>
+    <string name="terms_of_use_dialog_text">You must agree to the terms of use before you can use this network</string>
     <string name="terms_of_use_dialog_agree">Agree</string>
     <string name="terms_of_use_dialog_disagree">Disagree</string>
 

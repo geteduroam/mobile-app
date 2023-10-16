@@ -78,7 +78,8 @@ fun MainGraph(
                 arguments = Route.SelectProfile.arguments,
             ) { entry ->
                 val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
-                SelectProfileModal(viewModel = viewModel,
+                SelectProfileModal(
+                    viewModel = viewModel,
                     goToOAuth = { auth, token ->
                         navController.navigate(Route.OAuth.encodeArguments(auth, token))
                     },

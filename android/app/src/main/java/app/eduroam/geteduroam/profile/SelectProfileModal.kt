@@ -98,11 +98,14 @@ fun SelectProfileModal(
     )
 
     if (viewModel.uiState.showTermsOfUseDialog) {
-        TermsOfUseDialog(onConfirmClicked = {
-            viewModel.didAgreeToTerms(true)
-        }, onDismiss = {
-            viewModel.didAgreeToTerms(false)
-        })
+        TermsOfUseDialog(
+            providerInfo = viewModel.uiState.providerInfo,
+            onConfirmClicked = {
+                viewModel.didAgreeToTerms(true)
+            }, onDismiss = {
+                viewModel.didAgreeToTerms(false)
+            }
+        )
     }
     if (viewModel.uiState.showUsernameDialog) {
         UsernamePasswordDialog(
@@ -229,7 +232,9 @@ fun SelectProfileContent(
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                 }
-                Column {
+                Column(
+                    modifier = Modifier.fillMaxWidth(fraction = 1f)
+                ) {
                     providerInfo.displayName?.let { displayName ->
                         Text(
                             text = displayName,
@@ -252,11 +257,25 @@ fun SelectProfileContent(
                         contactDetails.forEach {
                             LinkifyText(
                                 text = it,
+                                color = MaterialTheme.colorScheme.secondary,
                                 linkColor = MaterialTheme.colorScheme.secondary,
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Spacer(modifier = Modifier.size(4.dp))
                         }
+                    }
+                    providerInfo.termsOfUse?.let { termsOfUse ->
+                        Text(
+                            text = stringResource(id = R.string.terms_of_use_dialog_title),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Spacer(modifier = Modifier.size(4.dp))
+                        LinkifyText(
+                            text = termsOfUse,
+                            color = MaterialTheme.colorScheme.secondary,
+                            linkColor = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
             }
