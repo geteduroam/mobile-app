@@ -54,6 +54,7 @@ fun LoginDialog(
                             .padding(vertical = 16.dp)
                     ) {
                         Text(
+                            modifier = Modifier.padding(bottom = 4.dp),
                             text = stringResource(R.string.login_dialog_text)
                         )
 
@@ -83,7 +84,8 @@ fun LoginDialog(
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = {
                             openDialog.value = false

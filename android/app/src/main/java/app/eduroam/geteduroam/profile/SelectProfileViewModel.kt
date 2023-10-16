@@ -201,7 +201,8 @@ class SelectProfileViewModel @Inject constructor(
                     termsOfUse = info?.termsOfUse,
                     helpDesk = info?.helpdesk,
                     requiredSuffix = firstProvider.authenticationMethod?.firstOrNull()?.clientSideCredential?.innerIdentitySuffix
-                )
+                ),
+                providerInfo = info
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)

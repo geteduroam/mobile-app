@@ -46,6 +46,10 @@
     <string name="button_connect">CONNECT</string>
     <string name="button_back">Back</string>
 
+    <string name="content_description_provider_logo">Provider logo</string>
+
+    <string name="helpdesk_title">Helpdesk</string>
+
     <string name="username_password_login_required">Login required</string>
     <string name="username_password_please_enter">Please enter your username and password.</string>
     <string name="username_password_label_username">Username</string>
