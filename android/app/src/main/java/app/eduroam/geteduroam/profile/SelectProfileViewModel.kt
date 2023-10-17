@@ -224,7 +224,8 @@ class SelectProfileViewModel @Inject constructor(
 
     private fun displayEapError() {
         uiState = uiState.copy(
-            inProgress = false, errorData = ErrorData(
+            inProgress = false,
+            errorData = ErrorData(
                 titleId = R.string.err_title_generic_fail,
                 messageId = R.string.err_msg_no_valid_provider
             )
