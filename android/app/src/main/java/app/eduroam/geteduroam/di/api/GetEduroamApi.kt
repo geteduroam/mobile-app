@@ -1,13 +1,10 @@
 package app.eduroam.geteduroam.di.api
 
-import app.eduroam.geteduroam.models.InstitutionResult
+import app.eduroam.geteduroam.models.OrganizationResult
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Url
 
 interface GetEduroamApi {
     @GET("v1/discovery.json")
-    suspend fun getInstitutions(): Response<InstitutionResult>
+    suspend fun getOrganizations(): Response<OrganizationResult>
 }

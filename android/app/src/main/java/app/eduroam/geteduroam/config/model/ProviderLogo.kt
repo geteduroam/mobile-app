@@ -1,8 +1,12 @@
 package app.eduroam.geteduroam.config.model
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import com.squareup.moshi.JsonClass
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Text
+
 
 @JsonClass(generateAdapter = true)
 class ProviderLogo {
@@ -15,4 +19,12 @@ class ProviderLogo {
 
     @field:Attribute
     var encoding: String? = null
+
+    fun convertToBitmap() : Bitmap? {
+        if (encoding?.lowercase() == "base64") {
+            val binary = Base64.decode(value, Base64.DEFAULT)
+            return BitmapFactory.decodeByteArray(binary, 0, binary.size)
+        }
+        return null
+    }
 }

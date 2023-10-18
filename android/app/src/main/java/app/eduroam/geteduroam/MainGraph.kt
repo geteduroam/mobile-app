@@ -11,9 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -22,8 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.eduroam.geteduroam.config.WifiConfigScreen
 import app.eduroam.geteduroam.config.WifiConfigViewModel
-import app.eduroam.geteduroam.institutions.SelectInstitutionScreen
-import app.eduroam.geteduroam.institutions.SelectInstitutionViewModel
+import app.eduroam.geteduroam.organizations.SelectOrganizationScreen
+import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.oauth.OAuthScreen
 import app.eduroam.geteduroam.oauth.OAuthViewModel
 import app.eduroam.geteduroam.profile.SelectProfileModal
@@ -49,9 +47,9 @@ fun MainGraph(
             navController = navController, startDestination = Route.SelectInstitution.route
         ) {
             composable(Route.SelectInstitution.route) { entry ->
-                val viewModel = hiltViewModel<SelectInstitutionViewModel>(entry)
+                val viewModel = hiltViewModel<SelectOrganizationViewModel>(entry)
                 val focusManager = LocalFocusManager.current
-                SelectInstitutionScreen(
+                SelectOrganizationScreen(
                     viewModel = viewModel,
                     openProfileModal = { institutionId ->
                         // Remove the focus from the search field (if it was there)
@@ -80,7 +78,8 @@ fun MainGraph(
                 arguments = Route.SelectProfile.arguments,
             ) { entry ->
                 val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
-                SelectProfileModal(viewModel = viewModel,
+                SelectProfileModal(
+                    viewModel = viewModel,
                     goToOAuth = { auth, token ->
                         navController.navigate(Route.OAuth.encodeArguments(auth, token))
                     },

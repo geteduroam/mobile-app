@@ -1,6 +1,7 @@
 package app.eduroam.geteduroam.profile
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,9 +15,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -30,20 +33,25 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.institutions.TermsOfUseDialog
-import app.eduroam.geteduroam.institutions.UsernamePasswordDialog
+import app.eduroam.geteduroam.config.model.ProviderInfo
+import app.eduroam.geteduroam.organizations.TermsOfUseDialog
+import app.eduroam.geteduroam.organizations.UsernamePasswordDialog
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.ErrorData
+import app.eduroam.geteduroam.ui.LinkifyText
 import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import kotlinx.coroutines.android.awaitFrame
@@ -81,6 +89,7 @@ fun SelectProfileModal(
     SelectProfileContent(
         profiles = viewModel.uiState.profiles,
         institution = viewModel.uiState.institution,
+        providerInfo = viewModel.uiState.providerInfo,
         inProgress = viewModel.uiState.inProgress,
         errorData = viewModel.uiState.errorData,
         errorDataShown = viewModel::errorDataShown,
@@ -89,11 +98,14 @@ fun SelectProfileModal(
     )
 
     if (viewModel.uiState.showTermsOfUseDialog) {
-        TermsOfUseDialog(onConfirmClicked = {
-            viewModel.didAgreeToTerms(true)
-        }, onDismiss = {
-            viewModel.didAgreeToTerms(false)
-        })
+        TermsOfUseDialog(
+            providerInfo = viewModel.uiState.providerInfo,
+            onConfirmClicked = {
+                viewModel.didAgreeToTerms(true)
+            }, onDismiss = {
+                viewModel.didAgreeToTerms(false)
+            }
+        )
     }
     if (viewModel.uiState.showUsernameDialog) {
         UsernamePasswordDialog(
@@ -111,6 +123,7 @@ fun SelectProfileModal(
 fun SelectProfileContent(
     profiles: List<PresentProfile>,
     institution: PresentInstitution? = null,
+    providerInfo: ProviderInfo? = null,
     inProgress: Boolean = false,
     errorData: ErrorData? = null,
     errorDataShown: () -> Unit = {},
@@ -152,7 +165,7 @@ fun SelectProfileContent(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
                 )
             }
             Spacer(Modifier.height(24.dp))
@@ -202,11 +215,77 @@ fun SelectProfileContent(
                 )
             }
         }
+        if (providerInfo != null) {
+            Row(modifier = Modifier.padding(vertical = 16.dp),
+                verticalAlignment = Alignment.Top) {
+                providerInfo.providerLogo?.convertToBitmap()?.let { logoBitmap ->
+                    Surface(
+                        modifier = Modifier.size(104.dp),
+                        color = Color.White,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            bitmap = logoBitmap.asImageBitmap(),
+                            contentDescription = stringResource(id = R.string.content_description_provider_logo)
+                        )
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                }
+                Column(
+                    modifier = Modifier.fillMaxWidth(fraction = 1f)
+                ) {
+                    providerInfo.displayName?.let { displayName ->
+                        Text(
+                            text = displayName,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                    }
+                    val contactDetails = listOfNotNull(
+                        providerInfo.helpdesk?.webAddress,
+                        providerInfo.helpdesk?.emailAddress,
+                        providerInfo.helpdesk?.phone
+                    )
+                    if (contactDetails.isNotEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.helpdesk_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        contactDetails.forEach {
+                            LinkifyText(
+                                text = it,
+                                color = MaterialTheme.colorScheme.secondary,
+                                linkColor = MaterialTheme.colorScheme.secondary,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                        }
+                    }
+                    providerInfo.termsOfUse?.let { termsOfUse ->
+                        Text(
+                            text = stringResource(id = R.string.terms_of_use_dialog_title),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Spacer(modifier = Modifier.size(4.dp))
+                        LinkifyText(
+                            text = termsOfUse,
+                            color = MaterialTheme.colorScheme.secondary,
+                            linkColor = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        }
         PrimaryButton(
             text = stringResource(R.string.button_connect),
             enabled = !inProgress,
             onClick = { connectWithSelectedProfile() },
-            modifier = Modifier.weight(1f, false)
+            modifier = Modifier
+                .weight(1f, false)
                 .navigationBarsPadding()
         )
     }

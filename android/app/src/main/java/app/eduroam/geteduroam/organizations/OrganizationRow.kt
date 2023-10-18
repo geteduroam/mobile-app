@@ -1,4 +1,4 @@
-package app.eduroam.geteduroam.institutions
+package app.eduroam.geteduroam.organizations
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -15,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.eduroam.geteduroam.models.Institution
+import app.eduroam.geteduroam.models.Organization
 
 
 @Composable
-fun InstitutionRow(
-    institution: Institution,
-    onSelectInstitution: (Institution) -> Unit,
+fun OrganizationRow(
+    organization: Organization,
+    onSelectOrganization: (Organization) -> Unit,
     modifier: Modifier = Modifier,
 ) = Surface(
     color = MaterialTheme.colorScheme.surface
@@ -30,10 +30,10 @@ fun InstitutionRow(
     modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp)
-        .clickable { onSelectInstitution(institution) }) {
+        .clickable { onSelectOrganization(organization) }) {
         Spacer(Modifier.height(8.dp))
         Text(
-            text = institution.name,
+            text = organization.nameOrId,
             style = MaterialTheme.typography.titleMedium,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -41,7 +41,7 @@ fun InstitutionRow(
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = institution.country,
+            text = organization.country,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.secondary
         )

@@ -20,7 +20,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
@@ -56,7 +55,7 @@ class SelectProfileViewModel @Inject constructor(
 
     private fun loadData() = viewModelScope.launch {
         uiState = uiState.copy(inProgress = true)
-        val response = api.getInstitutions()
+        val response = api.getOrganizations()
         val institutionResult = response.body()
         if (response.isSuccessful && institutionResult != null) {
             val selectedInstitution = institutionResult.instances.find { it.id == institutionId }
@@ -202,7 +201,8 @@ class SelectProfileViewModel @Inject constructor(
                     termsOfUse = info?.termsOfUse,
                     helpDesk = info?.helpdesk,
                     requiredSuffix = firstProvider.authenticationMethod?.firstOrNull()?.clientSideCredential?.innerIdentitySuffix
-                )
+                ),
+                providerInfo = info
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
@@ -224,7 +224,8 @@ class SelectProfileViewModel @Inject constructor(
 
     private fun displayEapError() {
         uiState = uiState.copy(
-            inProgress = false, errorData = ErrorData(
+            inProgress = false,
+            errorData = ErrorData(
                 titleId = R.string.err_title_generic_fail,
                 messageId = R.string.err_msg_no_valid_provider
             )

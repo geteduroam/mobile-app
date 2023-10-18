@@ -1,4 +1,4 @@
-package app.eduroam.geteduroam.institutions
+package app.eduroam.geteduroam.organizations
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.di.api.GetEduroamApi
-import app.eduroam.geteduroam.models.Institution
+import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
+import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class SelectInstitutionViewModel @Inject constructor(
+class SelectOrganizationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     val api: GetEduroamApi,
 ) : ViewModel() {
@@ -25,7 +26,7 @@ class SelectInstitutionViewModel @Inject constructor(
     var uiState by mutableStateOf(UiState())
         private set
 
-    private var allInstitutions by mutableStateOf(emptyList<Institution>())
+    private var allOrganizations by mutableStateOf(emptyList<Organization>())
 
 
     val creds: MutableStateFlow<Pair<String?, String?>> =
@@ -35,20 +36,19 @@ class SelectInstitutionViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true)
             try {
-                val response = api.getInstitutions()
-                val institutionResult = response.body()
-                if (response.isSuccessful && institutionResult != null) {
-                    allInstitutions = institutionResult.instances
-                    uiState = uiState.copy(
-                        isLoading = false, institutions = institutionResult.instances
-                    )
+                val response = api.getOrganizations()
+                val organizationResult = response.body()
+                if (response.isSuccessful && organizationResult != null) {
+                    allOrganizations = organizationResult.instances
+                    uiState = uiState.copy(isLoading = false)
                 } else {
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
                     }"
-                    Timber.e("Failed to load institutions: $failReason")
+                    Timber.e("Failed to load organizations: $failReason")
                     uiState = uiState.copy(
-                        isLoading = false, errorData = ErrorData(
+                        isLoading = false,
+                        errorData = ErrorData(
                             titleId = R.string.err_title_generic_fail,
                             messageId = R.string.err_msg_generic_unexpected_with_arg,
                             messageArg = failReason
@@ -56,9 +56,10 @@ class SelectInstitutionViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Timber.e("Failed to get institutions", e)
+                Timber.e("Failed to get organizations", e)
                 uiState = uiState.copy(
-                    isLoading = false, errorData = ErrorData(
+                    isLoading = false,
+                    errorData = ErrorData(
                         titleId = R.string.err_title_generic_fail,
                         messageId = R.string.err_msg_generic_unexpected_with_arg,
                         messageArg = "${e.message}/${e.javaClass.name}"
@@ -72,17 +73,22 @@ class SelectInstitutionViewModel @Inject constructor(
 
     }
 
-    fun onInstitutionSelect(institution: Institution) {
-        uiState = uiState.copy(selectedInstitution = institution)
+    fun onOrganizationSelect(organization: Organization) {
+        uiState = uiState.copy(selectedOrganization = organization)
     }
 
     fun onSearchTextChange(filter: String) {
         val filtered = if (filter.isNotBlank()) {
-            allInstitutions.filter { it.name.contains(filter, ignoreCase = true) }
+            val normalizedFilter = filter.removeNonSpacingMarks()
+            allOrganizations.filter { organization ->
+                organization.matchWords.any {
+                    it.contains(filter, ignoreCase = true)
+                }
+            }.sortedBy { it.nameOrId.lowercase() }
         } else {
-            allInstitutions
+            emptyList()
         }
-        uiState = uiState.copy(filter = filter, institutions = filtered)
+        uiState = uiState.copy(filter = filter, organizations = filtered)
     }
 
     fun clearDialog() {
@@ -90,6 +96,6 @@ class SelectInstitutionViewModel @Inject constructor(
     }
 
     fun clearSelection() {
-        uiState = uiState.copy(selectedInstitution = null, filter = "")
+        uiState = uiState.copy(selectedOrganization = null, filter = "")
     }
 }

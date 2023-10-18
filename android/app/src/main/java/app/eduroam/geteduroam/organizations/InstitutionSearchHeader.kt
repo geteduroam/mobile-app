@@ -1,4 +1,4 @@
-package app.eduroam.geteduroam.institutions
+package app.eduroam.geteduroam.organizations
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -7,12 +7,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,7 +19,7 @@ import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.ui.theme.AppTheme
 
 @Composable
-fun InstitutionSearchHeader(
+fun OrganizationSearchHeader(
     searchText: String, onSearchTextChange: (String) -> Unit, modifier: Modifier = Modifier,
 ) = Column(modifier.fillMaxWidth()) {
     val focusManager = LocalFocusManager.current
@@ -40,7 +38,7 @@ fun InstitutionSearchHeader(
         },
         placeholder = {
             Text(
-                    text = stringResource(id = R.string.institution_search_text),
+                    text = stringResource(id = R.string.organization_search_text),
                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -68,6 +66,6 @@ fun InstitutionSearchHeader(
 @Composable
 private fun MarketPlaceHeader_Preview() {
     AppTheme {
-        InstitutionSearchHeader("filterOn", {})
+        OrganizationSearchHeader("filterOn", {})
     }
 }
