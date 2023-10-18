@@ -9,6 +9,7 @@ import android.text.SpannableString
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -75,20 +76,11 @@ fun LinkifyText(
         ClickableText(
             text = annotatedString,
             modifier = modifier,
-            color = color,
-            fontSize = fontSize,
-            fontStyle = fontStyle,
-            fontWeight = fontWeight,
-            fontFamily = fontFamily,
-            letterSpacing = letterSpacing,
-            textDecoration = textDecoration,
-            textAlign = textAlign,
-            lineHeight = lineHeight,
             overflow = overflow,
             softWrap = softWrap,
             maxLines = maxLines,
             onTextLayout = onTextLayout,
-            style = style,
+            style = style.copy(color = color),
             onClick = { offset ->
                 annotatedString.getStringAnnotations(
                     start = offset,
@@ -125,56 +117,6 @@ fun LinkifyText(
     }
 }
 
-@Composable
-private fun ClickableText(
-    text: AnnotatedString,
-    modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    fontStyle: FontStyle? = null,
-    fontWeight: FontWeight? = null,
-    fontFamily: FontFamily? = null,
-    letterSpacing: TextUnit = TextUnit.Unspecified,
-    textDecoration: TextDecoration? = null,
-    textAlign: TextAlign? = null,
-    lineHeight: TextUnit = TextUnit.Unspecified,
-    overflow: TextOverflow = TextOverflow.Clip,
-    softWrap: Boolean = true,
-    maxLines: Int = Int.MAX_VALUE,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
-    style: TextStyle = LocalTextStyle.current,
-    onClick: (Int) -> Unit
-) {
-    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator = Modifier.pointerInput(onClick) {
-        detectTapGestures { pos ->
-            layoutResult.value?.let { layoutResult ->
-                onClick(layoutResult.getOffsetForPosition(pos))
-            }
-        }
-    }
-    Text(
-        text = text,
-        modifier = modifier.then(pressIndicator),
-        color = color,
-        fontSize = fontSize,
-        fontStyle = fontStyle,
-        fontWeight = fontWeight,
-        fontFamily = fontFamily,
-        letterSpacing = letterSpacing,
-        textDecoration = textDecoration,
-        textAlign = textAlign,
-        lineHeight = lineHeight,
-        overflow = overflow,
-        softWrap = softWrap,
-        maxLines = maxLines,
-        onTextLayout = {
-            layoutResult.value = it
-            onTextLayout(it)
-        },
-        style = style
-    )
-}
 
 private data class LinkInfo(
     val url: String,
