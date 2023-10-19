@@ -2,7 +2,7 @@
     <string name="name">geteduroam</string>
 
     <string name="welcome">Welcome</string>
-    <string name="organizations_no_results">Could not find any institutions.</string>
+    <string name="organizations_no_results">Could not find any organizations.</string>
     <string name="organization_search_text">Search for your organization</string>
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
     <string name="profiles_title">Profiles</string>
@@ -32,8 +32,8 @@
     <string name="err_msg_auth_code_failed_arg">Authorization code exchange failed: %s.</string>
     <string name="err_title_generic_fail">Cannot complete request</string>
     <string name="err_msg_generic_unexpected_with_arg">Unexpected error: %s, please retry.</string>
-    <string name="err_msg_invalid_institution_id">Invalid institution id. Cannot continue for selected institution.</string>
-    <string name="err_msg_cannot_find_institution">Cannot find institution with id %s.</string>
+    <string name="err_msg_invalid_organization_id">Invalid organization id. Cannot continue for selected organization.</string>
+    <string name="err_msg_cannot_find_organization">Cannot find organization with id %s.</string>
     <string name="err_msg_missing_eap_endpoint">Selected profile is missing EAP endpoint.</string>
     <string name="err_msg_no_valid_provider">No valid EAP provider was found.</string>
 

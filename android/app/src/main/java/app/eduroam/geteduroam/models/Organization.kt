@@ -22,10 +22,17 @@ data class Organization(
     val matchWords: List<String>
     init {
         // Split on anything which is non-alphanumeric
-        val words = nameOrId.split("\\W+").filter { it.isNotEmpty() }.toMutableList()
-        val abbreviation = words.map { it.first() }.joinToString()
+        val words = nameOrId.split(DELIMITER).filter { it.isNotEmpty() }.toMutableList()
+        val abbreviation = words.map { it.first() }.joinToString("")
         words += nameOrId
         words += abbreviation
         matchWords = words.map { it.removeNonSpacingMarks() }
+        if (nameOrId.startsWith("eduroam Visitor")) {
+            println("$nameOrId: $abbreviation")
+        }
+    }
+
+    companion object {
+        private val DELIMITER = "\\W+".toRegex()
     }
 }

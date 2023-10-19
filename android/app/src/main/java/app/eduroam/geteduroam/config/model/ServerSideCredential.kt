@@ -12,7 +12,7 @@ class ServerSideCredential {
     @field:Element(name = "ServerID", required = false)
     var serverId: String? = null
 
-    @field:ElementList(inline = true)
-    var cartData: List<CertData>? = null
+    @field:ElementList(name = "CA", inline = true, required = false)
+    var certData: List<CertData>? = null
 
 }
