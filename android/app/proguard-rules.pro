@@ -6,5 +6,8 @@
 -keep class org.simpleframework.xml.**{ *; }
 -keep class org.simpleframework.xml.core.**{ *; }
 -keep class org.simpleframework.xml.util.**{ *; }
--keepattributes *Annotation*
+-keepclassmembers class * {
+    @org.simpleframework.xml.* *;
+}
 -keepattributes Signature
+-keepattributes ElementList, Root, *Annotation*
