@@ -82,7 +82,7 @@ class SelectOrganizationViewModel @Inject constructor(
             val normalizedFilter = filter.removeNonSpacingMarks()
             allOrganizations.filter { organization ->
                 organization.matchWords.any {
-                    it.contains(filter, ignoreCase = true)
+                    it.startsWith(normalizedFilter, ignoreCase = true)
                 }
             }.sortedBy { it.nameOrId.lowercase() }
         } else {

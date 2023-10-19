@@ -103,7 +103,7 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     enterpriseConfig.eapMethod = enterpriseEAP
 
     val caCertificates =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }
+        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }
             ?.filterNotNull()
     enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
 
@@ -211,7 +211,7 @@ private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersio
 fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     val eapIdentityProvider = eapIdentityProvider?.first()
     val caCertificates =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.cartData?.first()?.value }
+        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }
             ?.filterNotNull()
     val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }
         ?.filterNotNull() ?: listOf()

@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
@@ -88,7 +85,7 @@ fun SelectProfileModal(
 
     SelectProfileContent(
         profiles = viewModel.uiState.profiles,
-        institution = viewModel.uiState.institution,
+        institution = viewModel.uiState.organization,
         providerInfo = viewModel.uiState.providerInfo,
         inProgress = viewModel.uiState.inProgress,
         errorData = viewModel.uiState.errorData,
@@ -109,7 +106,7 @@ fun SelectProfileModal(
     }
     if (viewModel.uiState.showUsernameDialog) {
         UsernamePasswordDialog(
-            requiredSuffix = viewModel.uiState.institution?.requiredSuffix,
+            requiredSuffix = viewModel.uiState.organization?.requiredSuffix,
             cancel = viewModel::didCancelLogin, // Just hide the dialog
             logIn = { username, password ->
                 viewModel.didEnterLoginDetails(username = username, password = password)
@@ -122,7 +119,7 @@ fun SelectProfileModal(
 @Composable
 fun SelectProfileContent(
     profiles: List<PresentProfile>,
-    institution: PresentInstitution? = null,
+    institution: PresentOrganization? = null,
     providerInfo: ProviderInfo? = null,
     inProgress: Boolean = false,
     errorData: ErrorData? = null,
@@ -298,7 +295,7 @@ private fun Preview_SelectProfileModal() {
     AppTheme {
         SelectProfileContent(
             profiles = profileList,
-            institution = PresentInstitution("Uninett", "NO")
+            institution = PresentOrganization("Uninett", "NO")
         )
     }
 }

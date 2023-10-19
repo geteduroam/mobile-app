@@ -36,18 +36,18 @@ class SelectProfileViewModel @Inject constructor(
 
     var uiState by mutableStateOf(UiState())
         private set
-    private val institutionId: String
+    private val organizationId: String
     private var didAgreeToTerms = false
 
     init {
-        institutionId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
-        if (institutionId.isNotBlank()) {
+        organizationId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
+        if (organizationId.isNotBlank()) {
             loadData()
         } else {
             uiState = uiState.copy(
                 inProgress = false, errorData = ErrorData(
                     titleId = R.string.err_title_generic_fail,
-                    messageId = R.string.err_msg_invalid_institution_id
+                    messageId = R.string.err_msg_invalid_organization_id
                 )
             )
         }
@@ -58,7 +58,7 @@ class SelectProfileViewModel @Inject constructor(
         val response = api.getOrganizations()
         val institutionResult = response.body()
         if (response.isSuccessful && institutionResult != null) {
-            val selectedInstitution = institutionResult.instances.find { it.id == institutionId }
+            val selectedInstitution = institutionResult.instances.find { it.id == organizationId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
                 val presentProfiles = selectedInstitution.profiles.mapIndexed { index, profile ->
@@ -69,7 +69,7 @@ class SelectProfileViewModel @Inject constructor(
                 uiState = uiState.copy(
                     inProgress = isSingleProfile,
                     profiles = presentProfiles,
-                    institution = PresentInstitution(
+                    organization = PresentOrganization(
                         name = selectedInstitution.name, location = selectedInstitution.country
                     )
                 )
@@ -78,13 +78,13 @@ class SelectProfileViewModel @Inject constructor(
                     connectWithProfile(selectedInstitution.profiles[0])
                 }
             } else {
-                Timber.e("Could not find institution with id $institutionId")
+                Timber.e("Could not find institution with id $organizationId")
                 uiState = uiState.copy(
                     inProgress = false,
                     errorData = ErrorData(
                         titleId = R.string.err_title_generic_fail,
-                        messageId = R.string.err_msg_cannot_find_institution,
-                        messageArg = institutionId
+                        messageId = R.string.err_msg_cannot_find_organization,
+                        messageArg = organizationId
                     )
                 )
             }
@@ -188,11 +188,11 @@ class SelectProfileViewModel @Inject constructor(
         }
         val firstProvider = providers.eapIdentityProvider?.firstOrNull()
         if (firstProvider != null) {
-            val knownInstitution = uiState.institution
+            val knownInstitution = uiState.organization
             val info = firstProvider.providerInfo
             uiState = uiState.copy(
                 inProgress = true,
-                institution = PresentInstitution(
+                organization = PresentOrganization(
                     name = knownInstitution?.name,
                     location = knownInstitution?.location,
                     displayName = info?.displayName,

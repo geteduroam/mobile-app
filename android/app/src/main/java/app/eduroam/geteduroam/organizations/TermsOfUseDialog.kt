@@ -4,8 +4,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,12 +46,18 @@ fun TermsOfUseDialog(
             providerInfo?.termsOfUse?.let { termsOfUse ->
                 dialogDescription += "\n\n" + termsOfUse.trim()
             }
-            LinkifyText(
-                text = dialogDescription,
-                color = MaterialTheme.colorScheme.secondary,
-                linkColor = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier
+                    .heightIn(min = 0.dp, max = 400.dp)
+                    .verticalScroll(state = rememberScrollState())
+            ) {
+                LinkifyText(
+                    text = dialogDescription,
+                    color = MaterialTheme.colorScheme.secondary,
+                    linkColor = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Spacer(modifier = Modifier.size(16.dp))
             Row(
                 modifier = Modifier

@@ -104,9 +104,7 @@ class SelectInstitutionViewModel(
     ) {
         if (search.length >= 3) {
             val filteredList = allInstitutions.filter {
-                it.name.startsWith(search, true) || it.name.contains(
-                    search, true
-                )
+                it.name.startsWith(search, true) || it.name.contains(search, true)
             }
             updateDataState(
                 DataState(
