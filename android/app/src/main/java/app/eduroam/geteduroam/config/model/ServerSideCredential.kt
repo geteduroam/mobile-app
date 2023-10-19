@@ -9,8 +9,8 @@ import org.simpleframework.xml.Root
 @JsonClass(generateAdapter = true)
 class ServerSideCredential {
 
-    @field:Element(name = "ServerID", required = false)
-    var serverId: String? = null
+    @field:ElementList(entry = "ServerID", inline = true, required = false)
+    var serverId: List<String>? = null
 
     @field:ElementList(name = "CA", inline = true, required = false)
     var certData: List<CertData>? = null

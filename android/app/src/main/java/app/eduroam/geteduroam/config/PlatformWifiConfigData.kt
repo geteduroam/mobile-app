@@ -140,6 +140,7 @@ private fun convertEAPMethod(apiEapMethod: Int?): Int {
         21 -> Eap.TTLS
         25 -> Eap.PEAP
         43 -> Eap.TLS // EAP-FAST
+        52 -> Eap.PWD
         else -> Eap.NONE
     }
 }
@@ -193,8 +194,7 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
 private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersion(): String? {
     val eapIdentityProvider = eapIdentityProvider?.first()
     val serverNames =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }
-            ?.filterNotNull()
+        eapIdentityProvider?.authenticationMethod?.flatMap { it.serverSideCredential?.serverId ?: emptyList() }
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         serverNames?.joinToString(";")
     } else {

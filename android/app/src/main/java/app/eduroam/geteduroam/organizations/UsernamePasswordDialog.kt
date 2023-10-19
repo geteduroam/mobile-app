@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -22,9 +23,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -32,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.eduroam.geteduroam.R
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UsernamePasswordDialog(
     requiredSuffix: String?,
@@ -42,6 +47,7 @@ fun UsernamePasswordDialog(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Surface(
         shape = MaterialTheme.shapes.medium
@@ -59,7 +65,8 @@ fun UsernamePasswordDialog(
                 onValueChange = {
                     username = it
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
                 placeholder = {
                     val exampleUsername =
                         stringResource(id = R.string.username_password_placeholder_username_before_suffix)
@@ -79,8 +86,18 @@ fun UsernamePasswordDialog(
                 onValueChange = {
                     password = it
                 },
+                maxLines = 1,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (username.isNotBlank() && password.isNotBlank()) {
+                            logIn(username, password)
+                        } else {
+                            keyboardController?.hide()
+                        }
+                    }
+                ),
                 label = {
                     Text(
                         stringResource(id = R.string.username_password_label_password),
