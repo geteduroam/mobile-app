@@ -13,8 +13,7 @@ class WifiConfigResult :
     override fun parseResult(resultCode: Int, intent: Intent?): WifiConfigResponse =
         when (resultCode) {
             Activity.RESULT_OK -> {
-                val forWifi =
-                    intent?.getIntArrayExtra(EXTRA_WIFI_NETWORK_RESULT_LIST) ?: intArrayOf()
+                val forWifi: List<Int> = intent?.getIntegerArrayListExtra(EXTRA_WIFI_NETWORK_RESULT_LIST) as? ArrayList<Int> ?: emptyList()
                 WifiConfigResponse.Success(forWifi)
             }
             Activity.RESULT_CANCELED -> {
@@ -27,6 +26,6 @@ class WifiConfigResult :
 }
 
 sealed class WifiConfigResponse() {
-    data class Success(val forWifi: IntArray) : WifiConfigResponse()
+    data class Success(val forWifi: List<Int>) : WifiConfigResponse()
     object Canceled : WifiConfigResponse()
 }

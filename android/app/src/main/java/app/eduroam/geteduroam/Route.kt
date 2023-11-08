@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -66,9 +67,7 @@ sealed class Route(val route: String) {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val wifiConfigDataJson = adapter.toJson(eapIdentityProviderList)
-            val encodedWifiConfig = URLEncoder.encode(
-                wifiConfigDataJson, Charsets.UTF_8.toString()
-            )
+            val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
             return "$route/$encodedWifiConfig"
         }
 
@@ -76,8 +75,7 @@ sealed class Route(val route: String) {
             val encodedEAPIdentityProviderList = arguments?.getString(wifiConfigDataArg).orEmpty()
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
-            val decodedWifiConfigDataJson =
-                URLDecoder.decode(encodedEAPIdentityProviderList, Charsets.UTF_8.toString())
+            val decodedWifiConfigDataJson = Uri.decode(encodedEAPIdentityProviderList)
             return adapter.fromJson(decodedWifiConfigDataJson)!!
         }
     }
