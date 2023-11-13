@@ -17,5 +17,17 @@ data class Profile(
     val authorizationEndpoint: String? = null,
     @Json(name = "token_endpoint")
     val tokenEndpoint: String? = null,
-) : Parcelable
+) : Parcelable {
+    fun createConfiguration() : Configuration {
+        return Configuration(
+            clientId = "app.eduroam.geteduroam",
+            scope = "eap-metadata",
+            redirect = "app.eduroam.geteduroam:/",
+            authEndpoint = authorizationEndpoint ?: "",
+            tokenEndpoint = tokenEndpoint ?: "",
+            discovery = "https://discovery.eduroam.app/v1/",
+            isHttpsRequired = false
+        )
+    }
+}
 

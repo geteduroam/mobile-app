@@ -40,7 +40,10 @@ internal object EduroamModule {
     fun providesOkHttp(
         loggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient {
-        val builder = OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
+        val builder = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(loggingInterceptor)
         }

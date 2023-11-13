@@ -13,7 +13,8 @@ data class UiState(
     val providerInfo: ProviderInfo? = null,
     val inProgress: Boolean = false,
     val errorData: ErrorData? = null,
-    val promptForOAuth: Unit? = null,
+    val promptForOAuth: Boolean = false,
+    val checkProfileWhenResuming: Boolean = false,
     val showTermsOfUseDialog: Boolean = false,
     val showUsernameDialog: Boolean = false,
     val goToConfigScreenWithProviderList: EAPIdentityProviderList? = null

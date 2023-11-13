@@ -49,35 +49,21 @@ class OAuthViewModel @Inject constructor(
     private val usePKCE = true
     private var service: AuthorizationService? = null
     private var configuration: Configuration = Configuration.EMPTY
-    private val authEndpoint: String
-    private val tokenEndpoint: String
-
     init {
-        val authUrlArg = savedStateHandle.get<String>(Route.OAuth.authEndpointArg) ?: ""
-        authEndpoint = Uri.decode(authUrlArg)
-        val tokenUrlArg = savedStateHandle.get<String>(Route.OAuth.tokenEndpointArg) ?: ""
-        tokenEndpoint = Uri.decode(tokenUrlArg)
-
+        val configurationArg = savedStateHandle.get<String>(Route.OAuth.configurationArg) ?: ""
+        configuration = Route.OAuth.decodeUrlArgument(configurationArg)
         prepareAppAuth(context)
     }
 
     fun prepareAppAuth(context: Context) = viewModelScope.launch {
         uiState = UiState(OAuthStep.Loading)
         try {
-            configuration = Configuration(
-                clientId = "app.eduroam.geteduroam",
-                scope = "eap-metadata",
-                redirect = "app.eduroam.geteduroam:/",
-                authEndpoint = authEndpoint,
-                tokenEndpoint = tokenEndpoint,
-                discovery = "https://discovery.eduroam.app/v1/",
-                isHttpsRequired = false
-            )
             checkIfConfigurationChanged()
             initializeAppAuth(context)
             val authorizationIntent = createAuthorizationIntent()
             uiState = UiState(OAuthStep.Initialized(authorizationIntent))
         } catch (e: Exception) {
+            Timber.w(e, "Unable to initialize AppAuth!")
             val argument = e.message ?: e.localizedMessage
             uiState = UiState(
                 OAuthStep.Error, ErrorData(
@@ -121,7 +107,7 @@ class OAuthViewModel @Inject constructor(
                 )
             }
 
-            currentAuthState.isAuthorized -> {
+            currentAuthState.isAuthorized && !currentAuthState.needsTokenRefresh -> {
                 Timber.d("Current state is already authorized.")
                 uiState = UiState(
                     oauthStep = OAuthStep.Authorized,

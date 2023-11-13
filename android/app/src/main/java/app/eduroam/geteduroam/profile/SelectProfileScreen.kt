@@ -1,6 +1,5 @@
 package app.eduroam.geteduroam.profile
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,11 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
@@ -40,9 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
+import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.config.model.ProviderInfo
+import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.organizations.TermsOfUseDialog
 import app.eduroam.geteduroam.organizations.UsernamePasswordDialog
 import app.eduroam.geteduroam.models.Profile
@@ -56,22 +57,37 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun SelectProfileModal(
+fun SelectProfileScreen(
     viewModel: SelectProfileViewModel,
-    goToOAuth: (String, String) -> Unit = { _, _ -> },
+    goToOAuth: (Configuration) -> Unit = { _ -> },
     goToConfigScreen: (EAPIdentityProviderList) -> Unit = { _ -> },
-) {
+    goToPrevious: () -> Unit = {}
+) = EduTopAppBar(
+    title = stringResource(id = R.string.profiles_header),
+    onBackClicked = goToPrevious
+) { paddingValues ->
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentGotoOauth by rememberUpdatedState(newValue = goToOAuth)
 
     LaunchedEffect(viewModel, lifecycle) {
-        snapshotFlow { viewModel.uiState }.distinctUntilChanged()
-            .filter { it.promptForOAuth != null }.flowWithLifecycle(lifecycle).collect { state ->
+        snapshotFlow { viewModel.uiState }
+            .filter { it.promptForOAuth }
+            .flowWithLifecycle(lifecycle)
+            .collect { state ->
                 awaitFrame()
                 val profile = state.profiles.first { it.isSelected }.profile
-                currentGotoOauth(
-                    profile.authorizationEndpoint.orEmpty(), profile.tokenEndpoint.orEmpty()
-                )
+                viewModel.setOAuthFlowStarted()
+                currentGotoOauth(profile.createConfiguration())
+            }
+    }
+
+    LaunchedEffect(viewModel, lifecycle) {
+        snapshotFlow { viewModel.uiState }
+            .filter { it.checkProfileWhenResuming }
+            .flowWithLifecycle(lifecycle)
+            .collect { state ->
+                awaitFrame()
+                viewModel.checkIfCurrentProfileHasAccess()
             }
     }
 
@@ -84,6 +100,8 @@ fun SelectProfileModal(
     }
 
     SelectProfileContent(
+        modifier = Modifier.padding(paddingValues)
+            .fillMaxSize(),
         profiles = viewModel.uiState.profiles,
         institution = viewModel.uiState.organization,
         providerInfo = viewModel.uiState.providerInfo,
@@ -118,6 +136,7 @@ fun SelectProfileModal(
 
 @Composable
 fun SelectProfileContent(
+    modifier: Modifier = Modifier,
     profiles: List<PresentProfile>,
     institution: PresentOrganization? = null,
     providerInfo: ProviderInfo? = null,
@@ -127,8 +146,7 @@ fun SelectProfileContent(
     setProfileSelected: (PresentProfile) -> Unit = {},
     connectWithSelectedProfile: () -> Unit = {}
 ) = Surface(
-    modifier = Modifier
-        .heightIn(min = 300.dp, max = 500.dp)
+    modifier = modifier
 ) {
     val context = LocalContext.current
     errorData?.let {
@@ -162,7 +180,9 @@ fun SelectProfileContent(
                 Text(
                     text = it,
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
                 )
             }
             Spacer(Modifier.height(24.dp))
@@ -289,7 +309,7 @@ fun SelectProfileContent(
 }
 
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Preview(uiMode = android.content.res.Configuration.UI_MODE_NIGHT_NO)
 @Composable
 private fun Preview_SelectProfileModal() {
     AppTheme {
