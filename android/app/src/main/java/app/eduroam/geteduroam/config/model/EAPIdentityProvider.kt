@@ -7,7 +7,7 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
 
 
-@Root(name = "EAPIdentityProvider")
+@Root(name = "EAPIdentityProvider", strict = false)
 @JsonClass(generateAdapter = true)
 class EAPIdentityProvider {
 

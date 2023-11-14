@@ -74,7 +74,6 @@ fun SelectProfileScreen(
             .filter { it.promptForOAuth }
             .flowWithLifecycle(lifecycle)
             .collect { state ->
-                awaitFrame()
                 val profile = state.profiles.first { it.isSelected }.profile
                 viewModel.setOAuthFlowStarted()
                 currentGotoOauth(profile.createConfiguration())
@@ -85,8 +84,7 @@ fun SelectProfileScreen(
         snapshotFlow { viewModel.uiState }
             .filter { it.checkProfileWhenResuming }
             .flowWithLifecycle(lifecycle)
-            .collect { state ->
-                awaitFrame()
+            .collect { _ ->
                 viewModel.checkIfCurrentProfileHasAccess()
             }
     }

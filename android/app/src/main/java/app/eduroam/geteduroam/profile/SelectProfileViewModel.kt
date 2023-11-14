@@ -3,7 +3,6 @@ package app.eduroam.geteduroam.profile
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,6 @@ import app.eduroam.geteduroam.config.model.ClientSideCredential
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
-import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +21,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -132,7 +131,7 @@ class SelectProfileViewModel @Inject constructor(
                     Timber.i("Already authenticated for this profile, continue with existing credentials")
                     val authState = repository.authState.first()
                     viewModelScope.launch(Dispatchers.IO) {
-                        getEapFrom(profile.eapconfigEndpoint, authState?.accessToken.orEmpty())
+                        getEapFrom(profile.eapconfigEndpoint, authState?.accessToken?.let { "Bearer $it" })
                     }
                 } else if (startOAuthFlowIfNoAccess) {
                     Timber.i("Prompt for authentication for selected profile.")
@@ -168,6 +167,7 @@ class SelectProfileViewModel @Inject constructor(
         val client = OkHttpClient.Builder().build()
         var requestBuilder = Request.Builder()
             .url(url)
+            .method("POST", byteArrayOf().toRequestBody())
         if (authorizationHeader != null) {
             requestBuilder = requestBuilder.addHeader("Authorization", authorizationHeader)
         }
