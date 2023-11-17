@@ -3,6 +3,7 @@ package app.eduroam.geteduroam.config
 import android.util.Base64
 import android.util.Log
 import app.eduroam.geteduroam.config.model.ClientSideCredential
+import timber.log.Timber
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -47,10 +48,7 @@ fun ClientSideCredential.getClientCertificate(
                     Arrays.copyOf(chain, chain.size, Array<X509Certificate>::class.java)
                 )
             } catch (e: ArrayStoreException) {
-                Log.w(
-                    "WifiProfile",
-                    "A certificate in the ClientCertificate chain is not an instance of X509Certificate"
-                )
+                Timber.w(e, "A certificate in the ClientCertificate chain is not an instance of X509Certificate")
             }
         }
         // KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, CertificateException

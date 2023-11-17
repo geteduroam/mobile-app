@@ -11,6 +11,8 @@ import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
 import app.eduroam.geteduroam.config.model.ClientSideCredential
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.config.model.bestMethod
+import app.eduroam.geteduroam.config.requiresUsernamePrompt
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
 import app.eduroam.geteduroam.models.Profile
@@ -205,14 +207,16 @@ class SelectProfileViewModel @Inject constructor(
                     logo = info?.providerLogo?.value,
                     termsOfUse = info?.termsOfUse,
                     helpDesk = info?.helpdesk,
-                    requiredSuffix = firstProvider.authenticationMethod?.firstOrNull()?.clientSideCredential?.innerIdentitySuffix
+                    requiredSuffix = firstProvider.authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentitySuffix
                 ),
                 providerInfo = info
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
-            } else {
+            } else if (firstProvider.requiresUsernamePrompt()) {
                 uiState = uiState.copy(inProgress = false, showUsernameDialog = true, credentialsEnteredForProviderList = providers)
+            } else {
+                uiState = uiState.copy(inProgress = false, goToConfigScreenWithProviderList = providers)
             }
         } else {
             displayEapError()
@@ -249,9 +253,9 @@ class SelectProfileViewModel @Inject constructor(
         val profileList = uiState.credentialsEnteredForProviderList ?: throw RuntimeException("Profile list not found for entered credentials!")
         profileList.eapIdentityProvider?.forEach { idp ->
             idp.authenticationMethod?.forEach { authMethod ->
-                authMethod.clientSideCredential = ClientSideCredential().apply {
-                    userName = username
-                    passphrase = password
+                authMethod.clientSideCredential?.apply {
+                    this.userName = username
+                    this.password = password
                 }
             }
         }
