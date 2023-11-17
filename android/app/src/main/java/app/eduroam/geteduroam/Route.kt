@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.models.Configuration
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -30,27 +31,30 @@ sealed class Route(val route: String) {
     }
 
     object OAuth : Route(route = "oauth_prompt") {
-        const val authEndpointArg = "authEndpointArg"
-        const val tokenEndpointArg = "tokenEndpointArg"
+        const val configurationArg = "configurationArg"
 
-        val routeWithArgs = "$route/{$authEndpointArg}/{$tokenEndpointArg}"
+        val routeWithArgs = "$route?config={$configurationArg}"
         val arguments = listOf(
-            navArgument(authEndpointArg) {
+            navArgument(configurationArg) {
                 type = NavType.StringType
                 nullable = false
                 defaultValue = ""
-            },
-            navArgument(tokenEndpointArg) {
-                type = NavType.StringType
-                nullable = false
-                defaultValue = ""
-            },
+            }
         )
 
-        fun encodeArguments(authEndpoint: String, tokenEndpoint: String): String {
-            val authEndpointEncoded = URLEncoder.encode(authEndpoint, Charsets.UTF_8.toString())
-            val tokenEndpointEndcoded = URLEncoder.encode(tokenEndpoint, Charsets.UTF_8.toString())
-            return "$route/$authEndpointEncoded/$tokenEndpointEndcoded"
+        fun encodeArguments(configuration: Configuration): String {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
+            val serializedConfig = adapter.toJson(configuration)
+            val encodedConfig = Uri.encode(serializedConfig)
+            return "$route?config=$encodedConfig"
+        }
+
+        fun decodeUrlArgument(encodedConfiguration: String): Configuration {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
+            val decodedConfiguration = Uri.decode(encodedConfiguration)
+            return adapter.fromJson(decodedConfiguration)!!
         }
 
     }

@@ -11,9 +11,10 @@ import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
 import app.eduroam.geteduroam.config.model.ClientSideCredential
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.config.model.bestMethod
+import app.eduroam.geteduroam.config.requiresUsernamePrompt
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
-import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -75,7 +77,7 @@ class SelectProfileViewModel @Inject constructor(
                 )
                 if (isSingleProfile) {
                     Timber.i("Single profile for institution. Continue with configuration")
-                    connectWithProfile(selectedInstitution.profiles[0])
+                    connectWithProfile(selectedInstitution.profiles[0], startOAuthFlowIfNoAccess = true)
                 }
             } else {
                 Timber.e("Could not find institution with id $organizationId")
@@ -115,31 +117,35 @@ class SelectProfileViewModel @Inject constructor(
 
     fun connectWithSelectedProfile() = viewModelScope.launch {
         val profile = uiState.profiles.first { it.isSelected }
-        connectWithProfile(profile.profile)
+        connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = true)
     }
 
-    private suspend fun connectWithProfile(profile: Profile) {
+    private suspend fun connectWithProfile(
+        profile: Profile,
+        startOAuthFlowIfNoAccess: Boolean
+    ) {
         uiState = uiState.copy(inProgress = true)
         if (profile.eapconfigEndpoint != null) {
             if (profile.oauth) {
                 Timber.i("Selected profile requires authentication.")
-                val configForProfile = Configuration(
-                    clientId = "app.eduroam.geteduroam",
-                    scope = "eap-metadata",
-                    redirect = "geteduroam:/",
-                    authEndpoint = profile.authorizationEndpoint.orEmpty(),
-                    tokenEndpoint = profile.tokenEndpoint.orEmpty(),
-                )
-                if (repository.isAuthenticatedForConfig(configForProfile)) {
+
+                if (repository.isAuthenticatedForConfig(profile.createConfiguration())) {
                     Timber.i("Already authenticated for this profile, continue with existing credentials")
                     val authState = repository.authState.first()
                     viewModelScope.launch(Dispatchers.IO) {
-                        getEapFrom(profile.eapconfigEndpoint, authState?.accessToken.orEmpty())
+                        getEapFrom(profile.eapconfigEndpoint, authState?.accessToken?.let { "Bearer $it" })
                     }
-                } else {
+                } else if (startOAuthFlowIfNoAccess) {
                     Timber.i("Prompt for authentication for selected profile.")
                     uiState = uiState.copy(
-                        promptForOAuth = Unit,
+                        promptForOAuth = true,
+                    )
+                } else {
+                    uiState = uiState.copy(
+                        errorData = ErrorData(
+                            titleId = R.string.err_title_auth_failed,
+                            messageId = R.string.err_msg_auth_token_failed
+                        )
                     )
                 }
             } else {
@@ -163,6 +169,7 @@ class SelectProfileViewModel @Inject constructor(
         val client = OkHttpClient.Builder().build()
         var requestBuilder = Request.Builder()
             .url(url)
+            .method("POST", byteArrayOf().toRequestBody())
         if (authorizationHeader != null) {
             requestBuilder = requestBuilder.addHeader("Authorization", authorizationHeader)
         }
@@ -200,14 +207,16 @@ class SelectProfileViewModel @Inject constructor(
                     logo = info?.providerLogo?.value,
                     termsOfUse = info?.termsOfUse,
                     helpDesk = info?.helpdesk,
-                    requiredSuffix = firstProvider.authenticationMethod?.firstOrNull()?.clientSideCredential?.innerIdentitySuffix
+                    requiredSuffix = firstProvider.authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentitySuffix
                 ),
                 providerInfo = info
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
-            } else {
+            } else if (firstProvider.requiresUsernamePrompt()) {
                 uiState = uiState.copy(inProgress = false, showUsernameDialog = true, credentialsEnteredForProviderList = providers)
+            } else {
+                uiState = uiState.copy(inProgress = false, goToConfigScreenWithProviderList = providers)
             }
         } else {
             displayEapError()
@@ -244,13 +253,34 @@ class SelectProfileViewModel @Inject constructor(
         val profileList = uiState.credentialsEnteredForProviderList ?: throw RuntimeException("Profile list not found for entered credentials!")
         profileList.eapIdentityProvider?.forEach { idp ->
             idp.authenticationMethod?.forEach { authMethod ->
-                authMethod.clientSideCredential = ClientSideCredential().apply {
-                    userName = username
-                    passphrase = password
+                authMethod.clientSideCredential?.apply {
+                    this.userName = username
+                    this.password = password
                 }
             }
         }
         uiState = uiState.copy(credentialsEnteredForProviderList = null, goToConfigScreenWithProviderList = profileList)
 
+    }
+
+    /**
+     * Call this when you start the OAuth flow, to avoid recalling it each time the screen is composed, and also to trigger the next check
+     */
+    fun setOAuthFlowStarted() {
+        uiState = uiState.copy(promptForOAuth = false, checkProfileWhenResuming = true)
+    }
+
+    suspend fun checkIfCurrentProfileHasAccess() {
+        val profile = if (uiState.profiles.size == 1) {
+            uiState.profiles.first()
+        } else {
+            uiState.profiles.firstOrNull { it.isSelected }
+        }
+        if (profile == null) {
+            Timber.e("Could not resume connection flow, selected profile not found!")
+        } else {
+            uiState = uiState.copy(checkProfileWhenResuming = false)
+            connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = false)
+        }
     }
 }

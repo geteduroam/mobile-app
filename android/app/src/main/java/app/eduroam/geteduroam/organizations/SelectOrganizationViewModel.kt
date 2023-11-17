@@ -28,7 +28,6 @@ class SelectOrganizationViewModel @Inject constructor(
 
     private var allOrganizations by mutableStateOf(emptyList<Organization>())
 
-
     val creds: MutableStateFlow<Pair<String?, String?>> =
         MutableStateFlow(Pair<String?, String?>(null, null))
 
@@ -41,6 +40,9 @@ class SelectOrganizationViewModel @Inject constructor(
                 if (response.isSuccessful && organizationResult != null) {
                     allOrganizations = organizationResult.instances
                     uiState = uiState.copy(isLoading = false)
+                    if (uiState.filter.isNotEmpty()) {
+                        onSearchTextChange(uiState.filter)
+                    }
                 } else {
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
@@ -56,7 +58,7 @@ class SelectOrganizationViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Timber.e("Failed to get organizations", e)
+                Timber.e(e, "Failed to get organizations")
                 uiState = uiState.copy(
                     isLoading = false,
                     errorData = ErrorData(

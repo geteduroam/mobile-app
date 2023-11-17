@@ -9,9 +9,11 @@ import android.net.wifi.hotspot2.pps.Credential
 import android.net.wifi.hotspot2.pps.HomeSp
 import android.os.Build
 import android.util.Base64
-import android.util.Log
 import androidx.annotation.RequiresApi
+import app.eduroam.geteduroam.config.model.EAPIdentityProvider
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.config.model.bestMethod
+import timber.log.Timber
 import java.nio.charset.Charset
 
 
@@ -95,21 +97,17 @@ fun EAPIdentityProviderList.buildWifiConfigurations(): List<WifiConfiguration> {
 
 private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfig {
     val eapIdentityProvider = eapIdentityProvider?.first()
+    val authMethod = eapIdentityProvider?.authenticationMethod?.bestMethod()
     val enterpriseConfig = WifiEnterpriseConfig()
-    enterpriseConfig.anonymousIdentity =
-        eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
+    enterpriseConfig.anonymousIdentity = authMethod?.clientSideCredential?.outerIdentity
 
-    val enterpriseEAP = convertEAPMethod(eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt())
+    val enterpriseEAP = authMethod?.eapMethod?.type?.toInt()?.convertEAPMethod() ?: Eap.NONE
     enterpriseConfig.eapMethod = enterpriseEAP
 
-    val caCertificates =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }
-            ?.filterNotNull()
+    val caCertificates = authMethod?.serverSideCredential?.certData?.mapNotNull { it.value }
     enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
 
-    val serverNames =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.serverId }
-            ?.filterNotNull()
+    val serverNames = authMethod?.serverSideCredential?.serverId
     assert(
         (serverNames?.size != 0) // Checked in WifiProfile constructor
     )
@@ -131,11 +129,16 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     return enterpriseConfig
 }
 
+fun EAPIdentityProvider.requiresUsernamePrompt(): Boolean {
+    val eapMethod = authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod()
+    return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP
+}
+
 /**
  * Converts an internal EAP method type to the one used by Android
  */
-private fun convertEAPMethod(apiEapMethod: Int?): Int {
-    return when (apiEapMethod) {
+fun Int.convertEAPMethod(): Int {
+    return when (this) {
         13 -> Eap.TLS
         21 -> Eap.TTLS
         25 -> Eap.PEAP
@@ -148,10 +151,10 @@ private fun convertEAPMethod(apiEapMethod: Int?): Int {
 private fun EAPIdentityProviderList.handleOtherEap(enterpriseConfig: WifiEnterpriseConfig) {
     val eapIdentityProvider = eapIdentityProvider?.first()
     val username =
-        eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName
+        eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.userName
     val password =
-        eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password
-    val enterprisePhase2Auth: Int = 0 // TODO fixme!!! is always 0
+        eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.password
+    val enterprisePhase2Auth = WifiEnterpriseConfig.Phase2.MSCHAPV2
 
     enterpriseConfig.identity = username
     enterpriseConfig.password = password
@@ -165,7 +168,7 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
     enterpriseConfig.password = ""
     enterpriseConfig.phase2Method = WifiEnterpriseConfig.Phase2.NONE
     val clientCert =
-        eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
+        eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.getClientCertificate()
     enterpriseConfig.setClientKeyEntry(
         clientCert!!.key, clientCert.value[0]
     )
@@ -174,7 +177,7 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
     // and anonymousIdentity is the outer identity
     // - so we have to do some weird shuffling here.
     val anonymousIdentity =
-        eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.outerIdentity
+        eapIdentityProvider.authenticationMethod?.bestMethod()?.clientSideCredential?.outerIdentity
     enterpriseConfig.identity = anonymousIdentity
 }
 
@@ -193,10 +196,9 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
  */
 private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersion(): String? {
     val eapIdentityProvider = eapIdentityProvider?.first()
-    val serverNames =
-        eapIdentityProvider?.authenticationMethod?.flatMap { it.serverSideCredential?.serverId ?: emptyList() }
+    val serverNames = eapIdentityProvider?.authenticationMethod?.bestMethod()?.serverSideCredential?.serverId ?: emptyList()
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        serverNames?.joinToString(";")
+        serverNames.joinToString(";")
     } else {
         getLongestSuffix(serverNames)
     }
@@ -210,16 +212,12 @@ private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersio
  */
 fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     val eapIdentityProvider = eapIdentityProvider?.first()
-    val caCertificates =
-        eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }
-            ?.filterNotNull()
-    val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }
-        ?.filterNotNull() ?: listOf()
-    val enterprisePhase2Auth: Int = 0 // TODO fixme!!! is always 0
-    val fqdn: String? = null // TODO fixme!!! is always null
+    val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }?.filterNotNull()
+    val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf()
+    val fqdn: String? = eapIdentityProvider?.ID
 
     if (oids.isEmpty()) {
-        Log.i(TAG, "Not creating Passpoint configuration due to no OIDs set")
+        Timber.i("Not creating Passpoint configuration due to no OIDs set")
         return null
     }
     val passpointConfig = PasspointConfiguration()
@@ -228,25 +226,23 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     val cred = Credential()
     val certificates = getCertificates(caCertificates)
     val rootCertificates = certificates.filter { isRootCertificate(it) }
-    // TODO Add support for multiple CAs
+    // For now we only support single CA
     if (rootCertificates.isNotEmpty() && rootCertificates.size == 1) {
         // Just use the first CA for Passpoint
         cred.caCertificate = rootCertificates[0]
     } else {
-        Log.e(
-            TAG,
-            "Not creating Passpoint configuration due to too many CAs in the profile (1 supported, $rootCertificates given)"
-        )
+        Timber.e("Not creating Passpoint configuration due to too many CAs in the profile (1 supported, $${rootCertificates.size} given)")
         return null
     }
     cred.realm = fqdn
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod() ?: Eap.NONE
+    val enterprisePhase2Auth = getPhase2AuthType(enterpriseEAP)
 
-    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.first()?.eapMethod?.type?.toInt()
     when (enterpriseEAP) {
-        WifiEnterpriseConfig.Eap.TLS -> {
+        Eap.TLS -> {
             val certCred = Credential.CertificateCredential()
             val clientCert =
-                eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.getClientCertificate()
+                    eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.getClientCertificate()
             certCred.certType = "x509v3"
             cred.clientPrivateKey = clientCert?.key!!
             cred.clientCertificateChain = clientCert.value
@@ -254,19 +250,16 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
             cred.certCredential = certCred
         }
 
-        WifiEnterpriseConfig.Eap.PWD -> {
-            Log.i(
-                TAG,
-                "Not creating Passpoint configuration due to unsupported EAP type $enterpriseEAP"
-            )
+        Eap.PWD -> {
+            Timber.i("Not creating Passpoint configuration due to unsupported EAP type $enterpriseEAP")
             return null // known but unsupported EAP method
         }
 
-        WifiEnterpriseConfig.Eap.PEAP, WifiEnterpriseConfig.Eap.TTLS -> {
+        Eap.PEAP, Eap.TTLS -> {
             val username =
-                eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.userName
+                eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.userName
             val password =
-                eapIdentityProvider?.authenticationMethod?.first()?.clientSideCredential?.password
+                eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.password
             val passwordBytes =
                 password!!.toByteArray(Charset.defaultCharset()) // TODO explicitly use UTF-8?
             val base64 = Base64.encodeToString(passwordBytes, Base64.DEFAULT)
@@ -278,7 +271,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
                 WifiEnterpriseConfig.Phase2.MSCHAPV2 -> us.nonEapInnerMethod = "MS-CHAP-V2"
                 WifiEnterpriseConfig.Phase2.PAP -> us.nonEapInnerMethod = "PAP"
                 WifiEnterpriseConfig.Phase2.MSCHAP -> us.nonEapInnerMethod = "MS-CHAP"
-                else -> throw IllegalArgumentException("Invalid Phase2 type $enterprisePhase2Auth")
+                else -> us.nonEapInnerMethod = null
             }
             cred.userCredential = us
         }
@@ -287,6 +280,32 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     }
     passpointConfig.credential = cred
     return passpointConfig
+}
+
+private fun getPhase2AuthType(eapMethod: Int): Int? {
+    if (eapMethod == Eap.TLS) {
+        return getInnerAuthMethod(0)
+    } else {
+        return null
+    }
+}
+
+/**
+ * Converts a eap-config/CAT inner type to an Android Phase2 integer
+ *
+ * @param authMethod Auth method as used in eap-config
+ * @return ENUM from WifiEnterpriseConfig.Phase2 (PAP/MSCHAP/MSCHAPv2) or -1 if no match
+ */
+private fun getInnerAuthMethod(authMethod: Int): Int? {
+    return when (authMethod) {
+        -1 -> WifiEnterpriseConfig.Phase2.PAP
+        -2 -> WifiEnterpriseConfig.Phase2.MSCHAP
+        -3, 26 ->
+            // This currently DOES happen because CAT has a bug where it reports TTLS-MSCHAPv2 as TTLS-EAP-MSCHAPv2,
+            // so denying this would prevent profiles from being side-loaded
+            WifiEnterpriseConfig.Phase2.MSCHAPV2
+        else -> null
+    }
 }
 
 private fun EAPIdentityProviderList.setupHomeSp(): HomeSp {
@@ -298,8 +317,7 @@ private fun EAPIdentityProviderList.setupHomeSp(): HomeSp {
     // The FQDN in this case is the server names being used to verify the server certificate
     // Passpoint also has a domain, which is set later with Credential.setRealm(fqdn)
     homeSp.fqdn = getServerNamesDomainDependentOnAndroidVersion()
-    val fqdn: String? = null // TODO fixme!!! is always null
-    homeSp.friendlyName = "$fqdn via Passpoint"
+    homeSp.friendlyName = "${eapIdentityProvider?.ID} via Passpoint"
     homeSp.roamingConsortiumOis = oids.toLongArray()
     return homeSp
 }

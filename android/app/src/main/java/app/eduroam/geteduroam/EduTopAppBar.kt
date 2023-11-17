@@ -18,6 +18,7 @@ import app.eduroam.geteduroam.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EduTopAppBar(
+    title: String = stringResource(R.string.name),
     onBackClicked: () -> Unit = {},
     withBackIcon: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -44,7 +45,6 @@ fun EduTopAppBar(
         },
         topBar = {
             CenterAlignedTopAppBar(
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                 navigationIcon = {
                     if (withBackIcon) {
                         IconButton(
@@ -61,7 +61,7 @@ fun EduTopAppBar(
                 },
                 title = {
                     Text(
-                        text = stringResource(R.string.name),
+                        text = title,
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth(),

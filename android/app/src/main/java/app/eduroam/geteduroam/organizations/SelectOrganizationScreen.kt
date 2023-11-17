@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
@@ -55,7 +56,7 @@ import kotlinx.coroutines.flow.filter
 fun SelectOrganizationScreen(
     viewModel: SelectOrganizationViewModel,
     openProfileModal: (String) -> Unit,
-    goToOAuth: (Profile) -> Unit,
+    goToOAuth: (Configuration) -> Unit,
     goToConfigScreen: (EAPIdentityProviderList) -> Unit,
 ) {
     val step: Step by remember { mutableStateOf(Step.Start) }
@@ -67,7 +68,7 @@ fun SelectOrganizationScreen(
             is Step.DoOAuthFor -> {
                 viewModel.onStepCompleted()
                 val doAuth = step as Step.DoOAuthFor
-                goToOAuth(doAuth.profile)
+                goToOAuth(doAuth.configuration)
             }
 
             is Step.DoConfig -> {
@@ -110,7 +111,9 @@ fun SelectOrganizationScreen(
         onClearDialog = viewModel::clearDialog,
         onCredsAvailable = { username, password ->
             viewModel.creds.value = Pair(username, password)
-        })
+        },
+        errorData = viewModel.uiState.errorData
+        )
 }
 
 

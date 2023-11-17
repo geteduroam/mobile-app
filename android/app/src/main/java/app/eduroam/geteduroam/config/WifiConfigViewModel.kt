@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProviderList) :
     ViewModel() {
@@ -74,17 +75,15 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
             wifiManager.removeNetworkSuggestions(suggestions)
         } catch (e: Exception) {
             progressMessage.value = "Failed to remove WiFi Suggestions. Exception: ${e.message}"
-            Log.e(
-                "WifiConfigViewModel", "Failed to clear previously added network suggestions", e
-            )
+            Timber.e(e, "Failed to clear previously added network suggestions")
         }
 
         try {
             val status = wifiManager.addNetworkSuggestions(suggestions)
-            Log.e("WifiConfigViewModel", "Status for adding network: $status")
+            Timber.e( "Status for adding network: $status")
         } catch (e: Exception) {
             progressMessage.value = "Failed to add WiFi Suggestions. Exception: ${e.message}"
-            Log.e("WifiConfigViewModel", "Failed to add network suggestion", e)
+            Timber.e(e, "Failed to add network suggestion")
         }
 
         processing.value = false

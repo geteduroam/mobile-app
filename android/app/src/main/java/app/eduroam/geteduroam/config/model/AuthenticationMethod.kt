@@ -1,5 +1,7 @@
 package app.eduroam.geteduroam.config.model
 
+import android.net.wifi.WifiEnterpriseConfig
+import app.eduroam.geteduroam.config.convertEAPMethod
 import com.squareup.moshi.JsonClass
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
@@ -20,4 +22,16 @@ class AuthenticationMethod {
     @field:Element(name = "InnerAuthenticationMethod", required = false)
     var innerAuthenticationMethod: InnerAuthenticationMethod? = null
 
+}
+
+fun List<AuthenticationMethod>.bestMethod(): AuthenticationMethod? {
+    return firstOrNull {
+        val method = it.eapMethod?.type?.toInt()?.convertEAPMethod()
+        method == WifiEnterpriseConfig.Eap.TLS
+    } ?:
+    firstOrNull {
+        val method = it.eapMethod?.type?.toInt()?.convertEAPMethod()
+        method == WifiEnterpriseConfig.Eap.PEAP || method == WifiEnterpriseConfig.Eap.TTLS|| method == WifiEnterpriseConfig.Eap.PWD
+    } ?:
+    firstOrNull()
 }
