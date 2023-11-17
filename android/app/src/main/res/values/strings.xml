@@ -8,6 +8,7 @@
     <string name="profiles_title">Profiles</string>
     <string name="profiles_header">Select a profile</string>
     <string name="configuration_progress">Establishing WiFi connection</string>
+    <string name="configuration_success">WiFi connection established</string>
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Canceled</string>
     <string name="configuration_completed">Completed</string>
@@ -48,6 +49,7 @@
     <string name="button_back">Back</string>
 
     <string name="content_description_provider_logo">Provider logo</string>
+    <string name="content_description_success_checkmark">Success checkmark</string>
 
     <string name="helpdesk_title">Helpdesk</string>
 
