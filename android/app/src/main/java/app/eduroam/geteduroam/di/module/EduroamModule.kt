@@ -72,7 +72,7 @@ internal object EduroamModule {
             .addCallAdapterFactory(ApiResponseAdapterFactory.create())
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl("https://discovery.eduroam.app/").build()
+            .baseUrl(BuildConfig.DISCOVERY_BASE_URL).build()
     }
 
     @Provides

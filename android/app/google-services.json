@@ -62,6 +62,64 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918090700616:android:005572e384c12a7024857d",
+        "android_client_info": {
+          "package_name": "app.govroam.getgovroam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgGjvpOIvR2KZz3_CNbHe4NPwpzRw6XTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918090700616:android:b68e92ea4c3014af24857d",
+        "android_client_info": {
+          "package_name": "app.govroam.getgovroam.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgGjvpOIvR2KZz3_CNbHe4NPwpzRw6XTU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918090700616-uf6thagj6skl7tns4ftorv641dsmmdev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
