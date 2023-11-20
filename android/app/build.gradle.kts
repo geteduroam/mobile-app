@@ -9,6 +9,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
     id("com.google.firebase.appdistribution")
+    id("com.google.firebase.crashlytics")
     kotlin("kapt")
 }
 
@@ -136,6 +137,12 @@ dependencies {
     //Compose navigation and hiltViewModel
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.compose.hilt.navigation)
+
+    // Firebase
+    val firebaseBom = platform(libs.firebase.bom)
+    implementation(firebaseBom)
+    implementation(libs.firebase.crashlytics)
+
 
     //Hilt dependencies
     implementation(libs.hilt.android)
