@@ -46,7 +46,6 @@ import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Organization
-import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -143,7 +142,7 @@ fun SelectOrganizationContent(
         ) {
             Spacer(Modifier.fillMaxHeight(fraction = 0.3f))
             Icon(
-                painterResource(R.drawable.ic_eduroam_logo),
+                painterResource(R.drawable.ic_home_center),
                 contentDescription = "App logo",
                 tint = Color(0xFFBDD6E5),
                 modifier = Modifier.size(150.dp)
@@ -163,7 +162,7 @@ fun SelectOrganizationContent(
                     .padding(horizontal = 32.dp, vertical = 16.dp)
             ) {
                 Image(
-                    painterResource(R.drawable.ic_eduroamtrans),
+                    painterResource(R.drawable.ic_home_bottom_right),
                     contentDescription = "App logo",
                     modifier = Modifier.width(120.dp)
                 )

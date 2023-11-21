@@ -17,20 +17,43 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import app.eduroam.geteduroam.BuildConfig
 
-private val LightThemeColors = lightColorScheme(
-    primary = md_theme_light_primary,
-    surface = md_theme_light_surface,
-    onSurface = md_theme_light_onSurface,
-    secondary = md_theme_light_secondary,
-    primaryContainer = md_theme_light_primaryContainer
+@Suppress("KotlinConstantConditions")
+const val IS_EDUROAM = BuildConfig.FLAVOR == "eduroam"
+@Suppress("KotlinConstantConditions")
+const val IS_GOVROAM = BuildConfig.FLAVOR == "govroam"
+
+
+
+private val EduroamLightColorScheme = lightColorScheme(
+    primary = eduroamLightThemePrimary,
+    surface = eduroamLightThemeSurface,
+    onSurface = eduroamLightThemeOnSurface,
+    secondary = eduroamLightThemeSecondary,
+    primaryContainer = eduroamLightThemePrimaryContainer
 )
-private val DarkThemeColors = darkColorScheme(
-    primary = md_theme_dark_primary,
-    surface = md_theme_dark_surface,
-    onSurface = md_theme_dark_onSurface,
-    secondary = md_theme_dark_secondary,
-    primaryContainer = md_theme_dark_primaryContainer
+private val EduroamDarkColorScheme = darkColorScheme(
+    primary = eduroamDarkThemePrimary,
+    surface = eduroamDarkThemeSurface,
+    onSurface = eduroamDarkThemeOnSurface,
+    secondary = eduroamDarkThemeSecondary,
+    primaryContainer = eduroamDarkThemePrimaryContainer
+)
+
+private val GovroamLightColorScheme = lightColorScheme(
+    primary = govroamLightThemePrimary,
+    surface = govroamLightThemeSurface,
+    onSurface = govroamLightThemeOnSurface,
+    secondary = govroamLightThemeSecondary,
+    primaryContainer = govroamLightThemePrimaryContainer
+)
+private val GovroamDarkColorScheme = darkColorScheme(
+    primary = govroamDarkThemePrimary,
+    surface = govroamDarkThemeSurface,
+    onSurface = govroamDarkThemeOnSurface,
+    secondary = govroamDarkThemeSecondary,
+    primaryContainer = govroamDarkThemePrimaryContainer
 )
 
 @Composable
@@ -39,8 +62,11 @@ fun AppTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        darkTheme -> DarkThemeColors
-        else -> LightThemeColors
+        IS_EDUROAM && darkTheme -> EduroamDarkColorScheme
+        IS_EDUROAM && !darkTheme -> EduroamLightColorScheme
+        IS_GOVROAM && darkTheme -> GovroamDarkColorScheme
+        IS_GOVROAM && !darkTheme -> GovroamLightColorScheme
+        else -> throw RuntimeException("Unexpected flavor / color scheme!")
     }
     val view = LocalView.current
     val context = LocalContext.current
