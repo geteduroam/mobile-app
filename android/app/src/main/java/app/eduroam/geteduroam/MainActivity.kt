@@ -21,7 +21,9 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             AppTheme {
-                MainGraph()
+                MainGraph(closeApp = {
+                    this@MainActivity.finish()
+                })
             }
         }
     }

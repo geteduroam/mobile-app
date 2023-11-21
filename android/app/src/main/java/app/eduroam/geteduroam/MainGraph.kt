@@ -19,6 +19,7 @@ import app.eduroam.geteduroam.profile.SelectProfileViewModel
 @Composable
 fun MainGraph(
     navController: NavHostController = rememberNavController(),
+    closeApp: () -> Unit
 ) {
 
     NavHost(
@@ -42,6 +43,7 @@ fun MainGraph(
                     )
                 },
                 goToConfigScreen = { wifiConfigData ->
+                    navController.popBackStack()
                     navController.navigate(
                         Route.ConfigureWifi.encodeArguments(
                             wifiConfigData,
@@ -71,7 +73,7 @@ fun MainGraph(
         }
         composable(
             route = Route.OAuth.routeWithArgs, arguments = Route.OAuth.arguments
-        ) { entry ->
+        ) { _ ->
             val viewModel = hiltViewModel<OAuthViewModel>()
             OAuthScreen(viewModel = viewModel, goToPrevious = {
                 navController.popBackStack()
@@ -82,7 +84,10 @@ fun MainGraph(
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
             val viewModel = WifiConfigViewModel(wifiConfigData)
-            WifiConfigScreen(viewModel)
+            WifiConfigScreen(
+                viewModel,
+                closeApp = closeApp
+            )
         }
     }
 }

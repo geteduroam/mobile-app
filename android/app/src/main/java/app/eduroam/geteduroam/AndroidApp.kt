@@ -9,7 +9,7 @@ class AndroidApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG || true) {
             Timber.plant(Timber.DebugTree())
         }
     }

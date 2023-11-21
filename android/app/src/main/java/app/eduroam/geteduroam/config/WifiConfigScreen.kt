@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -44,7 +44,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun WifiConfigScreen(
-    viewModel: WifiConfigViewModel, snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    viewModel: WifiConfigViewModel,
+    closeApp: () -> Unit,
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) = EduTopAppBar(withBackIcon = false) { paddingValues ->
     val launch by viewModel.launch.collectAsState(null)
     val processing by viewModel.processing.collectAsState(true)
@@ -68,15 +70,17 @@ fun WifiConfigScreen(
     }
 
     Column(
-        Modifier
+        modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize()
             .systemBarsPadding()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(24.dp))
         if (processing) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.configuration_progress),
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -86,11 +90,13 @@ fun WifiConfigScreen(
             )
         } else if (message.isNotEmpty()) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.configuration_logs),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.height(8.dp))
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = message,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -112,6 +118,13 @@ fun WifiConfigScreen(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            PrimaryButton(
+                text = stringResource(id = R.string.button_close_app),
+                onClick = {
+                    closeApp()
+                })
+            Spacer(modifier = Modifier.size(24.dp))
         }
         if (askNetworkPermission) {
             AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
@@ -219,7 +232,8 @@ private fun WifiConfigScreen_Preview() {
         WifiConfigScreen(
             viewModel = WifiConfigViewModel(
                 EAPIdentityProviderList()
-            )
+            ),
+            closeApp = {}
         )
     }
 }

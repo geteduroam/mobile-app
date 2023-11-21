@@ -65,27 +65,39 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
     /**
      * Requires CHANGE_WIFI_STATE permission
      * */
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun handleAndroid10WifiConfig(context: Context) {
-        val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
+        val ssidSuggestions = eapIdentityProviderList.buildSSIDSuggestions()
         val wifiManager: WifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         try {
-            wifiManager.removeNetworkSuggestions(suggestions)
+            wifiManager.removeNetworkSuggestions(ssidSuggestions)
         } catch (e: Exception) {
             progressMessage.value = "Failed to remove WiFi Suggestions. Exception: ${e.message}"
             Timber.e(e, "Failed to clear previously added network suggestions")
         }
 
         try {
-            val status = wifiManager.addNetworkSuggestions(suggestions)
+            val status = wifiManager.addNetworkSuggestions(ssidSuggestions)
             Timber.e( "Status for adding network: $status")
         } catch (e: Exception) {
             progressMessage.value = "Failed to add WiFi Suggestions. Exception: ${e.message}"
             Timber.e(e, "Failed to add network suggestion")
         }
 
+        val passpointConfig = eapIdentityProviderList.buildPasspointConfig()
+        if (passpointConfig != null) {
+            try {
+                wifiManager.addOrUpdatePasspointConfiguration(passpointConfig)
+            } catch (e: IllegalArgumentException) {
+                // Can throw when configuration is wrong or device does not support Passpoint
+                // while we did encounter a few devices without Passpoint support.
+                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+                Timber.e(e, "Failed to Passpoint")
+
+            }
+        }
         processing.value = false
     }
 
@@ -132,21 +144,16 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
         context, Manifest.permission.CHANGE_WIFI_STATE
     ) == PackageManager.PERMISSION_GRANTED
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun createSuggestionsIntent(suggestions: List<WifiNetworkSuggestion>?): Intent {
         val forBundle = ArrayList<WifiNetworkSuggestion>()
         if (suggestions != null) {
             forBundle.addAll(suggestions)
         }
         val bundle = Bundle().apply {
-            putParcelableArrayList(
-                Settings.EXTRA_WIFI_NETWORK_LIST, forBundle
-            )
+            putParcelableArrayList(Settings.EXTRA_WIFI_NETWORK_LIST, forBundle)
         }
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Intent(Settings.ACTION_WIFI_ADD_NETWORKS)
-        } else {
-            Intent()
-        }
+        val intent = Intent(Settings.ACTION_WIFI_ADD_NETWORKS)
         return intent.apply {
             putExtras(bundle)
         }
