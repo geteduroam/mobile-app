@@ -41,7 +41,7 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
                 handleAndroid11AndOver()
             }
             //Android 10 - API 29
-            Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
                 if (hasPermission(context)) {
                     handleAndroid10WifiConfig(context)
                 } else {
@@ -94,7 +94,7 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
                 // Can throw when configuration is wrong or device does not support Passpoint
                 // while we did encounter a few devices without Passpoint support.
                 progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
-                Timber.e(e, "Failed to Passpoint")
+                Timber.e(e, "Failed to add or update Passpoint config")
 
             }
         }
