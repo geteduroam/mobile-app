@@ -1,8 +1,11 @@
 package app.eduroam.geteduroam.config
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,9 +35,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -55,6 +60,13 @@ fun WifiConfigScreen(
     val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(
         false
     )
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.scheduleReminderNotification()
+        }
+    }
     val context = LocalContext.current
     launch?.let {
         LaunchedEffect(it) {
@@ -101,6 +113,13 @@ fun WifiConfigScreen(
                 style = MaterialTheme.typography.bodyMedium,
             )
         } else {
+            LaunchedEffect(Unit) {
+                if (viewModel.shouldRequestPushPermission()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -230,9 +249,7 @@ private fun getTextToShowGivenPermissions(
 private fun WifiConfigScreen_Preview() {
     AppTheme {
         WifiConfigScreen(
-            viewModel = WifiConfigViewModel(
-                EAPIdentityProviderList()
-            ),
+            viewModel = hiltViewModel(),
             closeApp = {}
         )
     }

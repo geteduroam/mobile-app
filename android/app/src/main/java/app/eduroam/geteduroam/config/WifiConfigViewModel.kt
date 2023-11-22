@@ -15,12 +15,17 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.di.repository.NotificationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProviderList) :
+class WifiConfigViewModel(
+    private val notificationRepository: NotificationRepository
+    ) :
     ViewModel() {
+
+    lateinit var eapIdentityProviderList: EAPIdentityProviderList
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage: MutableStateFlow<String> = MutableStateFlow("")
@@ -165,6 +170,19 @@ class WifiConfigViewModel(private val eapIdentityProviderList: EAPIdentityProvid
 
     fun markAsComplete() {
         processing.value = false
+    }
+
+    fun shouldRequestPushPermission() : Boolean {
+        eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
+            return notificationRepository.shouldRequestPushPermission(it)
+        }
+        return false
+    }
+
+    fun scheduleReminderNotification() {
+        eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
+            return notificationRepository.scheduleNotificationIfNeeded(it)
+        }
     }
 
 }

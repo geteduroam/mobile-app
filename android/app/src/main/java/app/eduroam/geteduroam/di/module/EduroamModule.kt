@@ -5,6 +5,7 @@ import app.eduroam.geteduroam.BuildConfig
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.api.response.ApiResponseAdapterFactory
 import app.eduroam.geteduroam.di.assist.AuthenticationAssistant
+import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.di.repository.StorageRepository
 import com.squareup.moshi.Moshi
 import dagger.Lazy
@@ -35,6 +36,13 @@ internal object EduroamModule {
     internal fun providesStorageRepository(
         @ApplicationContext context: Context,
     ) = StorageRepository(context)
+
+    @Provides
+    @Singleton
+    internal fun providesNotificationRepository(
+        @ApplicationContext context: Context,
+    ) = NotificationRepository(context)
+
 
     @Provides
     fun providesOkHttp(

@@ -65,4 +65,8 @@
     <string name="username_password_placeholder_username_before_suffix">username</string>
     <string name="username_password_accessibility_hide_password">Hide password</string>
     <string name="username_password_accessibility_show_password">Show password</string>
+    <string name="notification_channel_description">Reminds you when your configuration will expire soon</string>
+    <string name="notification_channel_name">Reconfiguration reminders</string>
+    <string name="notification_title">Reconfigure %s</string>
+    <string name="notification_message">There are %1$d days left for your %2$s profile to expire, click to reconfigure it</string>
 </resources>

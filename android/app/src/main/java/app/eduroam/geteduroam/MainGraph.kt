@@ -83,7 +83,8 @@ fun MainGraph(
             route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
-            val viewModel = WifiConfigViewModel(wifiConfigData)
+            val viewModel = hiltViewModel<WifiConfigViewModel>()
+            viewModel.eapIdentityProviderList = wifiConfigData
             WifiConfigScreen(
                 viewModel,
                 closeApp = closeApp
