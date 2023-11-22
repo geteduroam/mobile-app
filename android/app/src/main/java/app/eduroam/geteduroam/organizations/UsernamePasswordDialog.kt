@@ -73,6 +73,16 @@ fun UsernamePasswordDialog(
                     },
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            if (username.isNotEmpty() &&
+                                !requiredSuffix.isNullOrEmpty() &&
+                                !username.contains("@")) {
+                                username += "@$requiredSuffix"
+                            }
+                            defaultKeyboardAction(ImeAction.Next)
+                        }
+                    ),
                     placeholder = {
                         val exampleUsername =
                             stringResource(id = R.string.username_password_placeholder_username_before_suffix)
