@@ -8,7 +8,7 @@
     <string name="profiles_title">Profiles</string>
     <string name="profiles_header">Select a profile</string>
     <string name="configuration_progress">Establishing WiFi connection</string>
-    <string name="configuration_success">WiFi connection established</string>
+    <string name="configuration_success">WiFi configured</string>
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Canceled</string>
     <string name="configuration_completed">Completed</string>
@@ -47,6 +47,7 @@
     <string name="button_retry">Retry</string>
     <string name="button_connect">CONNECT</string>
     <string name="button_back">Back</string>
+    <string name="button_close_app">Close app</string>
 
     <string name="content_description_provider_logo">Provider logo</string>
     <string name="content_description_success_checkmark">Success checkmark</string>
@@ -64,4 +65,8 @@
     <string name="username_password_placeholder_username_before_suffix">username</string>
     <string name="username_password_accessibility_hide_password">Hide password</string>
     <string name="username_password_accessibility_show_password">Show password</string>
+    <string name="notification_channel_description">Reminds you when your configuration will expire soon</string>
+    <string name="notification_channel_name">Reconfiguration reminders</string>
+    <string name="notification_title">Reconfigure %s</string>
+    <string name="notification_message">There are %1$d days left for your %2$s profile to expire, click to reconfigure it</string>
 </resources>

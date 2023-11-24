@@ -62,9 +62,7 @@ fun EduTopAppBar(
                 title = {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 scrollBehavior = scrollBehavior

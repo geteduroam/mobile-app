@@ -1,6 +1,8 @@
 package app.eduroam.geteduroam
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -18,8 +20,14 @@ import app.eduroam.geteduroam.profile.SelectProfileViewModel
 
 @Composable
 fun MainGraph(
+    mainViewModel: MainViewModel,
     navController: NavHostController = rememberNavController(),
+    closeApp: () -> Unit
 ) {
+    LaunchedEffect(mainViewModel.openedAppWithOrganizationState) {
+        val id = mainViewModel.openedAppWithOrganizationState ?: return@LaunchedEffect
+        navController.navigate(Route.SelectProfile.encodeArgument(id))
+    }
 
     NavHost(
         navController = navController, startDestination = Route.SelectInstitution.route
@@ -42,6 +50,7 @@ fun MainGraph(
                     )
                 },
                 goToConfigScreen = { wifiConfigData ->
+                    navController.popBackStack()
                     navController.navigate(
                         Route.ConfigureWifi.encodeArguments(
                             wifiConfigData,
@@ -71,7 +80,7 @@ fun MainGraph(
         }
         composable(
             route = Route.OAuth.routeWithArgs, arguments = Route.OAuth.arguments
-        ) { entry ->
+        ) { _ ->
             val viewModel = hiltViewModel<OAuthViewModel>()
             OAuthScreen(viewModel = viewModel, goToPrevious = {
                 navController.popBackStack()
@@ -81,8 +90,12 @@ fun MainGraph(
             route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
-            val viewModel = WifiConfigViewModel(wifiConfigData)
-            WifiConfigScreen(viewModel)
+            val viewModel = hiltViewModel<WifiConfigViewModel>()
+            viewModel.eapIdentityProviderList = wifiConfigData
+            WifiConfigScreen(
+                viewModel,
+                closeApp = closeApp
+            )
         }
     }
 }

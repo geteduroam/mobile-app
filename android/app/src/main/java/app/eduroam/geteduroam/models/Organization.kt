@@ -27,9 +27,6 @@ data class Organization(
         words += nameOrId
         words += abbreviation
         matchWords = words.map { it.removeNonSpacingMarks() }
-        if (nameOrId.startsWith("eduroam Visitor")) {
-            println("$nameOrId: $abbreviation")
-        }
     }
 
     companion object {

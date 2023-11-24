@@ -5,12 +5,14 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.util.Date
 
 
 sealed class Route(val route: String) {
@@ -68,7 +70,9 @@ sealed class Route(val route: String) {
         })
 
         fun encodeArguments(eapIdentityProviderList: EAPIdentityProviderList): String {
-            val moshi = Moshi.Builder().build()
+            val moshi = Moshi.Builder()
+                .add(Date::class.java, DateJsonAdapter())
+                .build()
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val wifiConfigDataJson = adapter.toJson(eapIdentityProviderList)
             val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
@@ -77,7 +81,9 @@ sealed class Route(val route: String) {
 
         fun decodeUrlArgument(arguments: Bundle?): EAPIdentityProviderList {
             val encodedEAPIdentityProviderList = arguments?.getString(wifiConfigDataArg).orEmpty()
-            val moshi = Moshi.Builder().build()
+            val moshi = Moshi.Builder()
+                .add(Date::class.java, DateJsonAdapter())
+                .build()
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val decodedWifiConfigDataJson = Uri.decode(encodedEAPIdentityProviderList)
             return adapter.fromJson(decodedWifiConfigDataJson)!!

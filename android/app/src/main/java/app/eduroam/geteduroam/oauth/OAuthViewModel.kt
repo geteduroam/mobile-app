@@ -2,9 +2,12 @@ package app.eduroam.geteduroam.oauth
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.util.Base64
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationManagementActivity
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationResponse
 import net.openid.appauth.AuthorizationService
@@ -36,6 +40,7 @@ import timber.log.Timber
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.inject.Inject
+
 
 @HiltViewModel
 class OAuthViewModel @Inject constructor(
@@ -60,7 +65,7 @@ class OAuthViewModel @Inject constructor(
         try {
             checkIfConfigurationChanged()
             initializeAppAuth(context)
-            val authorizationIntent = createAuthorizationIntent()
+            val authorizationIntent = createAuthorizationIntent(context)
             uiState = UiState(OAuthStep.Initialized(authorizationIntent))
         } catch (e: Exception) {
             Timber.w(e, "Unable to initialize AppAuth!")
@@ -76,13 +81,45 @@ class OAuthViewModel @Inject constructor(
         }
     }
 
-    private suspend fun createAuthorizationIntent(): Intent {
+    private fun isCustomTabSupported(context: Context, url: Uri?): Boolean {
+        return getCustomTabsPackages(context, url).isNotEmpty()
+    }
+
+    /**
+     * Returns a list of packages that support Custom Tabs.
+     */
+    private fun getCustomTabsPackages(context: Context, url: Uri?): List<ResolveInfo> {
+        val pm = context.packageManager
+        val activityIntent = Intent(Intent.ACTION_VIEW, url)
+        val resolvedActivityList = pm.queryIntentActivities(activityIntent, 0)
+        val packagesSupportingCustomTabs = mutableListOf<ResolveInfo>()
+        for (info in resolvedActivityList) {
+            val serviceIntent = Intent()
+            serviceIntent.action = ACTION_CUSTOM_TABS_CONNECTION
+            serviceIntent.setPackage(info.activityInfo.packageName)
+            // Check if this package also resolves the Custom Tabs service.
+            if (pm.resolveService(serviceIntent, 0) != null) {
+                packagesSupportingCustomTabs.add(info)
+            }
+        }
+        return packagesSupportingCustomTabs
+    }
+
+
+    private suspend fun createAuthorizationIntent(context: Context): Intent {
         val currentAuthRequest = repository.authRequest.first()
             ?: throw IllegalStateException("AuthorizationRequest not available when trying to create authorization request Intent")
         val availableService = service
             ?: throw IllegalStateException("AuthorizationService not available when trying to create authorization request Intent")
-        val customTabIntent = warmupBrowser()
-        return availableService.getAuthorizationRequestIntent(currentAuthRequest, customTabIntent)
+
+        val requestUri = currentAuthRequest.toUri()
+        if (isCustomTabSupported(context, requestUri)) {
+            val customTabIntent = warmupBrowser()
+            return availableService.getAuthorizationRequestIntent(currentAuthRequest, customTabIntent)
+        } else {
+            val launchIntent = Intent(Intent.ACTION_VIEW, requestUri)
+            return AuthorizationManagementActivity.createStartForResultIntent(context, currentAuthRequest, launchIntent)
+        }
     }
 
     fun continueWithFetchToken(intent: Intent?) = viewModelScope.launch {

@@ -1,8 +1,11 @@
 package app.eduroam.geteduroam.config
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -33,9 +35,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -44,7 +49,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun WifiConfigScreen(
-    viewModel: WifiConfigViewModel, snackbarHostState: SnackbarHostState = SnackbarHostState(),
+    viewModel: WifiConfigViewModel,
+    closeApp: () -> Unit,
+    snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) = EduTopAppBar(withBackIcon = false) { paddingValues ->
     val launch by viewModel.launch.collectAsState(null)
     val processing by viewModel.processing.collectAsState(true)
@@ -53,6 +60,13 @@ fun WifiConfigScreen(
     val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(
         false
     )
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.scheduleReminderNotification()
+        }
+    }
     val context = LocalContext.current
     launch?.let {
         LaunchedEffect(it) {
@@ -68,15 +82,17 @@ fun WifiConfigScreen(
     }
 
     Column(
-        Modifier
+        modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize()
             .systemBarsPadding()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(24.dp))
         if (processing) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.configuration_progress),
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -86,15 +102,26 @@ fun WifiConfigScreen(
             )
         } else if (message.isNotEmpty()) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.configuration_logs),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.height(8.dp))
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = message,
                 style = MaterialTheme.typography.bodyMedium,
             )
         } else {
+            LaunchedEffect(Unit) {
+                if (viewModel.shouldRequestPushPermission()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                } else {
+                    viewModel.scheduleReminderNotification()
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -112,6 +139,13 @@ fun WifiConfigScreen(
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
+            Spacer(modifier = Modifier.weight(weight = 1f))
+            PrimaryButton(
+                text = stringResource(id = R.string.button_close_app),
+                onClick = {
+                    closeApp()
+                })
+            Spacer(modifier = Modifier.size(24.dp))
         }
         if (askNetworkPermission) {
             AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
@@ -217,9 +251,8 @@ private fun getTextToShowGivenPermissions(
 private fun WifiConfigScreen_Preview() {
     AppTheme {
         WifiConfigScreen(
-            viewModel = WifiConfigViewModel(
-                EAPIdentityProviderList()
-            )
+            viewModel = hiltViewModel(),
+            closeApp = {}
         )
     }
 }

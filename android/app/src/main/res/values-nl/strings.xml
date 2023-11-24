@@ -64,4 +64,9 @@
     <string name="username_password_accessibility_hide_password">Verberg wachtwoord</string>
     <string name="username_password_accessibility_show_password">Toon wachtwoord</string>
     <string name="welcome">Welkom</string>
+    <string name="button_close_app">App sluiten</string>
+    <string name="notification_channel_description">Herinnert je eraan wanneer je configuratie verloopt</string>
+    <string name="notification_channel_name">Herinnering om opnieuw in te stellen</string>
+    <string name="notification_title">Stel %s opnieuw in</string>
+    <string name="notification_message">Over %1$d dagen verloopt je %2$s profiel, klik hier om opnieuw in te stellen</string>
 </resources>

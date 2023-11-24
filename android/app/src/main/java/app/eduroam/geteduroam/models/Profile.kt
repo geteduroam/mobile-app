@@ -1,6 +1,7 @@
 package app.eduroam.geteduroam.models
 
 import android.os.Parcelable
+import app.eduroam.geteduroam.BuildConfig
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
@@ -20,12 +21,12 @@ data class Profile(
 ) : Parcelable {
     fun createConfiguration() : Configuration {
         return Configuration(
-            clientId = "app.eduroam.geteduroam",
+            clientId = BuildConfig.OAUTH_CLIENT_ID,
             scope = "eap-metadata",
-            redirect = "app.eduroam.geteduroam:/",
+            redirect = BuildConfig.OAUTH_REDIRECT_URI,
             authEndpoint = authorizationEndpoint ?: "",
             tokenEndpoint = tokenEndpoint ?: "",
-            discovery = "https://discovery.eduroam.app/v1/",
+            discovery = BuildConfig.DISCOVERY_BASE_URL + "v1",
             isHttpsRequired = false
         )
     }

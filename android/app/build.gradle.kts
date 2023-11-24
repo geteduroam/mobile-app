@@ -9,6 +9,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
     id("com.google.firebase.appdistribution")
+    id("com.google.firebase.crashlytics")
     kotlin("kapt")
 }
 
@@ -49,6 +50,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     signingConfigs {
         create("release") {
             storeFile = file("keystore/release.keystore")
@@ -70,6 +75,28 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+    flavorDimensions.add("brand")
+
+    productFlavors {
+        create("eduroam") {
+            dimension = "brand"
+            buildConfigField("String", "OAUTH_CLIENT_ID", "\"app.eduroam.geteduroam\"")
+            buildConfigField("String", "OAUTH_REDIRECT_URI", "\"app.eduroam.geteduroam:/\"")
+            buildConfigField("String", "DISCOVERY_BASE_URL", "\"https://discovery.eduroam.app/\"")
+        }
+        create("govroam") {
+            dimension = "brand"
+            applicationId = "app.govroam.getgovroam"
+            buildConfigField("String", "OAUTH_CLIENT_ID", "\"app.govroam.getgovroam\"")
+            buildConfigField("String", "OAUTH_REDIRECT_URI", "\"app.govroam.getgovroam:/\"")
+            buildConfigField("String", "DISCOVERY_BASE_URL", "\"https://discovery.getgovroam.nl/\"")
+            manifestPlaceholders += mapOf(
+                "appAuthRedirectScheme" to "app.govroam.getgovroam"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -84,7 +111,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
@@ -136,6 +163,12 @@ dependencies {
     //Compose navigation and hiltViewModel
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.compose.hilt.navigation)
+
+    // Firebase
+    val firebaseBom = platform(libs.firebase.bom)
+    implementation(firebaseBom)
+    implementation(libs.firebase.crashlytics)
+
 
     //Hilt dependencies
     implementation(libs.hilt.android)

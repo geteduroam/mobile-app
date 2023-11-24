@@ -3,16 +3,28 @@ package app.eduroam.geteduroam.ui.theme
 import androidx.compose.ui.graphics.Color
 
 
-val md_theme_light_primary = Color(0xFF00668b)
-val md_theme_light_onSurface = Color(0xFF303030)
-val md_theme_light_surface = Color(0xFFFAEDEF)
-val md_theme_light_secondary = Color(0xFF202020)
-val md_theme_light_primaryContainer = Color(0xFFf0456c)
+val eduroamLightThemePrimary = Color(0xFF00698F)
+val eduroamLightThemeOnSurface = Color(0xFF303030)
+val eduroamLightThemeSurface = Color(0xFFFAEDEF)
+val eduroamLightThemeSecondary = Color(0xFF202020)
+val eduroamLightThemePrimaryContainer = Color(0xFFf0456c)
 
-val md_theme_dark_primary = Color(0xFF7ad0ff)
-val md_theme_dark_onSurface = Color(0xFFffffff)
-val md_theme_dark_surface = Color(0xFF086a8f)
-val md_theme_dark_secondary = Color(0xFFFFFFFF)
-val md_theme_dark_primaryContainer = Color(0xFFf0456c)
+val eduroamDarkThemePrimary = Color(0xFFC5D9E7)
+val eduroamDarkThemeOnSurface = Color(0xFFffffff)
+val eduroamDarkThemeSurface = Color(0xFF086a8f)
+val eduroamDarkThemeSecondary = Color(0xFFFFFFFF)
+val eduroamDarkThemePrimaryContainer = Color(0xFFf0456c)
+
+val govroamLightThemePrimary = Color(0xFF00668b)
+val govroamLightThemeOnSurface = Color(0xFF303030)
+val govroamLightThemeSurface = Color(0xFFC1EBF0)
+val govroamLightThemeSecondary = Color(0xFF202020)
+val govroamLightThemePrimaryContainer = Color(0xFFE77007)
+
+val govroamDarkThemePrimary = Color(0xFF7ad0ff)
+val govroamDarkThemeOnSurface = Color(0xFFffffff)
+val govroamDarkThemeSurface = Color(0xFF23A2B2)
+val govroamDarkThemeSecondary = Color(0xFFFFFFFF)
+val govroamDarkThemePrimaryContainer = Color(0xFFE77007)
 
 val error = Color(0xFFB3261E)

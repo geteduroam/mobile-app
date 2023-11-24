@@ -46,8 +46,11 @@ fun EAPIdentityProviderList.buildSSIDSuggestions(): List<WifiNetworkSuggestion> 
     // Initial capacity = amount of SSIDs + 1, to keep room for a a Passpoint configuration
     val enterpriseConfig = buildEnterpriseConfig()
     return ssids.filterNotNull().map { ssid ->
-        WifiNetworkSuggestion.Builder().setSsid((ssid)).setWpa2EnterpriseConfig(enterpriseConfig)
-            .setIsAppInteractionRequired(true).build()
+        WifiNetworkSuggestion.Builder()
+            .setSsid((ssid))
+            .setWpa2EnterpriseConfig(enterpriseConfig)
+            .setIsAppInteractionRequired(true)
+            .build()
     }
 }
 
@@ -212,7 +215,7 @@ private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersio
  */
 fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     val eapIdentityProvider = eapIdentityProvider?.first()
-    val caCertificates = eapIdentityProvider?.authenticationMethod?.map { it.serverSideCredential?.certData?.first()?.value }?.filterNotNull()
+    val caCertificates = eapIdentityProvider?.authenticationMethod?.bestMethod()?.serverSideCredential?.certData?.mapNotNull { it.value }
     val oids = eapIdentityProvider?.credentialApplicability?.map { it.consortiumOID?.toLong(16) }?.filterNotNull() ?: listOf()
     val fqdn: String? = eapIdentityProvider?.ID
 
@@ -236,7 +239,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     }
     cred.realm = fqdn
     val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod() ?: Eap.NONE
-    val enterprisePhase2Auth = getPhase2AuthType(enterpriseEAP)
+    val enterprisePhase2Auth = eapIdentityProvider?.getPhase2AuthType(enterpriseEAP)
 
     when (enterpriseEAP) {
         Eap.TLS -> {
@@ -282,11 +285,18 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
     return passpointConfig
 }
 
-private fun getPhase2AuthType(eapMethod: Int): Int? {
+private fun EAPIdentityProvider.getPhase2AuthType(eapMethod: Int): Int? {
     if (eapMethod == Eap.TLS) {
         return getInnerAuthMethod(0)
     } else {
-        return null
+        val validAuthMethod = authenticationMethod?.bestMethod()
+        val innerNonEapMethod = validAuthMethod?.innerAuthenticationMethod?.nonEapMethod?.type?.toInt()?.times(-1)
+        val innerEapMethod = validAuthMethod?.innerAuthenticationMethod?.eapMethod?.type?.toInt()
+        return if (innerEapMethod != null && innerEapMethod != 0) {
+            getInnerAuthMethod(innerEapMethod)
+        } else {
+            getInnerAuthMethod(innerNonEapMethod)
+        }
     }
 }
 
@@ -296,7 +306,7 @@ private fun getPhase2AuthType(eapMethod: Int): Int? {
  * @param authMethod Auth method as used in eap-config
  * @return ENUM from WifiEnterpriseConfig.Phase2 (PAP/MSCHAP/MSCHAPv2) or -1 if no match
  */
-private fun getInnerAuthMethod(authMethod: Int): Int? {
+private fun getInnerAuthMethod(authMethod: Int?): Int? {
     return when (authMethod) {
         -1 -> WifiEnterpriseConfig.Phase2.PAP
         -2 -> WifiEnterpriseConfig.Phase2.MSCHAP
