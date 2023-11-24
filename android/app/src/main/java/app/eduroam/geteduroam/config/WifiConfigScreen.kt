@@ -118,6 +118,8 @@ fun WifiConfigScreen(
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
+                } else {
+                    viewModel.scheduleReminderNotification()
                 }
             }
             Row(

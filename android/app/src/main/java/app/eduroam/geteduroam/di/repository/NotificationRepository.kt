@@ -42,10 +42,10 @@ class NotificationRepository(
             return false
         }
         // Check if we actually need it
-        return getReminderDate(context, provider) != null
+        return getReminderDate(provider) != null
     }
 
-    private fun getReminderDate(context: Context, provider: EAPIdentityProvider): Date? {
+    private fun getReminderDate(provider: EAPIdentityProvider): Date? {
         if (provider.requiresUsernamePrompt()) {
             // Only OAuth users require notification reminders
             return null
@@ -59,14 +59,15 @@ class NotificationRepository(
         return null
     }
     fun scheduleNotificationIfNeeded(provider: EAPIdentityProvider) {
-        val reminderDate = getReminderDate(context, provider) ?: return
+        val reminderDate = getReminderDate(provider) ?: return
         createNotificationChannel()
-        postNotificationAtDate(Date(), provider) // TODO use correct date
+        Timber.i("Posting reminder to date: $reminderDate")
+        postNotificationAtDate(reminderDate, provider)
     }
 
     private fun postNotificationAtDate(reminderDate: Date, provider: EAPIdentityProvider) {
         val intent = Intent(context, NotificationAlarmReceiver::class.java)
-        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, provider.ID)
+        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, provider.ID )
         val pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val alarmManager = context.applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.set(AlarmManager.RTC_WAKEUP, reminderDate.time, pendingIntent)
@@ -97,7 +98,7 @@ class NotificationAlarmReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, NotificationRepository.NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title, context.getString(R.string.name)))
                 .setContentText(context.getString(R.string.notification_message, NotificationRepository.REMIND_DAYS_BEFORE_EXPIRY, context.getString(R.string.name)))
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)

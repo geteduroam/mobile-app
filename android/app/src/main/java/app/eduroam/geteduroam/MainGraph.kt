@@ -1,6 +1,8 @@
 package app.eduroam.geteduroam
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -18,9 +20,14 @@ import app.eduroam.geteduroam.profile.SelectProfileViewModel
 
 @Composable
 fun MainGraph(
+    mainViewModel: MainViewModel,
     navController: NavHostController = rememberNavController(),
     closeApp: () -> Unit
 ) {
+    LaunchedEffect(mainViewModel.openedAppWithOrganizationState) {
+        val id = mainViewModel.openedAppWithOrganizationState ?: return@LaunchedEffect
+        navController.navigate(Route.SelectProfile.encodeArgument(id))
+    }
 
     NavHost(
         navController = navController, startDestination = Route.SelectInstitution.route

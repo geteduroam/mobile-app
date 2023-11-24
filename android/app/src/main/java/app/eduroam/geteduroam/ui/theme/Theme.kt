@@ -24,6 +24,9 @@ const val IS_EDUROAM = BuildConfig.FLAVOR == "eduroam"
 @Suppress("KotlinConstantConditions")
 const val IS_GOVROAM = BuildConfig.FLAVOR == "govroam"
 
+fun Context.isChromeOs() : Boolean {
+    return packageManager.hasSystemFeature("org.chromium.arc.device_management")
+}
 
 
 private val EduroamLightColorScheme = lightColorScheme(

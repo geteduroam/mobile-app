@@ -16,14 +16,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.ui.theme.isChromeOs
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class WifiConfigViewModel(
+@HiltViewModel
+class WifiConfigViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository
-    ) :
-    ViewModel() {
+    ) : ViewModel() {
 
     lateinit var eapIdentityProviderList: EAPIdentityProviderList
 
@@ -41,9 +44,9 @@ class WifiConfigViewModel(
         launch.value = null
 
         when {
-            //Android 11 and higher - API 30
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                handleAndroid11AndOver()
+            //Android 11 and higher - API 30 - we only show intent on ChromeOS
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
+                handleAndroid11ChromeOs()
             }
             //Android 10 - API 29
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
@@ -61,7 +64,7 @@ class WifiConfigViewModel(
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
-    private fun handleAndroid11AndOver() {
+    private fun handleAndroid11ChromeOs() {
         val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val intent = createSuggestionsIntent(suggestions = suggestions)
         intentWithSuggestions.value = intent

@@ -45,6 +45,11 @@
                     android:scheme="app.eduroam.geteduroam" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".di.repository.NotificationAlarmReceiver"
+            android:exported="false"/>
+
     </application>
 
 </manifest>
