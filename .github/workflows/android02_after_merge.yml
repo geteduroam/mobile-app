@@ -57,7 +57,7 @@ jobs:
                     echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > firebase.json
                 env:
                     GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-            - name: Restore release keystore
+            - name: Create eduroam keystore
               run: |
                   echo "${{ secrets.PRODUCTION_KEYSTORE }}" > release.keystore.asc
                   mkdir ./android/app/keystore/
@@ -70,6 +70,13 @@ jobs:
                     PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                 run: |
                     ./gradlew :android:app:assembleEduroamRelease :android:app:appDistributionUploadEduroamRelease
+            - name: Create govroam keystore
+              run: |
+                  rm ./android/app/keystore/release.keystore
+                  echo "${{ secrets.GOVROAM_KEYSTORE }}" > release.keystore.asc
+                  mkdir ./android/app/keystore/
+                  gpg -d --passphrase "${{ secrets.GOVROAM_KEYSTORE_PASSWORD }}" --batch release.keystore.asc > ./android/app/keystore/release.keystore
+                  rm release.keystore.asc
             -   name: Build & upload the release version of the getgovroam app to Firebase App Distribution
                 env:
                     GOOGLE_APPLICATION_CREDENTIALS: ./firebase.json
