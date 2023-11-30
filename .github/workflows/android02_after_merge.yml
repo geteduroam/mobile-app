@@ -70,6 +70,13 @@ jobs:
                     PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
                 run: |
                     ./gradlew :android:app:assembleEduroamRelease :android:app:appDistributionUploadEduroamRelease
+            -   name: Build & upload the release version of the geteduroam app to the Google Play Console
+                env:
+                    PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
+                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
+                    ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+                run: |
+                    ./gradlew :android:app:publishEduroamReleaseApk
             - name: Create govroam keystore
               run: |
                   rm ./android/app/keystore/release.keystore
@@ -84,6 +91,13 @@ jobs:
                     PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.GOVROAM_KEYSTORE_ALIAS }}
                 run: |
                     ./gradlew :android:app:assembleGovroamRelease :android:app:appDistributionUploadGovroamRelease
+            -   name: Build & upload the release version of the getgovroam app to the Google Play Console
+                env:
+                    PRODUCTION_KEYSTORE_PASSWORD: ${{ secrets.PRODUCTION_KEYSTORE_PASSWORD }}
+                    PRODUCTION_KEYSTORE_ALIAS: ${{ secrets.PRODUCTION_KEYSTORE_ALIAS }}
+                    ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+                run: |
+                    ./gradlew :android:app:publishGovroamReleaseApk
             -   name: Push tag for snapshot
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
