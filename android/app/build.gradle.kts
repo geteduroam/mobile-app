@@ -3,14 +3,14 @@ import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
-    id("kotlin-parcelize")
-    id("com.google.protobuf") version (libs.versions.protobufPlugin)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.hilt)
+    id("kotlin-parcelize")
+    alias(libs.plugins.protobuf)
     id("com.google.gms.google-services")
     id("com.google.firebase.appdistribution")
     id("com.google.firebase.crashlytics")
-    kotlin("kapt")
+    alias(libs.plugins.play.publisher)
 }
 
 if (JavaVersion.current() < JavaVersion.VERSION_17) {
@@ -111,7 +111,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.5"
     }
     packaging {
         resources {
@@ -140,7 +140,6 @@ dependencies {
     implementation(libs.appauth)
     implementation(libs.simpleframework.xml.parser)
 
-    //Moshi dependency for parsing with ksp i.s.o. kapt
     implementation(libs.moshi.moshi)
     ksp(libs.moshi.codegen)
 
@@ -172,7 +171,7 @@ dependencies {
 
     //Hilt dependencies
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     //Compose debug/tool preview
     debugImplementation(libs.androidx.compose.debug.ui.tooling)
