@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam
 
+import android.content.Intent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,5 +10,5 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
-    var openedAppWithOrganizationState by mutableStateOf<String?>(null)
+    var openIntent by mutableStateOf<Intent?>(null)
 }

@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import app.eduroam.geteduroam.config.WifiConfigScreen
 import app.eduroam.geteduroam.config.WifiConfigViewModel
 import app.eduroam.geteduroam.oauth.OAuthScreen
@@ -17,18 +18,25 @@ import app.eduroam.geteduroam.organizations.SelectOrganizationScreen
 import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.geteduroam.profile.SelectProfileViewModel
+import timber.log.Timber
 
+const val BASE_URI = "https://eduroam.org"
 @Composable
 fun MainGraph(
     mainViewModel: MainViewModel,
     navController: NavHostController = rememberNavController(),
     closeApp: () -> Unit
 ) {
-    LaunchedEffect(mainViewModel.openedAppWithOrganizationState) {
-        val id = mainViewModel.openedAppWithOrganizationState ?: return@LaunchedEffect
-        navController.navigate(Route.SelectProfile.encodeArgument(id))
+    LaunchedEffect(mainViewModel.openIntent) {
+        val intentUri = mainViewModel.openIntent?.data ?: return@LaunchedEffect
+        try {
+            navController.navigate(intentUri)
+        } catch (ex: Exception) {
+            Timber.w(ex, "Could not navigate to deeplink: $intentUri")
+        }
+        // Make sure we don't consume the URI twice:
+        mainViewModel.openIntent?.data = null
     }
-
     NavHost(
         navController = navController, startDestination = Route.SelectInstitution.route
     ) {
@@ -62,6 +70,9 @@ fun MainGraph(
         composable(
             route = Route.SelectProfile.routeWithArgs,
             arguments = Route.SelectProfile.arguments,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = Route.SelectProfile.deepLinkUrl
+            })
         ) { entry ->
             val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
             SelectProfileScreen(

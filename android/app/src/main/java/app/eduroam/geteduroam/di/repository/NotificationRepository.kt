@@ -2,7 +2,6 @@ package app.eduroam.geteduroam.di.repository
 
 import android.Manifest
 import android.app.AlarmManager
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,12 +11,14 @@ import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import app.eduroam.geteduroam.MainActivity
 import app.eduroam.geteduroam.R
+import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.model.EAPIdentityProvider
 import app.eduroam.geteduroam.config.requiresUsernamePrompt
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,9 +31,9 @@ class NotificationRepository(
 ){
 
     companion object {
+        const val NOTIFICATION_KEY_PROVIDER_ID = "provider_id"
         const val NOTIFICATION_CHANNEL_ID = "reconfiguration_reminders"
         const val REMIND_DAYS_BEFORE_EXPIRY = 5
-        const val NOTIFICATION_KEY_PROVIDER_ID = "provider_id"
         const val NOTIFICATION_ID = 100
     }
 
@@ -67,7 +68,7 @@ class NotificationRepository(
 
     private fun postNotificationAtDate(reminderDate: Date, provider: EAPIdentityProvider) {
         val intent = Intent(context, NotificationAlarmReceiver::class.java)
-        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, provider.ID )
+        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, provider.ID)
         val pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val alarmManager = context.applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.set(AlarmManager.RTC_WAKEUP, reminderDate.time, pendingIntent)
@@ -91,7 +92,9 @@ class NotificationAlarmReceiver : BroadcastReceiver() {
             return
         }
         val tapResultIntent = Intent(context, MainActivity::class.java)
-        tapResultIntent.putExtra(NotificationRepository.NOTIFICATION_KEY_PROVIDER_ID, intent?.getStringExtra(NotificationRepository.NOTIFICATION_KEY_PROVIDER_ID))
+        intent?.getStringExtra(NotificationRepository.NOTIFICATION_KEY_PROVIDER_ID)?.let {
+            tapResultIntent.data = Uri.parse(Route.SelectProfile.buildDeepLink(it))
+        }
         tapResultIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingIntent: PendingIntent = getActivity( context, 0, tapResultIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 

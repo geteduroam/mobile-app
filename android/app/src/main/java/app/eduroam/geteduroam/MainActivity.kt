@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.AppTheme
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,7 +20,6 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
-
         setContent {
             viewModel = hiltViewModel()
             AppTheme {
@@ -45,9 +41,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val providerId = intent?.getStringExtra(NotificationRepository.NOTIFICATION_KEY_PROVIDER_ID)
-        if (providerId != null) {
-            viewModel.openedAppWithOrganizationState = providerId
-        }
+        viewModel.openIntent = intent
     }
 }
