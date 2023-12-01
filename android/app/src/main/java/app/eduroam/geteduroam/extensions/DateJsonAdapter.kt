@@ -31,6 +31,8 @@ class DateJsonAdapter : JsonAdapter<Date>() {
     override fun toJson(writer: JsonWriter, value: Date?) {
         if (value != null) {
             writer.value(SERVER_DATE_FORMAT.format(value))
+        } else {
+            writer.nullValue()
         }
     }
 }
