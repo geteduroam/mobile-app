@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSuggestion
+import android.net.wifi.hotspot2.PasspointConfiguration
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -44,12 +45,30 @@ class WifiConfigViewModel @Inject constructor(
         launch.value = null
 
         when {
-            //Android 11 and higher - API 30 - we only show intent on ChromeOS
+            //Android 11 and higher - API 30 - ChromeOS - we show everything in one intent
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
                 handleAndroid11ChromeOs()
             }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                // We will use Intent for SSID, and Suggestion for Passpoint.
+                // It would've been possible to use Intent for both SSID and Passpoint,
+                // but we can never remove intents for Passpoint.
+                // Android will overwrite existing intents if it considers the new Passpoint configuration similar enough,
+                // but it considers the certificate (among other things) in checking for equality, so "similar" is too high a bar.
+                // For SSIDs it works well, it's considered equal if the SSID matches.
+                // This is why we use intents for SSIDs and suggestions for Passpoint.
+
+                // We don't use suggestions for SSIDs (if we can avoid it) because it would confuse users;
+                // suggestions are prioritized under user-configured (e.g. has ever connected to) networks,
+                // which includes any onboarding guest network, nearby Starbucks and lab-raspberry-pi setup.
+                // Worse, when the user does notice this and explicitly wants to connect to eduroam,
+                // the network appears unconfigured in the Wi-Fi picker.
+                // This would confuse both users and help desks.
+                handleAndroid11PhoneOrTablet(context)
+            }
             //Android 10 - API 29
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                // Not using intent, only suggestions, since the API is not available
                 if (hasPermission(context)) {
                     handleAndroid10WifiConfig(context)
                 } else {
@@ -63,11 +82,74 @@ class WifiConfigViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun removeNetworks(context: Context) {
+        val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        // Empty list removes all networks
+        wifiManager.removeNetworkSuggestions(emptyList<WifiNetworkSuggestion>())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun removeNetworks(context: Context, vararg ssids: String) {
+        val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (ssids.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val suggestions: MutableList<WifiNetworkSuggestion> = wifiManager.networkSuggestions
+            for (suggestion in suggestions) {
+                for (ssid in ssids) {
+                    if (ssid == suggestion.ssid) break
+                }
+                suggestions.remove(suggestion)
+            }
+            wifiManager.removeNetworkSuggestions(suggestions)
+        } else {
+            removeNetworks(context)
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.R)
     private fun handleAndroid11ChromeOs() {
+        // We don't remove networks here, because networks added by an intent cannot be removed.
         val suggestions = eapIdentityProviderList.buildAllNetworkSuggestions()
         val intent = createSuggestionsIntent(suggestions = suggestions)
         intentWithSuggestions.value = intent
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun handleAndroid11PhoneOrTablet(context: Context) {
+        val suggestions = eapIdentityProviderList.buildSSIDSuggestions()
+        val intent = createSuggestionsIntent(suggestions = suggestions)
+        intentWithSuggestions.value = intent
+        val passPointSuggestion = eapIdentityProviderList.buildPasspointSuggestion()
+        if (passPointSuggestion != null) {
+            removeNetworks(context)
+            val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            try {
+                val status = wifiManager.addNetworkSuggestions(listOf(passPointSuggestion))
+                Timber.e("Status for adding network: $status")
+            } catch (e: Exception) {
+                progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
+                Timber.e(e, "Failed to add network suggestion")
+            }
+        }
+        processing.value = false
+    }
+
+    private fun PasspointConfiguration.install(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            throw RuntimeException("This method should not be called on this device! Use buildPasspointSuggestion()!")
+        } else {
+            try {
+                val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                @Suppress("DEPRECATION")
+                wifiManager.removePasspointConfiguration(this.homeSp.fqdn)
+                wifiManager.addOrUpdatePasspointConfiguration(this)
+            } catch (e: IllegalArgumentException) {
+                // Can throw when configuration is wrong or device does not support Passpoint
+                // while we did encounter a few devices without Passpoint support.
+                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+                Timber.e(e, "Failed to add or update Passpoint config")
+            }
+        }
     }
 
     /**
@@ -78,13 +160,8 @@ class WifiConfigViewModel @Inject constructor(
         val ssidSuggestions = eapIdentityProviderList.buildSSIDSuggestions()
         val wifiManager: WifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-        try {
-            wifiManager.removeNetworkSuggestions(ssidSuggestions)
-        } catch (e: Exception) {
-            progressMessage.value = "Failed to remove WiFi Suggestions. Exception: ${e.message}"
-            Timber.e(e, "Failed to clear previously added network suggestions")
-        }
+        val ssids = eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.credentialApplicability?.mapNotNull { it.ssid } ?: emptyList()
+        removeNetworks(context, *ssids.toTypedArray())
 
         try {
             val status = wifiManager.addNetworkSuggestions(ssidSuggestions)
@@ -95,16 +172,14 @@ class WifiConfigViewModel @Inject constructor(
         }
 
         val passpointConfig = eapIdentityProviderList.buildPasspointConfig()
-        if (passpointConfig != null) {
-            try {
-                wifiManager.addOrUpdatePasspointConfiguration(passpointConfig)
-            } catch (e: IllegalArgumentException) {
-                // Can throw when configuration is wrong or device does not support Passpoint
-                // while we did encounter a few devices without Passpoint support.
-                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
-                Timber.e(e, "Failed to add or update Passpoint config")
+        try {
+            passpointConfig?.install(context)
+        } catch (e: IllegalArgumentException) {
+            // Can throw when configuration is wrong or device does not support Passpoint
+            // while we did encounter a few devices without Passpoint support.
+            progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+            Timber.e(e, "Failed to add or update Passpoint config")
 
-            }
         }
         processing.value = false
     }
@@ -133,18 +208,7 @@ class WifiConfigViewModel @Inject constructor(
                 Log.e("WifiConfigViewModel", "Failed to add/connect WifiConfiguration", e)
             }
         }
-
-        if (passpointConfig != null) {
-            try {
-                wifiManager.addOrUpdatePasspointConfiguration(passpointConfig)
-            } catch (e: IllegalArgumentException) {
-                // Can throw when configuration is wrong or device does not support Passpoint
-                // while we did encounter a few devices without Passpoint support.
-                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
-                Log.e("WifiConfigViewModel", "Failed to Passpoint", e)
-
-            }
-        }
+        passpointConfig?.install(context)
         processing.value = false
     }
 
