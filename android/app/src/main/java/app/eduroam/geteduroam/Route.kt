@@ -7,11 +7,8 @@ import androidx.navigation.navArgument
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import java.net.URLDecoder
-import java.net.URLEncoder
 import java.util.Date
 
 
@@ -27,9 +24,9 @@ sealed class Route(val route: String) {
                 defaultValue = ""
             },
         )
-
-        fun encodeArgument(id: String) =
-            "$route/${URLEncoder.encode(id, Charsets.UTF_8.toString())}"
+        val deepLinkUrl = "$BASE_URI/${route}/{${institutionIdArg}}"
+        fun buildDeepLink(institutionId: String) =  "$BASE_URI/${route}/${Uri.encode(institutionId)}"
+        fun encodeArgument(id: String) = "$route/${Uri.encode(id)}"
     }
 
     object OAuth : Route(route = "oauth_prompt") {

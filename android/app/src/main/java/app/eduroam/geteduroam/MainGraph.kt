@@ -1,14 +1,14 @@
 package app.eduroam.geteduroam
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import app.eduroam.geteduroam.config.WifiConfigScreen
 import app.eduroam.geteduroam.config.WifiConfigViewModel
 import app.eduroam.geteduroam.oauth.OAuthScreen
@@ -18,17 +18,12 @@ import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.geteduroam.profile.SelectProfileViewModel
 
+const val BASE_URI = "https://eduroam.org"
 @Composable
 fun MainGraph(
-    mainViewModel: MainViewModel,
     navController: NavHostController = rememberNavController(),
     closeApp: () -> Unit
-) {
-    LaunchedEffect(mainViewModel.openedAppWithOrganizationState) {
-        val id = mainViewModel.openedAppWithOrganizationState ?: return@LaunchedEffect
-        navController.navigate(Route.SelectProfile.encodeArgument(id))
-    }
-
+) : NavController {
     NavHost(
         navController = navController, startDestination = Route.SelectInstitution.route
     ) {
@@ -62,6 +57,9 @@ fun MainGraph(
         composable(
             route = Route.SelectProfile.routeWithArgs,
             arguments = Route.SelectProfile.arguments,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = Route.SelectProfile.deepLinkUrl
+            })
         ) { entry ->
             val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
             SelectProfileScreen(
@@ -98,4 +96,5 @@ fun MainGraph(
             )
         }
     }
+    return navController
 }
