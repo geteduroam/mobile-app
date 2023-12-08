@@ -1,10 +1,9 @@
 package app.eduroam.geteduroam
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,25 +17,13 @@ import app.eduroam.geteduroam.organizations.SelectOrganizationScreen
 import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.geteduroam.profile.SelectProfileViewModel
-import timber.log.Timber
 
 const val BASE_URI = "https://eduroam.org"
 @Composable
 fun MainGraph(
-    mainViewModel: MainViewModel,
     navController: NavHostController = rememberNavController(),
     closeApp: () -> Unit
-) {
-    LaunchedEffect(mainViewModel.openIntent) {
-        val intentUri = mainViewModel.openIntent?.data ?: return@LaunchedEffect
-        try {
-            navController.navigate(intentUri)
-        } catch (ex: Exception) {
-            Timber.w(ex, "Could not navigate to deeplink: $intentUri")
-        }
-        // Make sure we don't consume the URI twice:
-        mainViewModel.openIntent?.data = null
-    }
+) : NavController {
     NavHost(
         navController = navController, startDestination = Route.SelectInstitution.route
     ) {
@@ -109,4 +96,5 @@ fun MainGraph(
             )
         }
     }
+    return navController
 }

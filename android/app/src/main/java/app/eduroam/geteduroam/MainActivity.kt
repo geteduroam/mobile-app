@@ -7,13 +7,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private lateinit var viewModel: MainViewModel
+    private var navController: NavController? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -21,26 +25,22 @@ class MainActivity : ComponentActivity() {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         setContent {
-            viewModel = hiltViewModel()
             AppTheme {
-                MainGraph(
-                    mainViewModel = viewModel,
+                navController = MainGraph(
                     closeApp = {
                         this@MainActivity.finish()
                     })
             }
-            handleIntent(intent)
+        }
+        runOnUiThread {
+            navController?.handleDeepLink(intent)
         }
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         runOnUiThread {
-            handleIntent(intent)
+            navController?.handleDeepLink(intent)
         }
-    }
-
-    private fun handleIntent(intent: Intent?) {
-        viewModel.openIntent = intent
     }
 }
