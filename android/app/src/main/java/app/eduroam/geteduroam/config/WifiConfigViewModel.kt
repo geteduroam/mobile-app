@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.ui.theme.IS_EDUROAM
 import app.eduroam.geteduroam.ui.theme.isChromeOs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,7 @@ class WifiConfigViewModel @Inject constructor(
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
                 handleAndroid11ChromeOs()
             }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM -> {
                 // We will use Intent for SSID, and Suggestion for Passpoint.
                 // It would've been possible to use Intent for both SSID and Passpoint,
                 // but we can never remove intents for Passpoint.
