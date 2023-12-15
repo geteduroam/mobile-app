@@ -97,7 +97,7 @@ fun MainGraph(
                 viewModel,
                 closeApp = closeApp,
                 goBack = {
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             )
         }

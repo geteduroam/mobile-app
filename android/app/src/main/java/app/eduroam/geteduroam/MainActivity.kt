@@ -20,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
@@ -64,7 +65,9 @@ class MainActivity : ComponentActivity() {
                 CoroutineScope(coroutineContext).launch {
                     Route.ConfigureWifi.buildDeepLink(this@MainActivity, intent.data!!)?.let {
                         intent.data = Uri.parse(it)
-                        navController?.handleDeepLink(intent)
+                        withContext(Dispatchers.Main) {
+                            navController?.handleDeepLink(intent)
+                        }
                     }
                 }
             } else {
