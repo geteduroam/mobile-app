@@ -15,6 +15,7 @@ import app.eduroam.geteduroam.config.model.bestMethod
 import app.eduroam.geteduroam.config.requiresUsernamePrompt
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
+import app.eduroam.geteduroam.models.OrganizationResult
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,9 +58,18 @@ class SelectProfileViewModel @Inject constructor(
 
     private fun loadData() = viewModelScope.launch {
         uiState = uiState.copy(inProgress = true)
-        val response = api.getOrganizations()
-        val institutionResult = response.body()
-        if (response.isSuccessful && institutionResult != null) {
+        var responseError: String? = null
+        val institutionResult: OrganizationResult? = try {
+            val response = api.getOrganizations()
+            if (!response.isSuccessful) {
+                responseError = "${response.code()}/${response.message()}]${response.errorBody()?.string()}"
+            }
+            response.body()
+        } catch (ex: Exception) {
+            Timber.w(ex, "Could not fetch organizations!")
+            null
+        }
+        if (institutionResult != null) {
             val selectedInstitution = institutionResult.instances.find { it.id == organizationId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
@@ -91,16 +101,13 @@ class SelectProfileViewModel @Inject constructor(
                 )
             }
         } else {
-            val failReason = "${response.code()}/${response.message()}]${
-                response.errorBody()?.string()
-            }"
-            Timber.e("Failed to load institutions: $failReason")
+            Timber.e("Failed to load institutions: $responseError")
             uiState = uiState.copy(
                 inProgress = false,
                 errorData = ErrorData(
                     titleId = R.string.err_title_generic_fail,
                     messageId = R.string.err_msg_generic_unexpected_with_arg,
-                    messageArg = failReason
+                    messageArg = responseError
                 )
             )
 
