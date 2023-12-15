@@ -18,6 +18,7 @@ data class Profile(
     val authorizationEndpoint: String? = null,
     @Json(name = "token_endpoint")
     val tokenEndpoint: String? = null,
+    val redirect: String? = null
 ) : Parcelable {
     fun createConfiguration() : Configuration {
         return Configuration(

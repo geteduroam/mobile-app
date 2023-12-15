@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +68,7 @@ fun SelectProfileScreen(
     onBackClicked = goToPrevious
 ) { paddingValues ->
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val uriHandler = LocalUriHandler.current
     val currentGotoOauth by rememberUpdatedState(newValue = goToOAuth)
 
     LaunchedEffect(viewModel, lifecycle) {
@@ -94,6 +96,14 @@ fun SelectProfileScreen(
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
                 val providerList = state.goToConfigScreenWithProviderList!!
                 goToConfigScreen(providerList)
+            }
+    }
+
+    LaunchedEffect(viewModel, lifecycle) {
+        snapshotFlow { viewModel.uiState }.distinctUntilChanged()
+            .filter { it.openUrlInBrowser != null }.flowWithLifecycle(lifecycle).collect { state ->
+                uriHandler.openUri(state.openUrlInBrowser!!)
+                viewModel.didOpenBrowserForRedirect()
             }
     }
 
