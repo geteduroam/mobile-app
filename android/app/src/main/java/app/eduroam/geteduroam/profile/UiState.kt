@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.profile
 
+import android.net.Uri
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.config.model.Helpdesk
 import app.eduroam.geteduroam.config.model.ProviderInfo
@@ -17,7 +18,8 @@ data class UiState(
     val checkProfileWhenResuming: Boolean = false,
     val showTermsOfUseDialog: Boolean = false,
     val showUsernameDialog: Boolean = false,
-    val goToConfigScreenWithProviderList: EAPIdentityProviderList? = null
+    val goToConfigScreenWithProviderList: EAPIdentityProviderList? = null,
+    val openUrlInBrowser: String? = null
 )
 
 data class PresentProfile(val profile: Profile, val isSelected: Boolean = false)

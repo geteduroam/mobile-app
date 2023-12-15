@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.profile
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -161,10 +162,16 @@ class SelectProfileViewModel @Inject constructor(
                     getEapFrom(profile.eapconfigEndpoint, null)
                 }
             }
+        } else if (!profile.redirect.isNullOrEmpty()) {
+            uiState = uiState.copy(
+                inProgress = false,
+                openUrlInBrowser = profile.redirect
+            )
         } else {
             Timber.e("Missing EAP endpoint in profile configuration. Cannot continue with selected profile.")
             uiState = uiState.copy(
-                inProgress = false, errorData = ErrorData(
+                inProgress = false,
+                errorData = ErrorData(
                     titleId = R.string.err_title_generic_fail,
                     messageId = R.string.err_msg_missing_eap_endpoint
                 )
@@ -276,6 +283,11 @@ class SelectProfileViewModel @Inject constructor(
     fun setOAuthFlowStarted() {
         uiState = uiState.copy(promptForOAuth = false, checkProfileWhenResuming = true)
     }
+
+    fun didOpenBrowserForRedirect() {
+        uiState = uiState.copy(openUrlInBrowser = null)
+    }
+
 
     suspend fun checkIfCurrentProfileHasAccess() {
         val profile = if (uiState.profiles.size == 1) {
