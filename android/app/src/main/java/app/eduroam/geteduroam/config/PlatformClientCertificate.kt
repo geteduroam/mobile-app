@@ -29,9 +29,12 @@ import java.util.*
     NoSuchAlgorithmException::class,
     UnrecoverableKeyException::class
 )
-fun ClientSideCredential.getClientCertificate(
-): Map.Entry<PrivateKey, Array<X509Certificate>> {
+fun ClientSideCredential.getClientCertificate(): Map.Entry<PrivateKey, Array<X509Certificate>>? {
     try {
+        val certificateBytes = clientCertificate?.value
+        if (certificateBytes.isNullOrEmpty()) {
+            return null
+        }
         val bytes = Base64.decode(clientCertificate?.value, Base64.NO_WRAP)
         val passphraseBytes = passphrase?.toCharArray() ?: CharArray(0)
         val pkcs12ks = KeyStore.getInstance("pkcs12")
