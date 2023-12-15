@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Benvingut/da</string>
+    <string name="organizations_no_results">No s\'ha pogut trobar cap organització.</string>
+    <string name="organization_search_text">Cerqueu la vostra organització</string>
+    <string name="institutions_choose_one">Seleccioneu la institució a la qual voleu connectar-vos.</string>
+    <string name="profiles_title">Perfils</string>
+    <string name="profiles_header">Seleccioneu un perfil</string>
+    <string name="configuration_progress">Establint connexió WiFi</string>
+    <string name="configuration_success">WiFi configurat</string>
+    <string name="configuration_logs">Missatges de registre:</string>
+    <string name="configuration_canceled">Cancel·lat</string>
+    <string name="configuration_completed">Completat</string>
+    <string name="login_dialog_title">Login necessari</string>
+    <string name="login_dialog_text">Si us plau, introduïu el vostre nom d\'usuari i contrasenya.</string>
+    <string name="login_dialog_username">Nom d\'usuari</string>
+    <string name="login_dialog_password">Contrasenya</string>
+    <string name="login_dialog_cancel">Cancel·la</string>
+    <string name="login_dialog_login">Iniciar sessió</string>
+    <string name="terms_of_use_dialog_title">Termes d\'ús</string>
+    <string name="terms_of_use_dialog_text">Heu d\'acceptar els termes d\'ús abans de poder utilitzar aquesta xarxa.</string>
+    <string name="terms_of_use_dialog_agree">Acceptar</string>
+    <string name="terms_of_use_dialog_disagree">Rebutjar</string>
+
+    <string name="err_title_auth_unexpected_fail">Error inesperat</string>
+    <string name="err_msg_auth_init_fail">No s\'ha pogut inicialitzar AppData. Si us plau, torneu-ho a intentar.</string>
+    <string name="err_msg_auth_init_fail_arg">No s\'ha pogut inicialitzar AppData. Motiu: %s</string>
+    <string name="err_title_auth_invalid">Autorització no vàlida</string>
+    <string name="err_msg_auth_invalid">No s\'ha rebut una autenticació vàlida.</string>
+    <string name="err_title_auth_failed">Autorització fallida</string>
+    <string name="err_msg_auth_failed">No s\'ha conservat cap estat d\'autorització: es requereix una nova autorització.</string>
+    <string name="err_msg_auth_token_failed">L\'intercanvi de codi del token d\'autorització ha fallat.</string>
+    <string name="err_msg_auth_code_failed_arg">L\'intercanvi del codi d\'autorització ha fallat: %s.</string>
+    <string name="err_title_generic_fail">No es pot completar la sol·licitud</string>
+    <string name="err_msg_generic_unexpected_with_arg">Error inesperat: %s, si us plau, torneu-ho a intentar.</string>
+    <string name="err_msg_invalid_organization_id">Id d\'organització no vàlid. No es pot continuar per a l\'organització seleccionada.</string>
+    <string name="err_msg_cannot_find_organization">No es pot trobar l\'organització amb l\'identificador %s.</string>
+    <string name="err_msg_missing_eap_endpoint">El perfil seleccionat no té un punt final EAP.</string>
+    <string name="err_msg_no_valid_provider">No s\'ha trobat cap proveïdor EAP vàlid.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Autentiqueu-vos</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Autentiqueu-vos amb el vostre compte per obtenir la configuració del vostre wifi.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Processant...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Reintentar</string>
+    <string name="button_connect">CONNECTAR</string>
+    <string name="button_back">Enrere</string>
+    <string name="button_close_app">Tancar l\'aplicació</string>
+
+    <string name="content_description_provider_logo">Logotip del proveïdor</string>
+    <string name="content_description_success_checkmark">Èxit en la marca de verificació</string>
+
+    <string name="helpdesk_title">Servei d\'assistència técnica</string>
+
+    <string name="username_password_login_required">Login necessari</string>
+    <string name="username_password_please_enter">Si us plau, introduïu el vostre nom d\'usuari i contrasenya.</string>
+    <string name="username_password_label_username">Nom d\'usuari</string>
+    <string name="username_password_label_password">Contrasenya</string>
+    <string name="username_password_button_cancel">Cancel·la</string>
+    <string name="username_password_button_log_in">Iniciar sessió</string>
+
+    <string name="username_password_placeholder_username_example_suffix">exemple.com</string>
+    <string name="username_password_placeholder_username_before_suffix">nom d\'usuari</string>
+    <string name="username_password_accessibility_hide_password">Amagar contrasenya</string>
+    <string name="username_password_accessibility_show_password">Mostrar contrasenya</string>
+    <string name="notification_channel_description">Avisar quan la teva configuració sigui a punt de caducar.</string>
+    <string name="notification_channel_name">Recordatoris de reconfiguració</string>
+    <string name="notification_title">Reconfigura %s</string>
+    <string name="notification_message">Queden %1$d dies perquè el teu perfil de %2$s expiri, fes clic per reconfigurar-lo.</string>
+</resources>

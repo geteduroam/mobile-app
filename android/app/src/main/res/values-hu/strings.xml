@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Üdvözlet</string>
+    <string name="organizations_no_results">Nem találom a  szervezetet.</string>
+    <string name="organization_search_text">Intézmény keresés</string>
+    <string name="institutions_choose_one">Válaszd ki azt az intézményt amelyhez csatlkozol.</string>
+    <string name="profiles_title">Profilok</string>
+    <string name="profiles_header">Válaszd ki a profile-t</string>
+    <string name="configuration_progress">WiFi kapcsolat létrehozása</string>
+    <string name="configuration_success">WiFi konfiguráció kész</string>
+    <string name="configuration_logs">Log üzenet</string>
+    <string name="configuration_canceled">Törlés</string>
+    <string name="configuration_completed">Kész</string>
+    <string name="login_dialog_title">Belépés szükséges</string>
+    <string name="login_dialog_text">Írd be a felhasználó neved és jelszavad</string>
+    <string name="login_dialog_username">Felhasználói név</string>
+    <string name="login_dialog_password">Jelszó</string>
+    <string name="login_dialog_cancel">Töröl</string>
+    <string name="login_dialog_login">Belépés</string>
+    <string name="terms_of_use_dialog_title">Felhasználási feltételek</string>
+    <string name="terms_of_use_dialog_text">Hagyd jóvá a felhasználási feltételeket, mielőtt csatlkozol a hálózarthoz.</string>
+    <string name="terms_of_use_dialog_agree">Elfogadom</string>
+    <string name="terms_of_use_dialog_disagree">Elutasítom</string>
+
+    <string name="err_title_auth_unexpected_fail">Ismeretlen hiba</string>
+    <string name="err_msg_auth_init_fail">Az AppData inicializálása nem sikerrült. Próbáld újra.</string>
+    <string name="err_msg_auth_init_fail_arg">Az AppData inicializálása nem sikerrült.: Hiba ok%s</string>
+    <string name="err_title_auth_invalid">Érvénytelen jogosultság.</string>
+    <string name="err_msg_auth_invalid">Nem sikerült az azonosítás/belépés.</string>
+    <string name="err_title_auth_failed"> Jogosultság ellenőrzés sikertelen.</string>
+    <string name="err_msg_auth_failed">Jogosultság információ nem érkezett meg. Meg kell ismételni a jogosultság ellenőrzést.</string>
+    <string name="err_msg_auth_token_failed">Jogosultság ellenőrzési token csere nem sikerült.</string>
+    <string name="err_msg_auth_code_failed_arg">ogosultság ellenőrzési token csere nem sikerült. %s.</string>
+    <string name="err_title_generic_fail">Nem tudom a kérést végrehajtani.</string>
+    <string name="err_msg_generic_unexpected_with_arg">Váralan hiba: %s, próbáld újra</string>
+    <string name="err_msg_invalid_organization_id">Érvényelen intézmény azonosító. Nem lehetséges ezzel az intéménnyel tovább lépni.</string>
+    <string name="err_msg_cannot_find_organization">Nem találok intézményt %s azonosítóval.</string>
+    <string name="err_msg_missing_eap_endpoint">A kiválasztott profile-hoz nincsen EAP konfiguráció.</string>
+    <string name="err_msg_no_valid_provider">Nem találtam megfelelő EAP beállítást.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Azonosítás</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Lépjj be az azonosíróddal, hogy be tudjuk állítani a WiFi-t</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Dolgozom...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Újra</string>
+    <string name="button_connect">KAPCSOLÓDÁS</string>
+    <string name="button_back">Vissza</string>
+    <string name="button_close_app">Bezárás</string>
+
+    <string name="content_description_provider_logo">Szolgáltató logó</string>
+    <string name="content_description_success_checkmark">Sikerül pipa</string>
+
+    <string name="helpdesk_title">Ügyfélszolgáltat</string>
+
+    <string name="username_password_login_required">Belépés szükséges</string>
+    <string name="username_password_please_enter">Írd be a felhasználói neved és jelszavas</string>
+    <string name="username_password_label_username">Felhasználói név</string>
+    <string name="username_password_label_password">Jelszó</string>
+    <string name="username_password_button_cancel">Törlés</string>
+    <string name="username_password_button_log_in">Belépés</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">felhasználói név</string>
+    <string name="username_password_accessibility_hide_password">Rejtsd el a jelszót</string>
+    <string name="username_password_accessibility_show_password">Mutasd a jelszót</string>
+    <string name="notification_channel_description">Emlékeztess, ha hamarosan lejár a WiFi konfigurációm</string>
+    <string name="notification_channel_name">Újra konfigurációs emlékeztető</string>
+    <string name="notification_title"> %s Újra konfigurálása</string>
+    <string name="notification_message">%1$d nap múlva lejárt  %2$s profile-od, Kattins az újra konfiguráciértt</string>
+</resources>
