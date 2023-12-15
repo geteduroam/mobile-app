@@ -172,15 +172,17 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
     enterpriseConfig.phase2Method = WifiEnterpriseConfig.Phase2.NONE
     val clientCert =
         eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.getClientCertificate()
-    enterpriseConfig.setClientKeyEntry(
-        clientCert!!.key, clientCert.value[0]
-    )
+    if (clientCert?.key != null) {
+        enterpriseConfig.setClientKeyEntry(
+            clientCert.key, clientCert.value[0]
+        )
+    }
     // For TLS, "identity" is used for outer identity,
     // while for PEAP/TTLS, "identity" is the inner identity,
     // and anonymousIdentity is the outer identity
     // - so we have to do some weird shuffling here.
     val anonymousIdentity =
-        eapIdentityProvider.authenticationMethod?.bestMethod()?.clientSideCredential?.outerIdentity
+        eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.outerIdentity
     enterpriseConfig.identity = anonymousIdentity
 }
 
@@ -246,11 +248,13 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
             val certCred = Credential.CertificateCredential()
             val clientCert =
                     eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.getClientCertificate()
-            certCred.certType = "x509v3"
-            cred.clientPrivateKey = clientCert?.key!!
-            cred.clientCertificateChain = clientCert.value
-            certCred.certSha256Fingerprint = getFingerprint(clientCert.value[0])
-            cred.certCredential = certCred
+            if (clientCert?.key != null) {
+                certCred.certType = "x509v3"
+                cred.clientPrivateKey = clientCert.key
+                cred.clientCertificateChain = clientCert.value
+                certCred.certSha256Fingerprint = getFingerprint(clientCert.value[0])
+                cred.certCredential = certCred
+            }
         }
 
         Eap.PWD -> {

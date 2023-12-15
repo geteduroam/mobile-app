@@ -2,6 +2,7 @@ package app.eduroam.geteduroam.config.model
 
 import android.net.wifi.WifiEnterpriseConfig
 import app.eduroam.geteduroam.config.convertEAPMethod
+import app.eduroam.geteduroam.config.getClientCertificate
 import com.squareup.moshi.JsonClass
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
@@ -27,11 +28,10 @@ class AuthenticationMethod {
 fun List<AuthenticationMethod>.bestMethod(): AuthenticationMethod? {
     return firstOrNull {
         val method = it.eapMethod?.type?.toInt()?.convertEAPMethod()
-        method == WifiEnterpriseConfig.Eap.TLS
-    } ?:
-    firstOrNull {
-        val method = it.eapMethod?.type?.toInt()?.convertEAPMethod()
-        method == WifiEnterpriseConfig.Eap.PEAP || method == WifiEnterpriseConfig.Eap.TTLS|| method == WifiEnterpriseConfig.Eap.PWD
+        method == WifiEnterpriseConfig.Eap.PEAP ||
+                method == WifiEnterpriseConfig.Eap.TTLS ||
+                method == WifiEnterpriseConfig.Eap.PWD ||
+                (method == WifiEnterpriseConfig.Eap.TLS && it.clientSideCredential?.getClientCertificate()!= null)
     } ?:
     firstOrNull()
 }
