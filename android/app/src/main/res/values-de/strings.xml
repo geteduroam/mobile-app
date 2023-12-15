@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Willkommen</string>
+    <string name="organizations_no_results">Keine Organisationen gefunden.</string>
+    <string name="organization_search_text">Suchen Sie nach Ihrer Organisation</string>
+    <string name="institutions_choose_one">Wählen Sie die Organisation aus, mit der Sie sich verbinden wollen</string>
+    <string name="profiles_title">Profile</string>
+    <string name="profiles_header">Wählen Sie ein Profil aus</string>
+    <string name="configuration_progress">WLAN-Verbindung wird hergestellt</string>
+    <string name="configuration_success">WLAN konfiguriert</string>
+    <string name="configuration_logs">Logeinträge:</string>
+    <string name="configuration_canceled">Abgebrochen</string>
+    <string name="configuration_completed">Fertig</string>
+    <string name="login_dialog_title">Einloggen erforderlich</string>
+    <string name="login_dialog_text">Bitte geben Sie Ihren Benutzernamen und Passwort ein</string>
+    <string name="login_dialog_username">Benutzername</string>
+    <string name="login_dialog_password">Passwort</string>
+    <string name="login_dialog_cancel">Abbrechen</string>
+    <string name="login_dialog_login">Einloggen</string>
+    <string name="terms_of_use_dialog_title">Nutzungsbedingungen</string>
+    <string name="terms_of_use_dialog_text">SIe müssen den Nutzungsbedingungen zustimmen, bevor Sie das Netz nutzen können</string>
+    <string name="terms_of_use_dialog_agree">Einverstanden</string>
+    <string name="terms_of_use_dialog_disagree">Ablehnen</string>
+
+    <string name="err_title_auth_unexpected_fail">Unerwarteter Fehler</string>
+    <string name="err_msg_auth_init_fail">Fehler beim Initialisieren der AppData. Bitte erneut versuchen.</string>
+    <string name="err_msg_auth_init_fail_arg">Fehler beim Initialisieren der AppData. Grund: %s</string>
+    <string name="err_title_auth_invalid">Autorisierung ungültig</string>
+    <string name="err_msg_auth_invalid">Keine gültige Authentifizierung empfangen.</string>
+    <string name="err_title_auth_failed">Autorisierung fehlgeschlagen</string>
+    <string name="err_msg_auth_failed">Autorisierungsstatus verloren - neue Autorisierung erforderlich.</string>
+    <string name="err_msg_auth_token_failed">Fehler beim Austausch des Autorisierungsdokuments.</string>
+    <string name="err_msg_auth_code_failed_arg">Austausch des Autorisierungcodes fehlgeschlagen: %s.</string>
+    <string name="err_title_generic_fail">Anfrage konnte nicht abgeschlossen werden</string>
+    <string name="err_msg_generic_unexpected_with_arg">Unerwarteter Fehler: %s, bitte erneut versuchen.</string>
+    <string name="err_msg_invalid_organization_id">Ungültige Organisationsnummer. Mit dieser Organisation kann der Prozess nicht fortgesetzt werden.</string>
+    <string name="err_msg_cannot_find_organization">Organisation mit Nummer %s nicht gefunden.</string>
+    <string name="err_msg_missing_eap_endpoint">Im Profil fehlt der EAP Endpunkt.</string>
+    <string name="err_msg_no_valid_provider">Kein gültiger EAP Provider gefunden.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Einloggen</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Loggen Sie sich in Ihr Konto ein um die WLAN Konfiguration zu bekommen.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Verarbeitung...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Erneut versuchen</string>
+    <string name="button_connect">VERBINDEN</string>
+    <string name="button_back">Zurück</string>
+    <string name="button_close_app">App schließen</string>
+
+    <string name="content_description_provider_logo">Logo der Organisation</string>
+    <string name="content_description_success_checkmark">Sinnbild für Erfolg</string>
+
+    <string name="helpdesk_title">Hilfe erhältlich bei</string>
+
+    <string name="username_password_login_required">Einloggen erforderlich</string>
+    <string name="username_password_please_enter">Bitte geben Sie Ihren Benutzernamen und Passwort ein.</string>
+    <string name="username_password_label_username">Benutzername</string>
+    <string name="username_password_label_password">Passwort</string>
+    <string name="username_password_button_cancel">Abbrechen</string>
+    <string name="username_password_button_log_in">Einloggen</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">benutzername</string>
+    <string name="username_password_accessibility_hide_password">Passwort verstecken</string>
+    <string name="username_password_accessibility_show_password">Passwort anzeigen</string>
+    <string name="notification_channel_description">Erinnert Sie, wenn Ihre Konfiguration demnächst abläuft</string>
+    <string name="notification_channel_name">Ablauferinnerungen</string>
+    <string name="notification_title">%s neu einrichten</string>
+    <string name="notification_message">In %1$d Tagen läuft Ihr %2$s Profil ab, klicken Sie zum Erneuern</string>
+</resources>
