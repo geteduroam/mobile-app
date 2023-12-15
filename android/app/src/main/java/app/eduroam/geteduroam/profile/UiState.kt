@@ -9,7 +9,6 @@ import app.eduroam.geteduroam.ui.ErrorData
 
 data class UiState(
     val profiles: List<PresentProfile> = emptyList(),
-    val credentialsEnteredForProviderList: EAPIdentityProviderList? = null,
     val organization: PresentOrganization? = null,
     val providerInfo: ProviderInfo? = null,
     val inProgress: Boolean = false,
@@ -17,7 +16,6 @@ data class UiState(
     val promptForOAuth: Boolean = false,
     val checkProfileWhenResuming: Boolean = false,
     val showTermsOfUseDialog: Boolean = false,
-    val showUsernameDialog: Boolean = false,
     val goToConfigScreenWithProviderList: EAPIdentityProviderList? = null,
     val openUrlInBrowser: String? = null
 )
@@ -31,6 +29,5 @@ data class PresentOrganization(
     val description: String? = null,
     val logo: String? = null,
     val termsOfUse: String? = null,
-    val helpDesk: Helpdesk? = null,
-    val requiredSuffix: String? = null
+    val helpDesk: Helpdesk? = null
 )

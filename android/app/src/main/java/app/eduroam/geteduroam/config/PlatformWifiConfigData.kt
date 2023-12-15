@@ -137,6 +137,10 @@ fun EAPIdentityProvider.requiresUsernamePrompt(): Boolean {
     return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP
 }
 
+fun EAPIdentityProvider.requiredSuffix(): String? {
+    return authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentitySuffix
+}
+
 /**
  * Converts an internal EAP method type to the one used by Android
  */

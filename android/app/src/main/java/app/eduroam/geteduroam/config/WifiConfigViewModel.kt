@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.config.model.bestMethod
 import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.IS_EDUROAM
 import app.eduroam.geteduroam.ui.theme.isChromeOs
@@ -37,6 +38,8 @@ class WifiConfigViewModel @Inject constructor(
     val requestChangeNetworkPermission: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val processing: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val intentWithSuggestions: MutableStateFlow<Intent?> = MutableStateFlow(null)
+    val showUsernameDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val didEnterUserCredentials: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     init {
         launch.value = Unit
@@ -44,6 +47,10 @@ class WifiConfigViewModel @Inject constructor(
 
     fun launchConfiguration(context: Context) = viewModelScope.launch {
         launch.value = null
+        if (eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiresUsernamePrompt() == true && !didEnterUserCredentials.value) {
+            showUsernameDialog.value = true
+            return@launch
+        }
 
         when {
             //Android 11 and higher - API 30 - ChromeOS - we show everything in one intent
@@ -238,6 +245,19 @@ class WifiConfigViewModel @Inject constructor(
 
     fun markAsComplete() {
         processing.value = false
+    }
+
+    fun didEnterLoginDetails(username: String, password: String) {
+        eapIdentityProviderList.eapIdentityProvider?.forEach { idp ->
+            idp.authenticationMethod?.forEach { authMethod ->
+                authMethod.clientSideCredential?.apply {
+                    this.userName = username
+                    this.password = password
+                }
+            }
+        }
+        showUsernameDialog.value = false
+        didEnterUserCredentials.value = true
     }
 
     fun shouldRequestPushPermission() : Boolean {

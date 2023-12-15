@@ -220,15 +220,12 @@ class SelectProfileViewModel @Inject constructor(
                     description = info?.description,
                     logo = info?.providerLogo?.value,
                     termsOfUse = info?.termsOfUse,
-                    helpDesk = info?.helpdesk,
-                    requiredSuffix = firstProvider.authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentitySuffix
+                    helpDesk = info?.helpdesk
                 ),
                 providerInfo = info
             )
             if (info?.termsOfUse != null && !didAgreeToTerms) {
                 uiState = uiState.copy(inProgress = false, showTermsOfUseDialog = true)
-            } else if (firstProvider.requiresUsernamePrompt()) {
-                uiState = uiState.copy(inProgress = false, showUsernameDialog = true, credentialsEnteredForProviderList = providers)
             } else {
                 uiState = uiState.copy(inProgress = false, goToConfigScreenWithProviderList = providers)
             }
@@ -259,24 +256,6 @@ class SelectProfileViewModel @Inject constructor(
         uiState = uiState.copy(errorData = null)
     }
 
-    fun didCancelLogin() {
-        uiState = uiState.copy(showUsernameDialog = false)
-    }
-
-    fun didEnterLoginDetails(username: String, password: String) {
-        val profileList = uiState.credentialsEnteredForProviderList ?: throw RuntimeException("Profile list not found for entered credentials!")
-        profileList.eapIdentityProvider?.forEach { idp ->
-            idp.authenticationMethod?.forEach { authMethod ->
-                authMethod.clientSideCredential?.apply {
-                    this.userName = username
-                    this.password = password
-                }
-            }
-        }
-        uiState = uiState.copy(credentialsEnteredForProviderList = null, goToConfigScreenWithProviderList = profileList)
-
-    }
-
     /**
      * Call this when you start the OAuth flow, to avoid recalling it each time the screen is composed, and also to trigger the next check
      */
@@ -301,5 +280,9 @@ class SelectProfileViewModel @Inject constructor(
             uiState = uiState.copy(checkProfileWhenResuming = false)
             connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = false)
         }
+    }
+
+    fun didGoToConfigScreen() {
+        uiState = uiState.copy(goToConfigScreenWithProviderList = null)
     }
 }

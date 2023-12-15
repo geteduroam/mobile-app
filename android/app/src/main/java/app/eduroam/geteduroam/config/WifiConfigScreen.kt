@@ -40,6 +40,7 @@ import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.organizations.UsernamePasswordDialog
 import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -51,15 +52,15 @@ import kotlinx.coroutines.launch
 fun WifiConfigScreen(
     viewModel: WifiConfigViewModel,
     closeApp: () -> Unit,
+    goBack: () -> Unit,
     snackbarHostState: SnackbarHostState = SnackbarHostState(),
 ) = EduTopAppBar(withBackIcon = false) { paddingValues ->
     val launch by viewModel.launch.collectAsState(null)
     val processing by viewModel.processing.collectAsState(true)
     val message by viewModel.progressMessage.collectAsState("")
     val suggestionIntent by viewModel.intentWithSuggestions.collectAsState(null)
-    val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(
-        false
-    )
+    val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(false)
+    val showUsernameDialog by viewModel.showUsernameDialog.collectAsState(false)
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -93,13 +94,15 @@ fun WifiConfigScreen(
         if (processing) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.configuration_progress),
+                text = stringResource(id = if (showUsernameDialog) R.string.configuration_waiting_for_user_credentials else R.string.configuration_progress),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.height(8.dp))
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (!showUsernameDialog) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         } else if (message.isNotEmpty()) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -151,6 +154,16 @@ fun WifiConfigScreen(
             AskForWiFiPermissions { viewModel.handleAndroid10WifiConfig(context) }
         }
     }
+    if (showUsernameDialog) {
+        UsernamePasswordDialog(
+            requiredSuffix = viewModel.eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiredSuffix(),
+            cancel = goBack, // Go back to the previous screen
+            logIn = { username, password ->
+                viewModel.didEnterLoginDetails(username = username, password = password)
+                viewModel.launchConfiguration(context)
+            }
+        )
+    }
 }
 
 @Composable
@@ -187,8 +200,8 @@ private fun AskForWiFiPermissions(
 ) {
     val multiplePermissionsState = rememberMultiplePermissionsState(
         listOf(
-            android.Manifest.permission.CHANGE_WIFI_STATE,
-            android.Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE,
         )
     )
     if (multiplePermissionsState.allPermissionsGranted) {
@@ -252,7 +265,8 @@ private fun WifiConfigScreen_Preview() {
     AppTheme {
         WifiConfigScreen(
             viewModel = hiltViewModel(),
-            closeApp = {}
+            closeApp = {},
+            goBack = {}
         )
     }
 }

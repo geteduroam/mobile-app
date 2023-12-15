@@ -29,6 +29,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- MIME Type registration -->
+            <intent-filter>
+                <data
+                    android:mimeType="application/eap-config"
+                    android:pathPattern=".*\\.eap-config"
+                    android:scheme="content" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:mimeType="application/octet-stream"
+                    android:pathPattern=".*\\.eap-config"
+                    android:scheme="content" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
         </activity>
 
         <activity
@@ -48,7 +70,7 @@
 
         <receiver
             android:name=".di.repository.NotificationAlarmReceiver"
-            android:exported="false"/>
+            android:exported="false" />
 
     </application>
 

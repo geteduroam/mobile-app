@@ -1,14 +1,19 @@
 package app.eduroam.geteduroam
 
+import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import app.eduroam.geteduroam.config.AndroidConfigParser
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import timber.log.Timber
+import java.io.StringReader
 import java.util.Date
 
 
@@ -65,6 +70,23 @@ sealed class Route(val route: String) {
             type = NavType.StringType
             defaultValue = ""
         })
+
+        val deepLinkUrl = "$BASE_URI/$route/{${wifiConfigDataArg}}"
+        suspend fun buildDeepLink(context: Context, fileUri: Uri) : String? {
+            // Read the contents of the file as XML
+            val inputStream = context.contentResolver.openInputStream(fileUri) ?: return null
+            val bytes = inputStream.readBytes()
+            val configParser = AndroidConfigParser()
+            return try {
+                val provider = configParser.parse(bytes)
+                inputStream.close()
+                "${BASE_URI}/${encodeArguments(provider)}"
+            } catch (ex: Exception) {
+                Timber.e(ex, "Could not parse file opened!")
+                null
+            }
+        }
+
 
         fun encodeArguments(eapIdentityProviderList: EAPIdentityProviderList): String {
             val moshi = Moshi.Builder()
