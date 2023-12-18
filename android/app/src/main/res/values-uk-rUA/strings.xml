@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Ласкаво просимо</string>
+    <string name="organizations_no_results">Не вдалося знайти жодної організації.</string>
+    <string name="organization_search_text">Знайдіть свою організацію</string>
+    <string name="institutions_choose_one">Виберіть установу, до якої ви хочете підключитися.</string>
+    <string name="profiles_title">Профілі</string>
+    <string name="profiles_header">Виберіть профіль</string>
+    <string name="configuration_progress">Встановлення з\'єднання з WiFi</string>
+    <string name="configuration_success">WiFi налаштований</string>
+    <string name="configuration_logs">Повідомлення журналу</string>
+    <string name="configuration_canceled">Скасовано</string>
+    <string name="configuration_completed">Виконано</string>
+    <string name="login_dialog_title">Потрібен логін для входу</string>
+    <string name="login_dialog_text">Будь ласка, введіть своє ім\'я користувача та пароль</string>
+    <string name="login_dialog_username">Ім\'я користувача</string>
+    <string name="login_dialog_password">Пароль</string>
+    <string name="login_dialog_cancel">Скасувати</string>
+    <string name="login_dialog_login">Увійдіть в систему</string>
+    <string name="terms_of_use_dialog_title">Умови використання</string>
+    <string name="terms_of_use_dialog_text">Ви повинні погодитися з умовами використання, перш ніж зможете користуватися цією мережею</string>
+    <string name="terms_of_use_dialog_agree">Погоджуюсь</string>
+    <string name="terms_of_use_dialog_disagree">Не погоджуюсь</string>
+
+    <string name="err_title_auth_unexpected_fail">Непередбачувана помилка</string>
+    <string name="err_msg_auth_init_fail">Не вдалося ініціалізувати AppData. Спробуйте ще раз.</string>
+    <string name="err_msg_auth_init_fail_arg">Не вдалося ініціалізувати AppData. Причина:%s</string>
+    <string name="err_title_auth_invalid">Авторизація невірна</string>
+    <string name="err_msg_auth_invalid">Не вдалося отримати дійсну автентифікацію.</string>
+    <string name="err_title_auth_failed">Не вдалося виконати авторизацію</string>
+    <string name="err_msg_auth_failed">Стан авторизації не збережено - потрібна повторна авторизація.</string>
+    <string name="err_msg_auth_token_failed">Не вдалося обмінятися кодом маркера авторизації.</string>
+    <string name="err_msg_auth_code_failed_arg">Не вдалося обмінятися кодом авторизації:%s.</string>
+    <string name="err_title_generic_fail">Не вдається виконати запит</string>
+    <string name="err_msg_generic_unexpected_with_arg">Неочікувана помилка:%s , будь ласка, спробуйте ще раз.</string>
+    <string name="err_msg_invalid_organization_id">Невірний ідентифікатор організації. Неможливо продовжити для вибраної організації.</string>
+    <string name="err_msg_cannot_find_organization">Не вдається знайти організацію з ідентифікатором %s.</string>
+    <string name="err_msg_missing_eap_endpoint">У вибраному профілі відсутня кінцева точка EAP.</string>
+    <string name="err_msg_no_valid_provider">Не знайдено жодного дійсного постачальника послуг EAP.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Автентифікація</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Авторизуйтесь у своєму обліковому записі, щоб отримати конфігурацію wifi.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Обробка...</string>
+
+    <string name="button_ok">ТАК</string>
+    <string name="button_retry">Повторити спробу</string>
+    <string name="button_connect">З\'ЄДНАТИСЯ</string>
+    <string name="button_back">Повернутися назад</string>
+    <string name="button_close_app">Закрити додаток</string>
+
+    <string name="content_description_provider_logo">Логотип постачальника послуг</string>
+    <string name="content_description_success_checkmark">Відмітка про успішне завершення</string>
+
+    <string name="helpdesk_title">Служба технічної підтримки</string>
+
+    <string name="username_password_login_required">Потрібен логін</string>
+    <string name="username_password_please_enter">Будь ласка, введіть своє ім\'я користувача та пароль.</string>
+    <string name="username_password_label_username">Ім\'я користувача</string>
+    <string name="username_password_label_password">Пароль</string>
+    <string name="username_password_button_cancel">Скасувати</string>
+    <string name="username_password_button_log_in">Увійдіть у систему</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">ім\'я користувача</string>
+    <string name="username_password_accessibility_hide_password">Приховати пароль</string>
+    <string name="username_password_accessibility_show_password">Показати пароль</string>
+    <string name="notification_channel_description">Нагадує, коли закінчується термін дії вашої конфігурації</string>
+    <string name="notification_channel_name">Нагадування про зміну конфігурації</string>
+    <string name="notification_title">Змінити конфігурацію%s</string>
+    <string name="notification_message">До закінчення терміну дії вашого %2$sпрофілю залишилося %1$d днів, натисніть, щоб переналаштувати його</string>
+</resources>

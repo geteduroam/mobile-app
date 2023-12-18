@@ -7,8 +7,8 @@
     <string name="institutions_choose_one">Select the institution you want to connect to.</string>
     <string name="profiles_title">Profiles</string>
     <string name="profiles_header">Select a profile</string>
-    <string name="configuration_progress">Establishing WiFi connection</string>
-    <string name="configuration_success">WiFi configured</string>
+    <string name="configuration_progress">Establishing Wi-Fi connection</string>
+    <string name="configuration_success">Wi-Fi configured</string>
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Cancelled</string>
     <string name="configuration_completed">Completed</string>
@@ -40,7 +40,7 @@
     <string name="err_msg_no_valid_provider">No valid EAP provider was found.</string>
 
     <string name="oauth_title" tools:ignore="ExtraTranslation">Authenticate</string>
-    <string name="oauth_description" tools:ignore="ExtraTranslation">Authenticate with your account in order to get your Wi-Fi configuration.</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Authenticate with your account to fetch your Wi-Fi configuration.</string>
     <string name="oauth_processing" tools:ignore="ExtraTranslation">Processing…</string>
 
     <string name="button_ok">OK</string>
@@ -65,8 +65,8 @@
     <string name="username_password_placeholder_username_before_suffix">username</string>
     <string name="username_password_accessibility_hide_password">Hide password</string>
     <string name="username_password_accessibility_show_password">Show password</string>
-    <string name="notification_channel_description">Reminds you when your configuration will expire soon</string>
+    <string name="notification_channel_description">Reminds you when your configuration will soon expire</string>
     <string name="notification_channel_name">Reconfiguration reminders</string>
     <string name="notification_title">Reconfigure %s</string>
-    <string name="notification_message">There are %1$d days left for your %2$s profile to expire, click to reconfigure it</string>
+    <string name="notification_message">There are %1$d days left before your %2$s profile expires; click to reconfigure it</string>
 </resources>
