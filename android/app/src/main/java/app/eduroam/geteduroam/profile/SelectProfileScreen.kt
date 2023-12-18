@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -96,6 +97,7 @@ fun SelectProfileScreen(
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
                 val providerList = state.goToConfigScreenWithProviderList!!
                 goToConfigScreen(providerList)
+                viewModel.didGoToConfigScreen()
             }
     }
 
@@ -128,16 +130,6 @@ fun SelectProfileScreen(
             }, onDismiss = {
                 viewModel.didAgreeToTerms(false)
             }
-        )
-    }
-    if (viewModel.uiState.showUsernameDialog) {
-        UsernamePasswordDialog(
-            requiredSuffix = viewModel.uiState.organization?.requiredSuffix,
-            cancel = viewModel::didCancelLogin, // Just hide the dialog
-            logIn = { username, password ->
-                viewModel.didEnterLoginDetails(username = username, password = password)
-            }
-
         )
     }
 }
@@ -201,17 +193,14 @@ fun SelectProfileContent(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(4.dp))
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
             )
-            Spacer(Modifier.height(4.dp))
-
             if (inProgress) {
-                Spacer(Modifier.height(4.dp))
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-                Spacer(Modifier.height(4.dp))
             }
+            Spacer(Modifier.height(4.dp))
             profiles.forEach { profile ->
                 Row(
                     modifier = Modifier
@@ -234,7 +223,7 @@ fun SelectProfileContent(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )

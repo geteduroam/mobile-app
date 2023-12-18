@@ -8,6 +8,7 @@
     <string name="profiles_title">Profiles</string>
     <string name="profiles_header">Select a profile</string>
     <string name="configuration_progress">Establishing WiFi connection</string>
+    <string name="configuration_waiting_for_user_credentials">Waiting for user credentials…</string>
     <string name="configuration_success">WiFi configured</string>
     <string name="configuration_logs">Log messages:</string>
     <string name="configuration_canceled">Canceled</string>

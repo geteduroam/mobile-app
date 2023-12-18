@@ -85,14 +85,20 @@ fun MainGraph(
             })
         }
         composable(
-            route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments
+            route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = Route.ConfigureWifi.deepLinkUrl
+            })
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
             val viewModel = hiltViewModel<WifiConfigViewModel>()
             viewModel.eapIdentityProviderList = wifiConfigData
             WifiConfigScreen(
                 viewModel,
-                closeApp = closeApp
+                closeApp = closeApp,
+                goBack = {
+                    navController.navigateUp()
+                }
             )
         }
     }
