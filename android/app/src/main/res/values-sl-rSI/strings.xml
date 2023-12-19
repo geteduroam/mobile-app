@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Pozdravljeni</string>
+    <string name="organizations_no_results">Najti ni bilo mogoče nobene organizacije.</string>
+    <string name="organization_search_text">Poiščite svojo organizacijo</string>
+    <string name="institutions_choose_one">Izberite ustanovo, s katero se želite povezati.</string>
+    <string name="profiles_title">Profili</string>
+    <string name="profiles_header">Izberite profil</string>
+    <string name="configuration_progress">Vzpostavljanje povezave Wi-Fi</string>
+    <string name="configuration_success">Wi-Fi je konfiguriran</string>
+    <string name="configuration_logs">Dnevniška sporočila:</string>
+    <string name="configuration_canceled">Preklicano</string>
+    <string name="configuration_completed">Dokončano</string>
+    <string name="login_dialog_title">Zahtevana je prijava</string>
+    <string name="login_dialog_text">Vnesite uporabniško ime in geslo</string>
+    <string name="login_dialog_username">Uporabniško ime</string>
+    <string name="login_dialog_password">Geslo</string>
+    <string name="login_dialog_cancel">Prekliči</string>
+    <string name="login_dialog_login">Prijava</string>
+    <string name="terms_of_use_dialog_title">Pogoji uporabe</string>
+    <string name="terms_of_use_dialog_text">Preden lahko uporabljate to omrežje, se morate strinjati s pogoji uporabe</string>
+    <string name="terms_of_use_dialog_agree">Strinjam se</string>
+    <string name="terms_of_use_dialog_disagree">Ne strinjam se</string>
+
+    <string name="err_title_auth_unexpected_fail">Nepričakovana napaka</string>
+    <string name="err_msg_auth_init_fail">Mape AppData ni bilo mogoče inicializirati. Poskusite znova.</string>
+    <string name="err_msg_auth_init_fail_arg">Mape AppData ni bilo mogoče inicializirati. Razlog: %s</string>
+    <string name="err_title_auth_invalid">Pooblastilo ni veljavno</string>
+    <string name="err_msg_auth_invalid">Ni bilo prejeto veljavno preverjanje pristnosti.</string>
+    <string name="err_title_auth_failed">Pooblaščanje ni uspelo</string>
+    <string name="err_msg_auth_failed">Nobeno stanje pooblastila ni ohranjeno – zahtevano je vnovično pooblaščanje.</string>
+    <string name="err_msg_auth_token_failed">Zamenjava kode žetona za preverjanje pristnosti ni uspela.</string>
+    <string name="err_msg_auth_code_failed_arg">Zamenjava kode za preverjanje pristnosti ni uspela.: %s.</string>
+    <string name="err_title_generic_fail">Zahteve ni mogoče dokončati</string>
+    <string name="err_msg_generic_unexpected_with_arg">Nepričakovana napaka: %s. Poskusite znova.</string>
+    <string name="err_msg_invalid_organization_id">Neveljaven ID organizacije. Ni mogoče nadaljevati z izbrano organizacijo.</string>
+    <string name="err_msg_cannot_find_organization">Organizacije z ID-jem %s ni mogoče najti.</string>
+    <string name="err_msg_missing_eap_endpoint">Izbranemu profilu manjka končna točka EAP.</string>
+    <string name="err_msg_no_valid_provider">Najden ni bil noben veljaven ponudnik EAP.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Preverite pristnost</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Preverite pristnost svojega računa, če želite pridobiti svojo konfiguracijo Wi-Fi.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Obdelava …</string>
+
+    <string name="button_ok">V redu</string>
+    <string name="button_retry">Poskusi znova</string>
+    <string name="button_connect">POVEŽI</string>
+    <string name="button_back">Nazaj</string>
+    <string name="button_close_app">Zapri aplikacijo</string>
+
+    <string name="content_description_provider_logo">Logotip ponudnika</string>
+    <string name="content_description_success_checkmark">Kljukica za uspešno izvedbo</string>
+
+    <string name="helpdesk_title">Oddelek za pomoč</string>
+
+    <string name="username_password_login_required">Zahtevana je prijava</string>
+    <string name="username_password_please_enter">Vnesite uporabniško ime in geslo.</string>
+    <string name="username_password_label_username">Uporabniško ime</string>
+    <string name="username_password_label_password">Geslo</string>
+    <string name="username_password_button_cancel">Prekliči</string>
+    <string name="username_password_button_log_in">Prijava</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">uporabniško ime</string>
+    <string name="username_password_accessibility_hide_password">Skrij geslo</string>
+    <string name="username_password_accessibility_show_password">Pokaži geslo</string>
+    <string name="notification_channel_description">Opomni vas, ko je vaša konfiguracija tik pred iztekom</string>
+    <string name="notification_channel_name">Opomniki o vnovični konfiguraciji</string>
+    <string name="notification_title">Vnovična konfiguracija %s</string>
+    <string name="notification_message">Do izteka vašega profila za %2$s je še toliko dni: %1$d. Kliknite, če ga želite znova konfigurirati</string>
+</resources>

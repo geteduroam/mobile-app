@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Benvenuto</string>
+    <string name="organizations_no_results">Impossibile trovare qualsiasi organizzazione.</string>
+    <string name="organization_search_text">Cerca la tua organizzazione</string>
+    <string name="institutions_choose_one">Seleziona l\'organizzazione a cui desideri connetterti.</string>
+    <string name="profiles_title">Profili</string>
+    <string name="profiles_header">Seleziona un profilo</string>
+    <string name="configuration_progress">Sto instaurando la connessione Wi-Fi</string>
+    <string name="configuration_success">WiFi configurato</string>
+    <string name="configuration_logs">Messaggi di Log:</string>
+    <string name="configuration_canceled">Annullato</string>
+    <string name="configuration_completed">Completato</string>
+    <string name="login_dialog_title">Accesso richiesto</string>
+    <string name="login_dialog_text">Inserisci il tuo nome utente e la password</string>
+    <string name="login_dialog_username">Nome utente</string>
+    <string name="login_dialog_password">Password</string>
+    <string name="login_dialog_cancel">Annulla</string>
+    <string name="login_dialog_login">Accedi</string>
+    <string name="terms_of_use_dialog_title">Termini di utilizzo</string>
+    <string name="terms_of_use_dialog_text">Devi accettare i termini di utilizzo prima di poter utilizzare questa rete.</string>
+    <string name="terms_of_use_dialog_agree">Sono d\'accordo</string>
+    <string name="terms_of_use_dialog_disagree">Non sono d\'accordo</string>
+
+    <string name="err_title_auth_unexpected_fail">Errore imprevisto</string>
+    <string name="err_msg_auth_init_fail">Inizializzazione di AppData fallita. Per favore riprova.</string>
+    <string name="err_msg_auth_init_fail_arg">Inizializzazione di AppData fallita. Motivo: %s</string>
+    <string name="err_title_auth_invalid">Autorizzazione non valida</string>
+    <string name="err_msg_auth_invalid">Non ho ricevuto una autenticazione valida.</string>
+    <string name="err_title_auth_failed">Autorizzazione fallita</string>
+    <string name="err_msg_auth_failed">Nessuno stato di autorizzazione memorizzato: è necessaria una nuova autorizzazione.</string>
+    <string name="err_msg_auth_token_failed">Lo scambio del codice token di autorizzazione è fallito.</string>
+    <string name="err_msg_auth_code_failed_arg">Lo scambio del codice di autorizzazione è fallito: %s.</string>
+    <string name="err_title_generic_fail">Impossibile completare la richiesta</string>
+    <string name="err_msg_generic_unexpected_with_arg">Errore imprevisto: %s, riprova.</string>
+    <string name="err_msg_invalid_organization_id">ID organizzazione non valido. Impossibile continuare per l\'organizzazione selezionata.</string>
+    <string name="err_msg_cannot_find_organization">Impossibile trovare l\'organizzazione con ID %s.</string>
+    <string name="err_msg_missing_eap_endpoint">Nel profilo selezionato manca l\'endpoint EAP.</string>
+    <string name="err_msg_no_valid_provider">Non è stato trovato alcun provider EAP valido.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Autenticare</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Autenticati con il tuo account per ottenere la configurazione wifi.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Processando...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Riprova</string>
+    <string name="button_connect">CONNETTI</string>
+    <string name="button_back">Indietro</string>
+    <string name="button_close_app">Chiudi l\'app</string>
+
+    <string name="content_description_provider_logo">Logo del provider</string>
+    <string name="content_description_success_checkmark">Segno di spunta di successo</string>
+
+    <string name="helpdesk_title">Helpdesk</string>
+
+    <string name="username_password_login_required">Accesso richiesto</string>
+    <string name="username_password_please_enter">Inserisci il tuo nome utente e la password.</string>
+    <string name="username_password_label_username">Nome utente</string>
+    <string name="username_password_label_password">Password</string>
+    <string name="username_password_button_cancel">Annulla</string>
+    <string name="username_password_button_log_in">Accedi</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">nome utente</string>
+    <string name="username_password_accessibility_hide_password">Nascondi password</string>
+    <string name="username_password_accessibility_show_password">Mostra password</string>
+    <string name="notification_channel_description">Ti ricorda quando la tua configurazione sta per scadere</string>
+    <string name="notification_channel_name">Promemoria di riconfigurazione</string>
+    <string name="notification_title">Riconfigura %s</string>
+    <string name="notification_message">Mancano %1$d giorni alla scadenza del tuo profilo %2$s, clicca per riconfigurarlo</string>
+</resources>
