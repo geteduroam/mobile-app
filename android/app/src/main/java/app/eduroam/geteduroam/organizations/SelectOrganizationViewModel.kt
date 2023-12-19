@@ -64,32 +64,34 @@ class SelectOrganizationViewModel @Inject constructor(
                         response.errorBody()?.string()
                     }"
                     Timber.e("Failed to load organizations: $failReason")
+                    withContext(Dispatchers.Main) {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            errorData = ErrorData(
+                                titleId = R.string.err_title_generic_fail,
+                                messageId = R.string.err_msg_generic_unexpected_with_arg,
+                                messageArg = failReason
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to get organizations")
+                withContext(Dispatchers.Main) {
                     uiState = uiState.copy(
                         isLoading = false,
                         errorData = ErrorData(
                             titleId = R.string.err_title_generic_fail,
                             messageId = R.string.err_msg_generic_unexpected_with_arg,
-                            messageArg = failReason
+                            messageArg = "${e.message}/${e.javaClass.name}"
                         )
                     )
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to get organizations")
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorData = ErrorData(
-                        titleId = R.string.err_title_generic_fail,
-                        messageId = R.string.err_msg_generic_unexpected_with_arg,
-                        messageArg = "${e.message}/${e.javaClass.name}"
-                    )
-                )
             }
         }
     }
 
-    fun onStepCompleted() {
-
-    }
+    fun onStepCompleted() {}
 
     fun onOrganizationSelect(organization: Organization) {
         uiState = uiState.copy(selectedOrganization = organization)
