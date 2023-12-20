@@ -132,7 +132,11 @@ class WifiConfigViewModel @Inject constructor(
             val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             try {
                 val status = wifiManager.addNetworkSuggestions(listOf(passPointSuggestion))
-                Timber.e("Status for adding network: $status")
+                if (status != 0) {
+                    Timber.e("Status for adding network: $status")
+                } else {
+                    Timber.i("Successfully added network.")
+                }
             } catch (e: Exception) {
                 progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
                 Timber.e(e, "Failed to add network suggestion")
@@ -184,7 +188,11 @@ class WifiConfigViewModel @Inject constructor(
 
         try {
             val status = wifiManager.addNetworkSuggestions(ssidSuggestions)
-            Timber.e( "Status for adding network: $status")
+            if (status != 0) {
+                Timber.e("Status for adding network: $status")
+            } else {
+                Timber.i("Successfully added network.")
+            }
         } catch (e: Exception) {
             progressMessage.value = "Failed to add WiFi Suggestions. Exception: ${e.message}"
             Timber.e(e, "Failed to add network suggestion")
