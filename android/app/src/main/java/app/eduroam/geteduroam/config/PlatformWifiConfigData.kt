@@ -135,7 +135,7 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
 
 fun EAPIdentityProvider.requiresUsernamePrompt(): Boolean {
     val eapMethod = authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod()
-    return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP
+    return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP || eapMethod == Eap.PWD
 }
 
 fun EAPIdentityProvider.requiredSuffix(): String? {
