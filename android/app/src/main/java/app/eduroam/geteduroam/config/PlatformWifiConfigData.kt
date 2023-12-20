@@ -242,7 +242,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
         // Just use the first CA for Passpoint
         cred.caCertificate = rootCertificates[0]
     } else {
-        Timber.e("Not creating Passpoint configuration due to too many CAs in the profile (1 supported, $${rootCertificates.size} given)")
+        Timber.w("Not creating Passpoint configuration due to too many CAs in the profile (1 supported, ${rootCertificates.size} given)")
         return null
     }
     cred.realm = fqdn
