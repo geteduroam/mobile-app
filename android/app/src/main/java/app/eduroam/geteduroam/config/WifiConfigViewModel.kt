@@ -16,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.config.model.bestMethod
 import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.IS_EDUROAM
 import app.eduroam.geteduroam.ui.theme.isChromeOs
@@ -148,8 +147,20 @@ class WifiConfigViewModel @Inject constructor(
         } else {
             try {
                 val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                @Suppress("DEPRECATION")
-                wifiManager.removePasspointConfiguration(this.homeSp.fqdn)
+                try {
+                    // Remove any existing networks with the same FQDN
+                    @Suppress("DEPRECATION")
+                    wifiManager.removePasspointConfiguration(this.homeSp.fqdn)
+                } catch (e: java.lang.IllegalArgumentException) {
+                    // According to the documentation, IllegalArgumentException can be thrown
+                    // But after testing, we see that SecurityException will be thrown
+                    // with message "Permission denied".
+
+                    // This error makes sense when observed (maybe we can't remove the network),
+                    // but it's undocumented that this error can be thrown.
+                } catch (e: SecurityException) {
+                    // Ignore
+                }
                 wifiManager.addOrUpdatePasspointConfiguration(this)
             } catch (e: IllegalArgumentException) {
                 // Can throw when configuration is wrong or device does not support Passpoint
