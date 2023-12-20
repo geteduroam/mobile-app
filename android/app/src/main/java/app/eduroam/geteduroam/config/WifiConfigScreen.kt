@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -140,6 +141,13 @@ fun WifiConfigScreen(
                 Text(
                     text = stringResource(id = R.string.configuration_success),
                     style = MaterialTheme.typography.bodyLarge,
+                )
+            }
+            if (Build.VERSION.SDK_INT == 29) {
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(
+                    text = stringResource(id = R.string.configuration_android_10_notification_disclaimer),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             Spacer(modifier = Modifier.weight(weight = 1f))
