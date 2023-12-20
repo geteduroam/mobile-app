@@ -3,6 +3,7 @@ package app.eduroam.geteduroam.config
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiEnterpriseConfig
 import android.net.wifi.WifiEnterpriseConfig.Eap
+import android.net.wifi.WifiEnterpriseConfig.Phase2
 import android.net.wifi.WifiNetworkSuggestion
 import android.net.wifi.hotspot2.PasspointConfiguration
 import android.net.wifi.hotspot2.pps.Credential
@@ -134,7 +135,7 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
 
 fun EAPIdentityProvider.requiresUsernamePrompt(): Boolean {
     val eapMethod = authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod()
-    return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP
+    return  eapMethod == Eap.TTLS || eapMethod == Eap.PEAP || eapMethod == Eap.PWD
 }
 
 fun EAPIdentityProvider.requiredSuffix(): String? {
@@ -161,11 +162,12 @@ private fun EAPIdentityProviderList.handleOtherEap(enterpriseConfig: WifiEnterpr
         eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.userName
     val password =
         eapIdentityProvider?.authenticationMethod?.bestMethod()?.clientSideCredential?.password
-    val enterprisePhase2Auth = WifiEnterpriseConfig.Phase2.MSCHAPV2
+    val enterpriseEAP = eapIdentityProvider?.authenticationMethod?.bestMethod()?.eapMethod?.type?.toInt()?.convertEAPMethod() ?: Eap.NONE
+    val enterprisePhase2Auth = eapIdentityProvider?.getPhase2AuthType(enterpriseEAP)
 
     enterpriseConfig.identity = username
     enterpriseConfig.password = password
-    enterpriseConfig.phase2Method = enterprisePhase2Auth
+    enterpriseConfig.phase2Method = enterprisePhase2Auth ?: Phase2.NONE
 }
 
 private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpriseConfig) {
@@ -240,7 +242,7 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
         // Just use the first CA for Passpoint
         cred.caCertificate = rootCertificates[0]
     } else {
-        Timber.e("Not creating Passpoint configuration due to too many CAs in the profile (1 supported, $${rootCertificates.size} given)")
+        Timber.w("Not creating Passpoint configuration due to too many CAs in the profile (1 supported, ${rootCertificates.size} given)")
         return null
     }
     cred.realm = fqdn
@@ -279,9 +281,9 @@ fun EAPIdentityProviderList.buildPasspointConfig(): PasspointConfiguration? {
             us.password = base64
             us.eapType = 21 // 21 indicates TTLS (RFC 5281)
             when (enterprisePhase2Auth) {
-                WifiEnterpriseConfig.Phase2.MSCHAPV2 -> us.nonEapInnerMethod = "MS-CHAP-V2"
-                WifiEnterpriseConfig.Phase2.PAP -> us.nonEapInnerMethod = "PAP"
-                WifiEnterpriseConfig.Phase2.MSCHAP -> us.nonEapInnerMethod = "MS-CHAP"
+                Phase2.MSCHAPV2 -> us.nonEapInnerMethod = "MS-CHAP-V2"
+                Phase2.PAP -> us.nonEapInnerMethod = "PAP"
+                Phase2.MSCHAP -> us.nonEapInnerMethod = "MS-CHAP"
                 else -> us.nonEapInnerMethod = null
             }
             cred.userCredential = us

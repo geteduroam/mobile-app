@@ -12,8 +12,10 @@ import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
 import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,48 +34,64 @@ class SelectOrganizationViewModel @Inject constructor(
         MutableStateFlow(Pair<String?, String?>(null, null))
 
     init {
-        viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true)
+        uiState = uiState.copy(isLoading = true)
+        viewModelScope.launch (Dispatchers.IO) {
             try {
                 val response = api.getOrganizations()
                 val organizationResult = response.body()
                 if (response.isSuccessful && organizationResult != null) {
-                    allOrganizations = organizationResult.instances
-                    uiState = uiState.copy(isLoading = false)
-                    if (uiState.filter.isNotEmpty()) {
-                        onSearchTextChange(uiState.filter)
+                    withContext(Dispatchers.Main) {
+                        allOrganizations = organizationResult.instances
+                        uiState = uiState.copy(isLoading = false)
+                        if (uiState.filter.isNotEmpty()) {
+                            onSearchTextChange(uiState.filter)
+                        }
                     }
+                    do {
+                        var canImproveSearchWords = false
+                        allOrganizations.forEach {
+                            val result = it.improveMatchWords()
+                            canImproveSearchWords =  canImproveSearchWords || result
+                        }
+                        withContext(Dispatchers.Main) {
+                            if (uiState.filter.isNotEmpty()) {
+                                onSearchTextChange(uiState.filter)
+                            }
+                        }
+                    } while (canImproveSearchWords)
                 } else {
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
                     }"
                     Timber.e("Failed to load organizations: $failReason")
+                    withContext(Dispatchers.Main) {
+                        uiState = uiState.copy(
+                            isLoading = false,
+                            errorData = ErrorData(
+                                titleId = R.string.err_title_generic_fail,
+                                messageId = R.string.err_msg_generic_unexpected_with_arg,
+                                messageArg = failReason
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to get organizations")
+                withContext(Dispatchers.Main) {
                     uiState = uiState.copy(
                         isLoading = false,
                         errorData = ErrorData(
                             titleId = R.string.err_title_generic_fail,
                             messageId = R.string.err_msg_generic_unexpected_with_arg,
-                            messageArg = failReason
+                            messageArg = "${e.message}/${e.javaClass.name}"
                         )
                     )
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to get organizations")
-                uiState = uiState.copy(
-                    isLoading = false,
-                    errorData = ErrorData(
-                        titleId = R.string.err_title_generic_fail,
-                        messageId = R.string.err_msg_generic_unexpected_with_arg,
-                        messageArg = "${e.message}/${e.javaClass.name}"
-                    )
-                )
             }
         }
     }
 
-    fun onStepCompleted() {
-
-    }
+    fun onStepCompleted() {}
 
     fun onOrganizationSelect(organization: Organization) {
         uiState = uiState.copy(selectedOrganization = organization)
