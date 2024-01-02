@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Добре дошли</string>
+    <string name="organizations_no_results">Не могат да бъдат намерени никакви организации.</string>
+    <string name="organization_search_text">Търсене на Вашата организация</string>
+    <string name="institutions_choose_one">Изберете институция, към която искате да се свържете.</string>
+    <string name="profiles_title">Профили</string>
+    <string name="profiles_header">Изберете профил</string>
+    <string name="configuration_progress">Установяване на свързване по WiFi</string>
+    <string name="configuration_success">Конфигуриран е WiFi</string>
+    <string name="configuration_logs">Лог съобщения:</string>
+    <string name="configuration_canceled">Отменено</string>
+    <string name="configuration_completed">Завършено</string>
+    <string name="login_dialog_title">Изисква се влизане</string>
+    <string name="login_dialog_text">Моля, въведете Вашето потребителско име и парола</string>
+    <string name="login_dialog_username">Потребителско име</string>
+    <string name="login_dialog_password">Парола</string>
+    <string name="login_dialog_cancel">Отмяна</string>
+    <string name="login_dialog_login">Вход</string>
+    <string name="terms_of_use_dialog_title">Условия за ползване</string>
+    <string name="terms_of_use_dialog_text">Преди да използвате тази мрежа, трябва да се съгласите с условията за ползване</string>
+    <string name="terms_of_use_dialog_agree">Съгласен съм</string>
+    <string name="terms_of_use_dialog_disagree">Не съм съгласен</string>
+
+    <string name="err_title_auth_unexpected_fail">Неочаквана грешка</string>
+    <string name="err_msg_auth_init_fail">Неуспешна инициализация на AppData. Моля, опитайте отново.</string>
+    <string name="err_msg_auth_init_fail_arg">Неуспешна инициализация на AppData. Причина: %s</string>
+    <string name="err_title_auth_invalid">Невалидна авторизация</string>
+    <string name="err_msg_auth_invalid">Не получи валидна автентикация.</string>
+    <string name="err_title_auth_failed">Неуспешна авторизация</string>
+    <string name="err_msg_auth_failed">Изисква се повторна авторизация.</string>
+    <string name="err_msg_auth_token_failed">Неуспешна обмяна на кода на токъна за авторизация.</string>
+    <string name="err_msg_auth_code_failed_arg">Обмяната на кода за авторизация е неуспешна: %s.</string>
+    <string name="err_title_generic_fail">Заявката не може да бъде изпълнена</string>
+    <string name="err_msg_generic_unexpected_with_arg">Неочаквана грешка: %s, моля, опитайте отново.</string>
+    <string name="err_msg_invalid_organization_id">Невалиден id на организация. Не може да се продължи с избраната организация.</string>
+    <string name="err_msg_cannot_find_organization">Не може да бъде намерена организация с id %s.</string>
+    <string name="err_msg_missing_eap_endpoint">В избрания профил липсва EAP endpoint.</string>
+    <string name="err_msg_no_valid_provider">Не е намерен валиден EAP доставчик.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Автентикиране</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Автентикирайте се с Вашия акаунт, за да получите Вашата wifi конфигурация.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Обработка ...</string>
+
+    <string name="button_ok">ОК</string>
+    <string name="button_retry">Отново</string>
+    <string name="button_connect">Свързване</string>
+    <string name="button_back">Назад</string>
+    <string name="button_close_app">Затворете приложението</string>
+
+    <string name="content_description_provider_logo">Лого на доставчика</string>
+    <string name="content_description_success_checkmark">Успешно маркиране</string>
+
+    <string name="helpdesk_title">Хелпдеск</string>
+
+    <string name="username_password_login_required">Изисква се влизане</string>
+    <string name="username_password_please_enter">Моля, въведете Вашето потребителско име и парола.</string>
+    <string name="username_password_label_username">Потребителско име</string>
+    <string name="username_password_label_password">Парола</string>
+    <string name="username_password_button_cancel">Отмяна</string>
+    <string name="username_password_button_log_in">Вход</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">потребителско име</string>
+    <string name="username_password_accessibility_hide_password">скриване на паролата</string>
+    <string name="username_password_accessibility_show_password">показване на паролата</string>
+    <string name="notification_channel_description">Напомняне, когато конфигурацията Ви ще изтече скоро</string>
+    <string name="notification_channel_name">Напомняне за преконфигуриране</string>
+    <string name="notification_title">Преконфигурирайте %s</string>
+    <string name="notification_message">Остават %1$d дни до изтичането на Вашия %2$s профил. Кликнете, за да го преконфигурирате.</string>
+</resources>

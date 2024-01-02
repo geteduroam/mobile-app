@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Tere tulemast</string>
+    <string name="organizations_no_results">Asutusi ei leitud.</string>
+    <string name="organization_search_text">Otsi oma asutust</string>
+    <string name="institutions_choose_one">Vali asutus, millega soovid ühenduda</string>
+    <string name="profiles_title">Profiilid</string>
+    <string name="profiles_header">Vali profiil</string>
+    <string name="configuration_progress">WiFi ühenduse loomine</string>
+    <string name="configuration_success">WiFi seadistatud</string>
+    <string name="configuration_logs">Logisõnumid:</string>
+    <string name="configuration_canceled">Tühistatud</string>
+    <string name="configuration_completed">Tehtud</string>
+    <string name="login_dialog_title">Nõutud on sisselogimine</string>
+    <string name="login_dialog_text">Palun sisesta oma kasutajanimi ja parool</string>
+    <string name="login_dialog_username">Kasutajanimi</string>
+    <string name="login_dialog_password">Parool</string>
+    <string name="login_dialog_cancel">Tühista</string>
+    <string name="login_dialog_login">Logi sisse</string>
+    <string name="terms_of_use_dialog_title">Kasutustingimused</string>
+    <string name="terms_of_use_dialog_text">Pead nõustuma kasutustingimustega enne, kui saad seda võrku kasutada</string>
+    <string name="terms_of_use_dialog_agree">Nõustun</string>
+    <string name="terms_of_use_dialog_disagree">Ei nõustu</string>
+
+    <string name="err_title_auth_unexpected_fail">Ootamatu viga</string>
+    <string name="err_msg_auth_init_fail">AppData väärtustamine ebaõnnestus. Palun proovi uuesti.</string>
+    <string name="err_msg_auth_init_fail_arg">AppData väärtustamine ebaõnnestus. Põhjus: %s</string>
+    <string name="err_title_auth_invalid">Kehtetu autoriseerimine</string>
+    <string name="err_msg_auth_invalid">Autentimist ei kinnitatud.</string>
+    <string name="err_title_auth_failed">Autoriseerimine ebaõnnestus</string>
+    <string name="err_msg_auth_failed">Autoriseerimisandmeid ei säilitatud, vaja on uuesti autoriseerida.</string>
+    <string name="err_msg_auth_token_failed">Autoriseerimise loa koodi (token code) vahetamine ebaõnnestus.</string>
+    <string name="err_msg_auth_code_failed_arg">Autoriseerimise koodi (code) vahetamine ebaõnnestus: %s.</string>
+    <string name="err_title_generic_fail">Taotlust ei saa täita</string>
+    <string name="err_msg_generic_unexpected_with_arg">Ootamatu viga: %s, palun proovi uuesti.</string>
+    <string name="err_msg_invalid_organization_id">Kehtetu asutuse ID (organization id). Ei saa jätkata soovitud asutusega.</string>
+    <string name="err_msg_cannot_find_organization">Asutust ID-ga %s ei leita.</string>
+    <string name="err_msg_missing_eap_endpoint">Valitud profiilil puudub EAP lõpp-punkt.</string>
+    <string name="err_msg_no_valid_provider">Kehtivat EAP pakkujat ei leitud.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Autendi</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Oma wifi seadistuse saamiseks autendi oma kasutajakontoga.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Tegutsen...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Proovi uuesti</string>
+    <string name="button_connect">ÜHENDA</string>
+    <string name="button_back">Tagasi</string>
+    <string name="button_close_app">Sulge rakendus</string>
+
+    <string name="content_description_provider_logo">Tootja logo</string>
+    <string name="content_description_success_checkmark">Märge edust</string>
+
+    <string name="helpdesk_title">Kasutajatugi</string>
+
+    <string name="username_password_login_required">Nõutud on sisselogimine</string>
+    <string name="username_password_please_enter">Palun sisesta oma kasutajanimi ja parool.</string>
+    <string name="username_password_label_username">Kasutajanimi</string>
+    <string name="username_password_label_password">Parool</string>
+    <string name="username_password_button_cancel">Tühista</string>
+    <string name="username_password_button_log_in">Logi sisse</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">kasutajanimi</string>
+    <string name="username_password_accessibility_hide_password">Peida parool</string>
+    <string name="username_password_accessibility_show_password">Näita parooli</string>
+    <string name="notification_channel_description">Annab Sulle märku, kui Su seadistus hakkab aeguma</string>
+    <string name="notification_channel_name">Seadistuse uuendamise meeldetuletused</string>
+    <string name="notification_title">Seadista uuesti %s</string>
+    <string name="notification_message">On jäänud %1$d päeva, kuni Su %2$s profiil aegub, klõpsa seadistuse uuendamiseks</string>
+</resources>
