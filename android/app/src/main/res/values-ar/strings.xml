@@ -1,0 +1,72 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">مرحباً</string>
+    <string name="organizations_no_results">تعذر العثور على أي مؤسسة.</string>
+    <string name="organization_search_text">ابحث عن مؤسستك</string>
+    <string name="institutions_choose_one">اختر المؤسسة التي ترغب في الاتصال بها.</string>
+    <string name="profiles_title">الملفات التعريفية</string>
+    <string name="profiles_header">اختر الملف التعريفي</string>
+    <string name="configuration_progress">إنشاء اتصال لا سلكي WiFi </string>
+    <string name="configuration_success">تم تهيئة شبكة WiFi</string>
+    <string name="configuration_logs">رسائل السجل:</string>
+    <string name="configuration_canceled">تم الإلغاء</string>
+    <string name="configuration_completed">اكتمل</string>
+    <string name="login_dialog_title">يتطلب تسجيل الدخول</string>
+    <string name="login_dialog_text">الرجاء إدخال اسم المستخدم وكلمة المرور الخاصة بك.</string>
+    <string name="login_dialog_username">اسم المستخدم</string>
+    <string name="login_dialog_password">كلمة المرور</string>
+    <string name="login_dialog_cancel">إلغاء</string>
+    <string name="login_dialog_login">تسجيل الدخول</string>
+    <string name="terms_of_use_dialog_title">شروط الاستخدام </string>
+    <string name="terms_of_use_dialog_text">يجب أن توافق على شروط الاستخدام قبل أن تتمكن من استخدام هذا الشبكة</string>
+    <string name="terms_of_use_dialog_agree">موافق</string>
+    <string name="terms_of_use_dialog_disagree">غير موافق</string>
+
+    <string name="err_title_auth_unexpected_fail">خطأ غير متوقع</string>
+    <string name="err_msg_auth_init_fail">فشلت تهيئة بيانات التطبيق AppData. الرجاء إعادة المحاولة.</string>
+    <string name="err_msg_auth_init_fail_arg">فشلت تهيئة بيانات التطبيق AppData. السبب: %s</string>
+    <string name="err_title_auth_invalid">الصلاحيات غير صالحة</string>
+    <string name="err_msg_auth_invalid">لم يتم استلام مصادقة صالحة.</string>
+    <string name="err_title_auth_failed">فشل التحقق من الصلاحيات</string>
+    <string name="err_msg_auth_failed">لا توجد صلاحيات محتفظة - يتطلب إعادة تفويض الصلاحيات.</string>
+    <string name="err_msg_auth_token_failed">فشل تبادل رمز الصلاحية.</string>
+    <string name="err_msg_auth_code_failed_arg">فشل تبادل رمز التفويض%s.</string>
+    <string name="err_title_generic_fail">لا يمكن إكمال الطلب.</string>
+    <string name="err_msg_generic_unexpected_with_arg">حدث خطأ غير متوقع: %s، الرجاء إعادة المحاولة.</string>
+    <string name="err_msg_invalid_organization_id">معرّف المؤسسة غير صالح. لا يمكن المتابعة للمؤسسة المحددة.</string>
+    <string name="err_msg_cannot_find_organization">لا يمكن العثور على مؤسسة بمعرّف %s.</string>
+    <string name="err_msg_missing_eap_endpoint">ملف التعريف المحدد يفتقد إلى EAP endpoint.</string>
+    <string name="err_msg_no_valid_provider">\"لم يتم العثور على مزود EAP صالح .</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">المصادقة</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">المصادقة باستخدام حسابك للحصول على التهيئة لشبكة WiFi الخاصه بك</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">جاري المعالجة...</string>
+
+    <string name="button_ok">حسناً</string>
+    <string name="button_retry">أعد المحاولة</string>
+    <string name="button_connect">الاتصال</string>
+    <string name="button_back">رجوع</string>
+    <string name="button_close_app">إغلاق التطبيق</string>
+
+    <string name="content_description_provider_logo">شعار المزود</string>
+    <string name="content_description_success_checkmark">علامة صح للنجاح</string>
+
+    <string name="helpdesk_title">الدعم الفني</string>
+
+    <string name="username_password_login_required">يتطلب تسجيل الدخول</string>
+    <string name="username_password_please_enter">الرجاء إدخال اسم المستخدم وكلمة المرور الخاصة بك.</string>
+    <string name="username_password_label_username">اسم المستخدم</string>
+    <string name="username_password_label_password">كلمة المرور</string>
+    <string name="username_password_button_cancel">إلغاء</string>
+    <string name="username_password_button_log_in">تسجيل الدخول</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">اسم المستخدم</string>
+    <string name="username_password_accessibility_hide_password">إخفاء كلمة المرور</string>
+    <string name="username_password_accessibility_show_password">عرض كلمة المرور</string>
+    <string name="notification_channel_description">يذكرك بموعد انتهاء صلاحية التهيئة الخاصه بك قريبًا</string>
+    <string name="notification_channel_name">تذكير بإعادة التهيئة</string>
+    <string name="notification_title">إعادة تهيئة %s</string>
+    <string name="notification_message">تبقى %1$d يوم لانتهاء صلاحية ملف تعريف %2$s الخاص بك، انقر لإعادة تهيئتة.</string>
+</resources>

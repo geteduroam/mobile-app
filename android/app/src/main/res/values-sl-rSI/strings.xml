@@ -28,10 +28,10 @@
     <string name="err_msg_auth_init_fail_arg">Mape AppData ni bilo mogoče inicializirati. Razlog: %s</string>
     <string name="err_title_auth_invalid">Pooblastilo ni veljavno</string>
     <string name="err_msg_auth_invalid">Ni bilo prejeto veljavno preverjanje pristnosti.</string>
-    <string name="err_title_auth_failed">Pooblaščanje ni uspelo</string>
-    <string name="err_msg_auth_failed">Nobeno stanje pooblastila ni ohranjeno – zahtevano je vnovično pooblaščanje.</string>
-    <string name="err_msg_auth_token_failed">Zamenjava kode žetona za preverjanje pristnosti ni uspela.</string>
-    <string name="err_msg_auth_code_failed_arg">Zamenjava kode za preverjanje pristnosti ni uspela.: %s.</string>
+    <string name="err_title_auth_failed">Pooblastitev ni uspela</string>
+    <string name="err_msg_auth_failed">Nobeno stanje pooblastila ni ohranjeno – zahtevana je vnovična pooblastitev.</string>
+    <string name="err_msg_auth_token_failed">Zamenjava kode žetona za pooblastitev ni uspela.</string>
+    <string name="err_msg_auth_code_failed_arg">Zamenjava kode za pooblastitev ni uspela: %s.</string>
     <string name="err_title_generic_fail">Zahteve ni mogoče dokončati</string>
     <string name="err_msg_generic_unexpected_with_arg">Nepričakovana napaka: %s. Poskusite znova.</string>
     <string name="err_msg_invalid_organization_id">Neveljaven ID organizacije. Ni mogoče nadaljevati z izbrano organizacijo.</string>
