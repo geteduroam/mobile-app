@@ -3,6 +3,7 @@ package app.eduroam.geteduroam.organizations
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -39,7 +39,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.eduroam.geteduroam.R
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UsernamePasswordDialog(
     requiredSuffix: String?,
@@ -67,11 +66,13 @@ fun UsernamePasswordDialog(
                 Text(text = stringResource(id = R.string.username_password_please_enter))
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = username,
                     onValueChange = {
                         username = it
                     },
                     maxLines = 1,
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
                         onNext = {
@@ -98,11 +99,13 @@ fun UsernamePasswordDialog(
                     }
                 )
                 TextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = password,
                     onValueChange = {
                         password = it
                     },
                     maxLines = 1,
+                    singleLine = true,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
