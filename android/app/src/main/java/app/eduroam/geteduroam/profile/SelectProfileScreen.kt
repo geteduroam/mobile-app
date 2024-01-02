@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.ButtonDefaults
@@ -110,7 +112,8 @@ fun SelectProfileScreen(
     }
 
     SelectProfileContent(
-        modifier = Modifier.padding(paddingValues)
+        modifier = Modifier
+            .padding(paddingValues)
             .fillMaxSize(),
         profiles = viewModel.uiState.profiles,
         institution = viewModel.uiState.organization,
@@ -230,7 +233,8 @@ fun SelectProfileContent(
             }
         }
         if (providerInfo != null) {
-            Row(modifier = Modifier.padding(vertical = 16.dp),
+            val scrollState = rememberScrollState()
+            Row(modifier = Modifier.padding(vertical = 16.dp).verticalScroll(scrollState),
                 verticalAlignment = Alignment.Top) {
                 providerInfo.providerLogo?.convertToBitmap()?.let { logoBitmap ->
                     Surface(
