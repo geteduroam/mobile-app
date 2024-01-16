@@ -147,7 +147,10 @@ class WifiConfigViewModel @Inject constructor(
                     Timber.i("Successfully added network.")
                 }
             } catch (e: Exception) {
-                progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
+                if (Build.VERSION.SDK_INT >= 30) {
+                    // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
+                    progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
+                }
                 Timber.e(e, "Failed to add network suggestion")
             }
         }
@@ -178,7 +181,8 @@ class WifiConfigViewModel @Inject constructor(
             } catch (e: IllegalArgumentException) {
                 // Can throw when configuration is wrong or device does not support Passpoint
                 // while we did encounter a few devices without Passpoint support.
-                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+                // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
+                // - so there is no user visible message here.
                 Timber.e(e, "Failed to add or update Passpoint config")
             }
         }
@@ -213,7 +217,10 @@ class WifiConfigViewModel @Inject constructor(
         } catch (e: IllegalArgumentException) {
             // Can throw when configuration is wrong or device does not support Passpoint
             // while we did encounter a few devices without Passpoint support.
-            progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+            if (Build.VERSION.SDK_INT >= 30) {
+                // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
+                progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
+            }
             Timber.e(e, "Failed to add or update Passpoint config")
 
         }
