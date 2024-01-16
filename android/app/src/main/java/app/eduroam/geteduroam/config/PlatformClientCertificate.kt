@@ -59,7 +59,9 @@ fun ClientSideCredential.getClientCertificate(): Map.Entry<PrivateKey, Array<X50
         throw IllegalArgumentException("Unable to read ", e)
     } catch (e: IOException) {
         if (e.cause is UnrecoverableKeyException) throw (e.cause as UnrecoverableKeyException?)!!
-        throw IllegalStateException("Unexpected I/O error reading key data")
+        throw MissingPassphraseException()
     }
     throw IllegalArgumentException("Cannot extract a X509Certificate from the certificate store")
 }
+
+class MissingPassphraseException: Exception()

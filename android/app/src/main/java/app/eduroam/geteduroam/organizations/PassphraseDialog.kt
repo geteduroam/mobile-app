@@ -30,28 +30,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.eduroam.geteduroam.R
 
 @Composable
-fun UsernamePasswordDialog(
-    requiredSuffix: String?,
-    cancel: () -> Unit = { },
-    logIn: (String, String) -> Unit = { _, _ -> }
+fun PassphraseDialog(
+    isRetry: Boolean,
+    cancel: () -> Unit,
+    done: (String) -> Unit,
 ) = Dialog(
     onDismissRequest = { },
     properties = DialogProperties(decorFitsSystemWindows = false)
 ) {
-
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var passphrase by remember { mutableStateOf("") }
+    var passphraseVisible by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         Surface(
@@ -59,59 +59,26 @@ fun UsernamePasswordDialog(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = stringResource(id = R.string.username_password_login_required),
+                    text = stringResource(id = R.string.passphrase_dialog_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                Text(text = stringResource(id = R.string.username_password_please_enter))
+                Text(text = stringResource(id = R.string.passphrase_dialog_message))
                 Spacer(modifier = Modifier.size(16.dp))
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = username,
+                    value = passphrase,
                     onValueChange = {
-                        username = it
+                        passphrase = it
                     },
                     maxLines = 1,
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            if (username.isNotEmpty() &&
-                                !requiredSuffix.isNullOrEmpty() &&
-                                !username.contains("@")) {
-                                username += "@$requiredSuffix"
-                            }
-                            defaultKeyboardAction(ImeAction.Next)
-                        }
-                    ),
-                    placeholder = {
-                        val exampleUsername =
-                            stringResource(id = R.string.username_password_placeholder_username_before_suffix)
-                        val suffix = requiredSuffix
-                            ?: stringResource(id = R.string.username_password_placeholder_username_example_suffix)
-                        Text("${exampleUsername}@${suffix}", modifier = Modifier.alpha(0.5f))
-                    },
-                    label = {
-                        Text(
-                            stringResource(id = R.string.username_password_label_username),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                )
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = password,
-                    onValueChange = {
-                        password = it
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            if (username.isNotBlank() && password.isNotBlank()) {
-                                logIn(username, password)
+                            if (passphrase.isNotBlank()) {
+                                done(passphrase)
                             } else {
                                 keyboardController?.hide()
                             }
@@ -119,44 +86,54 @@ fun UsernamePasswordDialog(
                     ),
                     label = {
                         Text(
-                            stringResource(id = R.string.username_password_label_password),
+                            stringResource(id = R.string.passphrase_dialog_label_passphrase),
                             style = MaterialTheme.typography.labelSmall
                         )
                     },
                     trailingIcon = {
-                        val image = if (passwordVisible)
+                        val image = if (passphraseVisible)
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
                         // Please provide localized description for accessibility services
-                        val description = if (passwordVisible) {
-                            stringResource(id = R.string.username_password_accessibility_hide_password)
+                        val description = if (passphraseVisible) {
+                            stringResource(id = R.string.passphrase_accessibility_hide_passphrase)
                         } else {
-                            stringResource(id = R.string.username_password_accessibility_show_password)
+                            stringResource(id = R.string.passphrase_accessibility_show_passphrase)
                         }
 
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = { passphraseVisible = !passphraseVisible }) {
                             Icon(imageVector = image, description)
                         }
                     }
                 )
-                Spacer(modifier = Modifier.size(8.dp))
+                if (isRetry) {
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(id = R.string.passphrase_dialog_incorrect_passphrase),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.size(16.dp))
                 Row {
                     Button(
                         onClick = {
                             cancel()
                         },
                     ) {
-                        Text(stringResource(id = R.string.username_password_button_cancel))
+                        Text(stringResource(id = R.string.passphrase_dialog_button_cancel))
                     }
                     Spacer(modifier = Modifier.size(8.dp))
                     Button(
                         onClick = {
-                            logIn(username, password)
+                            done(passphrase)
                         },
-                        enabled = username.isNotBlank() && password.isNotBlank()
+                        enabled = passphrase.isNotBlank()
                     ) {
-                        Text(stringResource(id = R.string.username_password_button_log_in))
+                        Text(stringResource(id = R.string.passphrase_dialog_button_enter))
                     }
                 }
             }
@@ -167,4 +144,14 @@ fun UsernamePasswordDialog(
             .imePadding()
             .size(16.dp))
     }
+}
+
+@Preview
+@Composable
+fun PassphraseDialog_Preview() {
+    PassphraseDialog(
+        isRetry = true,
+        cancel = { },
+        done = { _ -> }
+    )
 }

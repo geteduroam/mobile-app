@@ -38,6 +38,8 @@ class WifiConfigViewModel @Inject constructor(
     val processing: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val intentWithSuggestions: MutableStateFlow<Intent?> = MutableStateFlow(null)
     val showUsernameDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showPassphraseDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val passphraseDialogRetryCount: MutableStateFlow<Int> = MutableStateFlow(0)
     val didEnterUserCredentials: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     init {
@@ -46,10 +48,17 @@ class WifiConfigViewModel @Inject constructor(
 
     fun launchConfiguration(context: Context) = viewModelScope.launch {
         launch.value = null
-        if (eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiresUsernamePrompt() == true && !didEnterUserCredentials.value) {
-            showUsernameDialog.value = true
+        try {
+            if (eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiresUsernamePrompt() == true && !didEnterUserCredentials.value) {
+                showUsernameDialog.value = true
+                return@launch
+            }
+        } catch (mpEx: MissingPassphraseException) {
+            passphraseDialogRetryCount.value += 1
+            showPassphraseDialog.value = true
             return@launch
         }
+        passphraseDialogRetryCount.value = 0
 
         when {
             //Android 11 and higher - API 30 - ChromeOS - we show everything in one intent
@@ -264,6 +273,15 @@ class WifiConfigViewModel @Inject constructor(
 
     fun markAsComplete() {
         processing.value = false
+    }
+
+    fun didEnterPassphrase(passphrase: String) {
+        eapIdentityProviderList.eapIdentityProvider?.forEach { idp ->
+            idp.authenticationMethod?.forEach { authMethod ->
+                authMethod.clientSideCredential?.passphrase = passphrase
+            }
+        }
+        showPassphraseDialog.value = false
     }
 
     fun didEnterLoginDetails(username: String, password: String) {
