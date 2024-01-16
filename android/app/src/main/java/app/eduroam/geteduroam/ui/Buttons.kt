@@ -1,6 +1,7 @@
 package app.eduroam.geteduroam.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -19,7 +20,9 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun PrimaryButton(
-    text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true,
+    text: String, onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     buttonTextColor: Color = Color.White,
     buttonBorderColor: Color = Color.Transparent,
 ) = Button(
@@ -28,7 +31,7 @@ fun PrimaryButton(
     shape = RoundedCornerShape(CornerSize(16.dp)),
     border = BorderStroke(1.dp, buttonBorderColor),
     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-    modifier = modifier.requiredHeight(height = 60.dp).requiredWidth(180.dp)
+    modifier = modifier.requiredHeight(height = 60.dp).defaultMinSize(minWidth = 180.dp)
 ) {
     Text(
         text = text,
