@@ -16,11 +16,13 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,12 +30,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -65,81 +70,86 @@ fun UsernamePasswordDialog(
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(text = stringResource(id = R.string.username_password_please_enter))
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = username,
-                    onValueChange = {
-                        username = it
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            if (username.isNotEmpty() &&
-                                !requiredSuffix.isNullOrEmpty() &&
-                                !username.contains("@")) {
-                                username += "@$requiredSuffix"
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = username,
+                        onValueChange = {
+                            username = it
+                        },
+                        textStyle = LocalTextStyle.current.copy(textDirection = TextDirection.Ltr),
+                        maxLines = 1,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                if (username.isNotEmpty() &&
+                                    !requiredSuffix.isNullOrEmpty() &&
+                                    !username.contains("@")
+                                ) {
+                                    username += "@$requiredSuffix"
+                                }
+                                defaultKeyboardAction(ImeAction.Next)
                             }
-                            defaultKeyboardAction(ImeAction.Next)
+                        ),
+                        placeholder = {
+                            val exampleUsername =
+                                stringResource(id = R.string.username_password_placeholder_username_before_suffix)
+                            val suffix = requiredSuffix
+                                ?: stringResource(id = R.string.username_password_placeholder_username_example_suffix)
+                            Text("${exampleUsername}@${suffix}", modifier = Modifier.alpha(0.5f))
+                        },
+                        label = {
+                            Text(
+                                stringResource(id = R.string.username_password_label_username),
+                                style = MaterialTheme.typography.labelSmall
+                            )
                         }
-                    ),
-                    placeholder = {
-                        val exampleUsername =
-                            stringResource(id = R.string.username_password_placeholder_username_before_suffix)
-                        val suffix = requiredSuffix
-                            ?: stringResource(id = R.string.username_password_placeholder_username_example_suffix)
-                        Text("${exampleUsername}@${suffix}", modifier = Modifier.alpha(0.5f))
-                    },
-                    label = {
-                        Text(
-                            stringResource(id = R.string.username_password_label_username),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                )
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = password,
-                    onValueChange = {
-                        password = it
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (username.isNotBlank() && password.isNotBlank()) {
-                                logIn(username, password)
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = password,
+                        onValueChange = {
+                            password = it
+                        },
+                        textStyle = LocalTextStyle.current.copy(textDirection = TextDirection.Ltr),
+                        maxLines = 1,
+                        singleLine = true,
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (username.isNotBlank() && password.isNotBlank()) {
+                                    logIn(username, password)
+                                } else {
+                                    keyboardController?.hide()
+                                }
+                            }
+                        ),
+                        label = {
+                            Text(
+                                stringResource(id = R.string.username_password_label_password),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+
+                            // Please provide localized description for accessibility services
+                            val description = if (passwordVisible) {
+                                stringResource(id = R.string.username_password_accessibility_hide_password)
                             } else {
-                                keyboardController?.hide()
+                                stringResource(id = R.string.username_password_accessibility_show_password)
+                            }
+
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, description)
                             }
                         }
-                    ),
-                    label = {
-                        Text(
-                            stringResource(id = R.string.username_password_label_password),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    trailingIcon = {
-                        val image = if (passwordVisible)
-                            Icons.Filled.Visibility
-                        else Icons.Filled.VisibilityOff
-
-                        // Please provide localized description for accessibility services
-                        val description = if (passwordVisible) {
-                            stringResource(id = R.string.username_password_accessibility_hide_password)
-                        } else {
-                            stringResource(id = R.string.username_password_accessibility_show_password)
-                        }
-
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = image, description)
-                        }
-                    }
-                )
+                    )
+                }
                 Spacer(modifier = Modifier.size(8.dp))
                 Row {
                     Button(

@@ -16,11 +16,13 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,7 +38,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -65,48 +70,51 @@ fun PassphraseDialog(
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(text = stringResource(id = R.string.passphrase_dialog_message))
                 Spacer(modifier = Modifier.size(16.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = passphrase,
-                    onValueChange = {
-                        passphrase = it
-                    },
-                    maxLines = 1,
-                    singleLine = true,
-                    visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (passphrase.isNotBlank()) {
-                                done(passphrase)
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = passphrase,
+                        onValueChange = {
+                            passphrase = it
+                        },
+                        textStyle = LocalTextStyle.current.copy(textDirection = TextDirection.Ltr),
+                        maxLines = 1,
+                        singleLine = true,
+                        visualTransformation = if (passphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (passphrase.isNotBlank()) {
+                                    done(passphrase)
+                                } else {
+                                    keyboardController?.hide()
+                                }
+                            }
+                        ),
+                        label = {
+                            Text(
+                                stringResource(id = R.string.passphrase_dialog_label_passphrase),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        },
+                        trailingIcon = {
+                            val image = if (passphraseVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+
+                            // Please provide localized description for accessibility services
+                            val description = if (passphraseVisible) {
+                                stringResource(id = R.string.passphrase_accessibility_hide_passphrase)
                             } else {
-                                keyboardController?.hide()
+                                stringResource(id = R.string.passphrase_accessibility_show_passphrase)
+                            }
+
+                            IconButton(onClick = { passphraseVisible = !passphraseVisible }) {
+                                Icon(imageVector = image, description)
                             }
                         }
-                    ),
-                    label = {
-                        Text(
-                            stringResource(id = R.string.passphrase_dialog_label_passphrase),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    trailingIcon = {
-                        val image = if (passphraseVisible)
-                            Icons.Filled.Visibility
-                        else Icons.Filled.VisibilityOff
-
-                        // Please provide localized description for accessibility services
-                        val description = if (passphraseVisible) {
-                            stringResource(id = R.string.passphrase_accessibility_hide_passphrase)
-                        } else {
-                            stringResource(id = R.string.passphrase_accessibility_show_passphrase)
-                        }
-
-                        IconButton(onClick = { passphraseVisible = !passphraseVisible }) {
-                            Icon(imageVector = image, description)
-                        }
-                    }
-                )
+                    )
+                }
                 if (isRetry) {
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
