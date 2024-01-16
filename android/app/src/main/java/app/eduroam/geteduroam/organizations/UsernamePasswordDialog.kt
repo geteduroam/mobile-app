@@ -70,6 +70,7 @@ fun UsernamePasswordDialog(
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(text = stringResource(id = R.string.username_password_please_enter))
                 Spacer(modifier = Modifier.size(16.dp))
+                // Username / password input fields need to be LTR even in RTL languages
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
