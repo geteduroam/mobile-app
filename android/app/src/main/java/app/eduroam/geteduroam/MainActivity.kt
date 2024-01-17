@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
         runOnUiThread {
             if (intent?.dataString?.startsWith("content://") == true) {
                 CoroutineScope(coroutineContext).launch {
+                    Timber.d("User has opened an .eap-config file...")
                     Route.ConfigureWifi.buildDeepLink(this@MainActivity, intent.data!!)?.let {
                         intent.data = Uri.parse(it)
                         withContext(Dispatchers.Main) {
