@@ -31,6 +31,7 @@ class WifiConfigViewModel @Inject constructor(
     ) : ViewModel() {
 
     lateinit var eapIdentityProviderList: EAPIdentityProviderList
+    lateinit var organizationId: String
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage: MutableStateFlow<String> = MutableStateFlow("")
@@ -248,7 +249,7 @@ class WifiConfigViewModel @Inject constructor(
             } catch (e: Exception) {
                 progressMessage.value =
                     "Failed to add/connect WifiConfiguration. Exception: ${e.message}"
-                Log.e("WifiConfigViewModel", "Failed to add/connect WifiConfiguration", e)
+                Timber.e( e, "Failed to add/connect WifiConfiguration")
             }
         }
         passpointConfig?.install(context)
@@ -306,14 +307,14 @@ class WifiConfigViewModel @Inject constructor(
 
     fun shouldRequestPushPermission() : Boolean {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
-            return notificationRepository.shouldRequestPushPermission(it)
+            return notificationRepository.shouldRequestPushPermission(it, organizationId)
         }
         return false
     }
 
     fun scheduleReminderNotification() {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
-            return notificationRepository.scheduleNotificationIfNeeded(it)
+             notificationRepository.scheduleNotificationIfNeeded(it, organizationId)
         }
     }
 

@@ -64,7 +64,7 @@ import kotlinx.coroutines.flow.filter
 fun SelectProfileScreen(
     viewModel: SelectProfileViewModel,
     goToOAuth: (Configuration) -> Unit = { _ -> },
-    goToConfigScreen: (EAPIdentityProviderList) -> Unit = { _ -> },
+    goToConfigScreen: (String, EAPIdentityProviderList) -> Unit = { _, _ -> },
     goToPrevious: () -> Unit = {}
 ) = EduTopAppBar(
     title = stringResource(id = R.string.profiles_header),
@@ -98,7 +98,7 @@ fun SelectProfileScreen(
         snapshotFlow { viewModel.uiState }.distinctUntilChanged()
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
                 val providerList = state.goToConfigScreenWithProviderList!!
-                goToConfigScreen(providerList)
+                goToConfigScreen(viewModel.organizationId, providerList)
                 viewModel.didGoToConfigScreen()
             }
     }

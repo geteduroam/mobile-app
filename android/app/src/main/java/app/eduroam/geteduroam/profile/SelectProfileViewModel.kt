@@ -40,7 +40,7 @@ class SelectProfileViewModel @Inject constructor(
 
     var uiState by mutableStateOf(UiState())
         private set
-    private val organizationId: String
+    val organizationId: String
     private var didAgreeToTerms = false
 
     init {

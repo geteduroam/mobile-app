@@ -30,7 +30,7 @@ sealed class Route(val route: String) {
             },
         )
         val deepLinkUrl = "$BASE_URI/${route}/{${institutionIdArg}}"
-        fun buildDeepLink(institutionId: String) =  "$BASE_URI/${route}/${Uri.encode(institutionId)}"
+        fun buildDeepLink(institutionId: String) = "$BASE_URI/${route}/${Uri.encode(institutionId)}"
         fun encodeArgument(id: String) = "$route/${Uri.encode(id)}"
     }
 
@@ -64,15 +64,21 @@ sealed class Route(val route: String) {
     }
 
     object ConfigureWifi : Route(route = "configure_wifi") {
+        const val organizationIdArg = "organizationid"
         const val wifiConfigDataArg = "wificonfigdata"
-        val routeWithArgs = "${route}/{${wifiConfigDataArg}}"
-        val arguments = listOf(navArgument(wifiConfigDataArg) {
-            type = NavType.StringType
-            defaultValue = ""
-        })
+        val routeWithArgs = "${route}/{${organizationIdArg}}/{${wifiConfigDataArg}}"
+        val arguments = listOf(
+            navArgument(organizationIdArg) {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+            navArgument(wifiConfigDataArg) {
+                type = NavType.StringType
+                defaultValue = ""
+            })
 
-        val deepLinkUrl = "$BASE_URI/$route/{${wifiConfigDataArg}}"
-        suspend fun buildDeepLink(context: Context, fileUri: Uri) : String? {
+        val deepLinkUrl = "$BASE_URI/$route/{${organizationIdArg}}/{${wifiConfigDataArg}}"
+        suspend fun buildDeepLink(context: Context, fileUri: Uri): String? {
             // Read the contents of the file as XML
             val inputStream = context.contentResolver.openInputStream(fileUri) ?: return null
             val bytes = inputStream.readBytes()
@@ -80,7 +86,7 @@ sealed class Route(val route: String) {
             return try {
                 val provider = configParser.parse(bytes)
                 inputStream.close()
-                "${BASE_URI}/${encodeArguments(provider)}"
+                "${BASE_URI}/${encodeArguments("", provider)}"
             } catch (ex: Exception) {
                 Timber.e(ex, "Could not parse file opened!")
                 null
@@ -88,14 +94,18 @@ sealed class Route(val route: String) {
         }
 
 
-        fun encodeArguments(eapIdentityProviderList: EAPIdentityProviderList): String {
+        fun encodeArguments(organizationId: String, eapIdentityProviderList: EAPIdentityProviderList): String {
             val moshi = Moshi.Builder()
                 .add(Date::class.java, DateJsonAdapter())
                 .build()
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val wifiConfigDataJson = adapter.toJson(eapIdentityProviderList)
             val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
-            return "$route/$encodedWifiConfig"
+            return "$route/$organizationId/$encodedWifiConfig"
+        }
+
+        fun decodeOrganizationIdArgument(arguments: Bundle?): String {
+            return arguments?.getString(organizationIdArg).orEmpty()
         }
 
         fun decodeUrlArgument(arguments: Bundle?): EAPIdentityProviderList {
