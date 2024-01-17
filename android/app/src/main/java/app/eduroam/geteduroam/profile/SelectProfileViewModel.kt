@@ -124,7 +124,7 @@ class SelectProfileViewModel @Inject constructor(
     }
 
     fun connectWithSelectedProfile() = viewModelScope.launch {
-        val profile = uiState.profiles.first { it.isSelected }
+        val profile = uiState.profiles.firstOrNull { it.isSelected } ?: return@launch
         connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = true)
     }
 
