@@ -23,6 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -177,7 +178,10 @@ class WifiConfigViewModel @Inject constructor(
                     // but it's undocumented that this error can be thrown.
                 } catch (e: SecurityException) {
                     // Ignore
+                } catch (e: UnsupportedOperationException) {
+                    // Ignore
                 }
+
                 wifiManager.addOrUpdatePasspointConfiguration(this)
             } catch (e: IllegalArgumentException) {
                 // Can throw when configuration is wrong or device does not support Passpoint
@@ -185,6 +189,8 @@ class WifiConfigViewModel @Inject constructor(
                 // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                 // - so there is no user visible message here.
                 Timber.e(e, "Failed to add or update Passpoint config")
+            } catch (e: UnsupportedOperationException) {
+                // Ignore
             }
         }
     }
