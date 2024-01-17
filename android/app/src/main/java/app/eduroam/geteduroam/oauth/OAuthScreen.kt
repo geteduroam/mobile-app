@@ -60,7 +60,7 @@ fun OAuthScreen(
         isAuthorizationLaunched = oAuthUiStages.isAuthorizationLaunched,
         padding = it,
         launchAuthorization = { intentAvailable ->
-//            Timber.e("0 - AppAuth intent available. Launching OAuth")
+//            Timber.w("0 - AppAuth intent available. Launching OAuth")
             oAuthUiStages = OAuthUiStages(
                 isAuthorizationLaunched = true,
             )

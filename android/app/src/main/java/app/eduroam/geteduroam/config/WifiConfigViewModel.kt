@@ -144,7 +144,7 @@ class WifiConfigViewModel @Inject constructor(
             try {
                 val status = wifiManager.addNetworkSuggestions(listOf(passPointSuggestion))
                 if (status != 0) {
-                    Timber.e("Status for adding network: $status")
+                    Timber.w("Status for adding network: $status")
                 } else {
                     Timber.i("Successfully added network.")
                 }
@@ -153,7 +153,7 @@ class WifiConfigViewModel @Inject constructor(
                     // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                     progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
                 }
-                Timber.e(e, "Failed to add network suggestion")
+                Timber.w(e, "Failed to add network suggestion")
             }
         }
         processing.value = false
@@ -188,7 +188,7 @@ class WifiConfigViewModel @Inject constructor(
                 // while we did encounter a few devices without Passpoint support.
                 // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                 // - so there is no user visible message here.
-                Timber.e(e, "Failed to add or update Passpoint config")
+                Timber.w(e, "Failed to add or update Passpoint config")
             } catch (e: UnsupportedOperationException) {
                 // Ignore
             }
@@ -209,13 +209,13 @@ class WifiConfigViewModel @Inject constructor(
         try {
             val status = wifiManager.addNetworkSuggestions(ssidSuggestions)
             if (status != 0) {
-                Timber.e("Status for adding network: $status")
+                Timber.w("Status for adding network: $status")
             } else {
                 Timber.i("Successfully added network.")
             }
         } catch (e: Exception) {
             progressMessage.value = "Failed to add WiFi Suggestions. Exception: ${e.message}"
-            Timber.e(e, "Failed to add network suggestion")
+            Timber.w(e, "Failed to add network suggestion")
         }
 
         val passpointConfig = eapIdentityProviderList.buildPasspointConfig()
@@ -228,7 +228,7 @@ class WifiConfigViewModel @Inject constructor(
                 // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                 progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
             }
-            Timber.e(e, "Failed to add or update Passpoint config")
+            Timber.w(e, "Failed to add or update Passpoint config")
 
         }
         processing.value = false
@@ -255,7 +255,7 @@ class WifiConfigViewModel @Inject constructor(
             } catch (e: Exception) {
                 progressMessage.value =
                     "Failed to add/connect WifiConfiguration. Exception: ${e.message}"
-                Timber.e( e, "Failed to add/connect WifiConfiguration")
+                Timber.w( e, "Failed to add/connect WifiConfiguration")
             }
         }
         passpointConfig?.install(context)

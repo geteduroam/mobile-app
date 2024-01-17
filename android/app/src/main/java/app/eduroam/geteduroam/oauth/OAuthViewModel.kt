@@ -77,7 +77,7 @@ class OAuthViewModel @Inject constructor(
                     messageArg = argument
                 )
             )
-            Timber.e(e, "Failed to prepare AppAuth")
+            Timber.w(e, "Failed to prepare AppAuth")
         }
     }
 
@@ -180,7 +180,7 @@ class OAuthViewModel @Inject constructor(
                             )
                         }
                     } catch (e: Exception) {
-                        Timber.e(e, "Failed to exchange authorization code.")
+                        Timber.w(e, "Failed to exchange authorization code.")
                         val arg = "${e.javaClass.simpleName}: ${e.message}"
                         uiState = UiState(
                             OAuthStep.Error, ErrorData(

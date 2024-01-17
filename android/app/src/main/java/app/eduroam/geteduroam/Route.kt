@@ -89,7 +89,7 @@ sealed class Route(val route: String) {
                 inputStream.close()
                 "${BASE_URI}/${encodeArguments(null, provider)}"
             } catch (ex: Exception) {
-                Timber.e(ex, "Could not parse file opened!")
+                Timber.w(ex, "Could not parse file opened!")
                 null
             }
         }
