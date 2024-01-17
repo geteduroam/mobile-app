@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import app.eduroam.geteduroam.config.AndroidConfigParser
+import app.eduroam.geteduroam.config.model.EAPIdentityProvider
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
@@ -101,11 +102,13 @@ sealed class Route(val route: String) {
                 .build()
             // Here we remove all the embedded images. This is required because some profiles embed images of several megabytes,
             // which makes the app slow or even crash
-            eapIdentityProviderList.eapIdentityProvider?.forEach {provider ->
-                provider.providerInfo?.providerLogo = null
-            }
+            val listWithoutLogos = eapIdentityProviderList.copy(
+                eapIdentityProvider = eapIdentityProviderList.eapIdentityProvider?.map { provider ->
+                    provider.copy(providerInfo = provider.providerInfo?.copy(providerLogo = null))
+                }
+            )
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
-            val wifiConfigDataJson = adapter.toJson(eapIdentityProviderList)
+            val wifiConfigDataJson = adapter.toJson(listWithoutLogos)
             val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
             return if (organizationId.isNullOrEmpty()) {
                 "$route/$encodedWifiConfig"
