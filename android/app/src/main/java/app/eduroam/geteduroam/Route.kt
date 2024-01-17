@@ -66,18 +66,19 @@ sealed class Route(val route: String) {
     object ConfigureWifi : Route(route = "configure_wifi") {
         const val organizationIdArg = "organizationid"
         const val wifiConfigDataArg = "wificonfigdata"
-        val routeWithArgs = "${route}/{${organizationIdArg}}/{${wifiConfigDataArg}}"
+        const val emptyOrganization = "no_organization_id"
+        val routeWithArgs = "$route/{$wifiConfigDataArg}?organization={$organizationIdArg}"
         val arguments = listOf(
             navArgument(organizationIdArg) {
                 type = NavType.StringType
-                defaultValue = ""
+                nullable = true
             },
             navArgument(wifiConfigDataArg) {
                 type = NavType.StringType
                 defaultValue = ""
             })
 
-        val deepLinkUrl = "$BASE_URI/$route/{${organizationIdArg}}/{${wifiConfigDataArg}}"
+        val deepLinkUrl = "$BASE_URI/$route/{$wifiConfigDataArg}?organization={$organizationIdArg}"
         suspend fun buildDeepLink(context: Context, fileUri: Uri): String? {
             // Read the contents of the file as XML
             val inputStream = context.contentResolver.openInputStream(fileUri) ?: return null
@@ -86,7 +87,7 @@ sealed class Route(val route: String) {
             return try {
                 val provider = configParser.parse(bytes)
                 inputStream.close()
-                "${BASE_URI}/${encodeArguments("", provider)}"
+                "${BASE_URI}/${encodeArguments(null, provider)}"
             } catch (ex: Exception) {
                 Timber.e(ex, "Could not parse file opened!")
                 null
@@ -94,14 +95,23 @@ sealed class Route(val route: String) {
         }
 
 
-        fun encodeArguments(organizationId: String, eapIdentityProviderList: EAPIdentityProviderList): String {
+        fun encodeArguments(organizationId: String?, eapIdentityProviderList: EAPIdentityProviderList): String {
             val moshi = Moshi.Builder()
                 .add(Date::class.java, DateJsonAdapter())
                 .build()
+            // Here we remove all the embedded images. This is required because some profiles embed images of several megabytes,
+            // which makes the app slow or even crash
+            eapIdentityProviderList.eapIdentityProvider?.forEach {provider ->
+                provider.providerInfo?.providerLogo = null
+            }
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val wifiConfigDataJson = adapter.toJson(eapIdentityProviderList)
             val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
-            return "$route/$organizationId/$encodedWifiConfig"
+            return if (organizationId.isNullOrEmpty()) {
+                "$route/$encodedWifiConfig"
+            } else {
+                "$route/$encodedWifiConfig?organization=$organizationId"
+            }
         }
 
         fun decodeOrganizationIdArgument(arguments: Bundle?): String {
