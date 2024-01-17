@@ -71,4 +71,13 @@
     <string name="notification_channel_name">Reconfiguration reminders</string>
     <string name="notification_title">Reconfigure %s</string>
     <string name="notification_message">There are %1$d days left for your %2$s profile to expire, click to reconfigure it</string>
+
+    <string name="passphrase_dialog_title">Enter passphrase</string>
+    <string name="passphrase_dialog_message">This profile requires a passphrase</string>
+    <string name="passphrase_dialog_label_passphrase">Passphrase</string>
+    <string name="passphrase_dialog_button_cancel">Cancel</string>
+    <string name="passphrase_dialog_button_enter">Enter</string>
+    <string name="passphrase_dialog_incorrect_passphrase">The passphrase you have entered is incorrect!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Hide passphrase</string>
+    <string name="passphrase_accessibility_show_passphrase">Show passphrase</string>
 </resources>

@@ -41,6 +41,7 @@ import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.organizations.PassphraseDialog
 import app.eduroam.geteduroam.organizations.UsernamePasswordDialog
 import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
@@ -62,6 +63,9 @@ fun WifiConfigScreen(
     val suggestionIntent by viewModel.intentWithSuggestions.collectAsState(null)
     val askNetworkPermission by viewModel.requestChangeNetworkPermission.collectAsState(false)
     val showUsernameDialog by viewModel.showUsernameDialog.collectAsState(false)
+    val passphraseDialogRetryCount by viewModel.passphraseDialogRetryCount.collectAsState(0)
+    val showPassphraseDialog by viewModel.showPassphraseDialog.collectAsState(false)
+
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -168,6 +172,16 @@ fun WifiConfigScreen(
             cancel = goBack, // Go back to the previous screen
             logIn = { username, password ->
                 viewModel.didEnterLoginDetails(username = username, password = password)
+                viewModel.launchConfiguration(context)
+            }
+        )
+    }
+    if (showPassphraseDialog) {
+        PassphraseDialog(
+            isRetry = passphraseDialogRetryCount > 1,
+            cancel = goBack, // Go back to the previous screen
+            done = { passphrase ->
+                viewModel.didEnterPassphrase(passphrase)
                 viewModel.launchConfiguration(context)
             }
         )
