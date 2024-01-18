@@ -7,20 +7,15 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import app.eduroam.geteduroam.config.WifiConfigScreen
-import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
@@ -63,6 +58,7 @@ class MainActivity : ComponentActivity() {
         runOnUiThread {
             if (intent?.dataString?.startsWith("content://") == true) {
                 CoroutineScope(coroutineContext).launch {
+                    Timber.d("User has opened an .eap-config file...")
                     Route.ConfigureWifi.buildDeepLink(this@MainActivity, intent.data!!)?.let {
                         intent.data = Uri.parse(it)
                         withContext(Dispatchers.Main) {

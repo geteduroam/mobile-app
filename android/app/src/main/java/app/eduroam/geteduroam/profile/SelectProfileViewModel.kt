@@ -40,7 +40,7 @@ class SelectProfileViewModel @Inject constructor(
 
     var uiState by mutableStateOf(UiState())
         private set
-    private val organizationId: String
+    val organizationId: String
     private var didAgreeToTerms = false
 
     init {
@@ -91,7 +91,7 @@ class SelectProfileViewModel @Inject constructor(
                     connectWithProfile(selectedInstitution.profiles[0], startOAuthFlowIfNoAccess = true)
                 }
             } else {
-                Timber.e("Could not find institution with id $organizationId")
+                Timber.w("Could not find institution with id $organizationId")
                 uiState = uiState.copy(
                     inProgress = false,
                     errorData = ErrorData(
@@ -102,7 +102,7 @@ class SelectProfileViewModel @Inject constructor(
                 )
             }
         } else {
-            Timber.e("Failed to load institutions: $responseError")
+            Timber.w("Failed to load institutions: $responseError")
             uiState = uiState.copy(
                 inProgress = false,
                 errorData = ErrorData(
@@ -124,7 +124,7 @@ class SelectProfileViewModel @Inject constructor(
     }
 
     fun connectWithSelectedProfile() = viewModelScope.launch {
-        val profile = uiState.profiles.first { it.isSelected }
+        val profile = uiState.profiles.firstOrNull { it.isSelected } ?: return@launch
         connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = true)
     }
 
@@ -132,6 +132,7 @@ class SelectProfileViewModel @Inject constructor(
         profile: Profile,
         startOAuthFlowIfNoAccess: Boolean
     ) {
+        Timber.i("Connecting with profile ${profile.name} (ID: ${profile.id})")
         uiState = uiState.copy(inProgress = true)
         if (profile.eapconfigEndpoint != null) {
             if (profile.oauth) {
@@ -168,7 +169,7 @@ class SelectProfileViewModel @Inject constructor(
                 openUrlInBrowser = profile.redirect
             )
         } else {
-            Timber.e("Missing EAP endpoint in profile configuration. Cannot continue with selected profile.")
+            Timber.w("Missing EAP endpoint in profile configuration. Cannot continue with selected profile.")
             uiState = uiState.copy(
                 inProgress = false,
                 errorData = ErrorData(
@@ -196,7 +197,7 @@ class SelectProfileViewModel @Inject constructor(
             }
             return parser.parse(bytes)
         } catch (ex: Exception) {
-            Timber.e(ex, "Unable to fetch EAP config from remote service")
+            Timber.w(ex, "Unable to fetch EAP config from remote service")
             return null
         }
     }
@@ -275,7 +276,7 @@ class SelectProfileViewModel @Inject constructor(
             uiState.profiles.firstOrNull { it.isSelected }
         }
         if (profile == null) {
-            Timber.e("Could not resume connection flow, selected profile not found!")
+            Timber.w("Could not resume connection flow, selected profile not found!")
         } else {
             uiState = uiState.copy(checkProfileWhenResuming = false)
             connectWithProfile(profile.profile, startOAuthFlowIfNoAccess = false)

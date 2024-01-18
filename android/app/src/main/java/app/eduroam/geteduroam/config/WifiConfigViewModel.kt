@@ -23,6 +23,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,23 +32,26 @@ class WifiConfigViewModel @Inject constructor(
     ) : ViewModel() {
 
     lateinit var eapIdentityProviderList: EAPIdentityProviderList
+    lateinit var organizationId: String
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
-    val progressMessage: MutableStateFlow<String> = MutableStateFlow("")
-    val requestChangeNetworkPermission: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val processing: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val progressMessage = MutableStateFlow("")
+    val requestChangeNetworkPermission = MutableStateFlow(false)
+    val processing = MutableStateFlow(true)
     val intentWithSuggestions: MutableStateFlow<Intent?> = MutableStateFlow(null)
-    val showUsernameDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val showPassphraseDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val passphraseDialogRetryCount: MutableStateFlow<Int> = MutableStateFlow(0)
-    val didEnterUserCredentials: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showUsernameDialog = MutableStateFlow(false)
+    val showPassphraseDialog = MutableStateFlow(false)
+    val passphraseDialogRetryCount = MutableStateFlow(0)
+    val didEnterUserCredentials = MutableStateFlow(false)
+    val isRetryLaunch = MutableStateFlow(false)
 
     init {
         launch.value = Unit
     }
 
-    fun launchConfiguration(context: Context) = viewModelScope.launch {
+    fun launchConfiguration(context: Context, fallbackToSuggestions: Boolean = false) = viewModelScope.launch {
         launch.value = null
+        isRetryLaunch.value = fallbackToSuggestions
         try {
             if (eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiresUsernamePrompt() == true && !didEnterUserCredentials.value) {
                 showUsernameDialog.value = true
@@ -65,7 +69,7 @@ class WifiConfigViewModel @Inject constructor(
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
                 handleAndroid11ChromeOs()
             }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM && !fallbackToSuggestions -> {
                 // We will use Intent for SSID, and Suggestion for Passpoint.
                 // It would've been possible to use Intent for both SSID and Passpoint,
                 // but we can never remove intents for Passpoint.
@@ -142,7 +146,7 @@ class WifiConfigViewModel @Inject constructor(
             try {
                 val status = wifiManager.addNetworkSuggestions(listOf(passPointSuggestion))
                 if (status != 0) {
-                    Timber.e("Status for adding network: $status")
+                    Timber.w("Status for adding network: $status")
                 } else {
                     Timber.i("Successfully added network.")
                 }
@@ -151,40 +155,41 @@ class WifiConfigViewModel @Inject constructor(
                     // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                     progressMessage.value = "Failed to add Passpoint suggestion. Exception: ${e.message}"
                 }
-                Timber.e(e, "Failed to add network suggestion")
+                Timber.w(e, "Failed to add network suggestion")
             }
         }
         processing.value = false
     }
 
     private fun PasspointConfiguration.install(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            throw RuntimeException("This method should not be called on this device! Use buildPasspointSuggestion()!")
-        } else {
+        try {
+            val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             try {
-                val wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                try {
-                    // Remove any existing networks with the same FQDN
-                    @Suppress("DEPRECATION")
-                    wifiManager.removePasspointConfiguration(this.homeSp.fqdn)
-                } catch (e: java.lang.IllegalArgumentException) {
-                    // According to the documentation, IllegalArgumentException can be thrown
-                    // But after testing, we see that SecurityException will be thrown
-                    // with message "Permission denied".
+                // Remove any existing networks with the same FQDN
+                @Suppress("DEPRECATION")
+                wifiManager.removePasspointConfiguration(this.homeSp.fqdn)
+            } catch (e: java.lang.IllegalArgumentException) {
+                // According to the documentation, IllegalArgumentException can be thrown
+                // But after testing, we see that SecurityException will be thrown
+                // with message "Permission denied".
 
-                    // This error makes sense when observed (maybe we can't remove the network),
-                    // but it's undocumented that this error can be thrown.
-                } catch (e: SecurityException) {
-                    // Ignore
-                }
-                wifiManager.addOrUpdatePasspointConfiguration(this)
-            } catch (e: IllegalArgumentException) {
-                // Can throw when configuration is wrong or device does not support Passpoint
-                // while we did encounter a few devices without Passpoint support.
-                // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
-                // - so there is no user visible message here.
-                Timber.e(e, "Failed to add or update Passpoint config")
+                // This error makes sense when observed (maybe we can't remove the network),
+                // but it's undocumented that this error can be thrown.
+            } catch (e: SecurityException) {
+                // Ignore
+            } catch (e: UnsupportedOperationException) {
+                // Ignore
             }
+
+            wifiManager.addOrUpdatePasspointConfiguration(this)
+        } catch (e: IllegalArgumentException) {
+            // Can throw when configuration is wrong or device does not support Passpoint
+            // while we did encounter a few devices without Passpoint support.
+            // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
+            // - so there is no user visible message here.
+            Timber.w(e, "Failed to add or update Passpoint config")
+        } catch (e: UnsupportedOperationException) {
+            // Ignore
         }
     }
 
@@ -202,13 +207,13 @@ class WifiConfigViewModel @Inject constructor(
         try {
             val status = wifiManager.addNetworkSuggestions(ssidSuggestions)
             if (status != 0) {
-                Timber.e("Status for adding network: $status")
+                Timber.w("Status for adding network: $status")
             } else {
                 Timber.i("Successfully added network.")
             }
         } catch (e: Exception) {
             progressMessage.value = "Failed to add WiFi Suggestions. Exception: ${e.message}"
-            Timber.e(e, "Failed to add network suggestion")
+            Timber.w(e, "Failed to add network suggestion")
         }
 
         val passpointConfig = eapIdentityProviderList.buildPasspointConfig()
@@ -221,7 +226,7 @@ class WifiConfigViewModel @Inject constructor(
                 // On Android 10 and lower we do not display Passpoint errors because the platform implementation is very unreliable
                 progressMessage.value = "Failed to add Passpoint. Exception: ${e.message}"
             }
-            Timber.e(e, "Failed to add or update Passpoint config")
+            Timber.w(e, "Failed to add or update Passpoint config")
 
         }
         processing.value = false
@@ -248,7 +253,7 @@ class WifiConfigViewModel @Inject constructor(
             } catch (e: Exception) {
                 progressMessage.value =
                     "Failed to add/connect WifiConfiguration. Exception: ${e.message}"
-                Log.e("WifiConfigViewModel", "Failed to add/connect WifiConfiguration", e)
+                Timber.w( e, "Failed to add/connect WifiConfiguration")
             }
         }
         passpointConfig?.install(context)
@@ -306,14 +311,14 @@ class WifiConfigViewModel @Inject constructor(
 
     fun shouldRequestPushPermission() : Boolean {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
-            return notificationRepository.shouldRequestPushPermission(it)
+            return notificationRepository.shouldRequestPushPermission(it, organizationId)
         }
         return false
     }
 
     fun scheduleReminderNotification() {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
-            return notificationRepository.scheduleNotificationIfNeeded(it)
+             notificationRepository.scheduleNotificationIfNeeded(it, organizationId)
         }
     }
 

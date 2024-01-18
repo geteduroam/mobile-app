@@ -29,7 +29,7 @@ class AuthenticationAssistant {
                 { config: AuthorizationServiceConfiguration?, ex: AuthorizationException? ->
                     when {
                         ex != null -> {
-                            Timber.e(ex, "Failed to retrieve discovery document")
+                            Timber.w(ex, "Failed to retrieve discovery document")
                             continuation.resumeWith(Result.failure(ex))
                         }
 
@@ -54,7 +54,7 @@ class AuthenticationAssistant {
         ) { response: RegistrationResponse?, ex: AuthorizationException? ->
             when {
                 ex != null -> {
-                    Timber.e(ex, "Failed to dynamically register client")
+                    Timber.w(ex, "Failed to dynamically register client")
                     continuation.resumeWith(Result.failure(ex))
                 }
 
@@ -83,7 +83,7 @@ class AuthenticationAssistant {
         ) { tokenResponse, ex ->
             when {
                 ex != null -> {
-                    Timber.e(ex, "Failed to exchange authorization code")
+                    Timber.w(ex, "Failed to exchange authorization code")
                     continuation.resumeWith(Result.failure(ex))
                 }
 
@@ -104,7 +104,7 @@ class AuthenticationAssistant {
             service.performTokenRequest(refreshTokenRequest) { tokenResponse, ex ->
                 when {
                     ex != null -> {
-                        Timber.e(ex, "Failed to refresh token")
+                        Timber.w(ex, "Failed to refresh token")
                         continuation.resumeWith(Result.failure(ex))
                     }
 

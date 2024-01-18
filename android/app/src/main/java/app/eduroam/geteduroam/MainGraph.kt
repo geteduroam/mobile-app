@@ -44,11 +44,11 @@ fun MainGraph(
                         )
                     )
                 },
-                goToConfigScreen = { wifiConfigData ->
+                goToConfigScreen = { organizationId, wifiConfigData ->
                     navController.popBackStack()
                     navController.navigate(
                         Route.ConfigureWifi.encodeArguments(
-                            wifiConfigData,
+                            organizationId, wifiConfigData
                         )
                     )
                 },
@@ -67,9 +67,9 @@ fun MainGraph(
                 goToOAuth = { configuration ->
                     navController.navigate(Route.OAuth.encodeArguments(configuration))
                 },
-                goToConfigScreen = { provider ->
+                goToConfigScreen = { organizationId, provider ->
                     navController.navigate(
-                        Route.ConfigureWifi.encodeArguments(provider)
+                        Route.ConfigureWifi.encodeArguments(organizationId, provider)
                     )
                 },
                 goToPrevious = {
@@ -91,8 +91,10 @@ fun MainGraph(
             })
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
+            val organizationId = Route.ConfigureWifi.decodeOrganizationIdArgument(backStackEntry.arguments)
             val viewModel = hiltViewModel<WifiConfigViewModel>()
             viewModel.eapIdentityProviderList = wifiConfigData
+            viewModel.organizationId = organizationId
             WifiConfigScreen(
                 viewModel,
                 closeApp = closeApp,

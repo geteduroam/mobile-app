@@ -7,7 +7,7 @@ import app.eduroam.geteduroam.models.Profile
 
 sealed class Step {
     object Start : Step()
-    data class DoConfig(val eapIdentityProviderList: EAPIdentityProviderList) : Step()
+    data class DoConfig(val organizationId: String, val eapIdentityProviderList: EAPIdentityProviderList) : Step()
     data class DoOAuthFor(val configuration: Configuration) : Step()
     data class PickProfileFrom(val organization: Organization) : Step()
 }

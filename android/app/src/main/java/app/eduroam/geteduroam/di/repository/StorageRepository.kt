@@ -24,7 +24,7 @@ class StorageRepository(private val context: Context) {
 
     val authState: Flow<AuthState?> = context.dataStore.data.catch { exception ->
         if (exception is IOException) {
-            Timber.e(exception, "Error reading preferences.")
+            Timber.w(exception, "Error reading preferences.")
             emit(emptyPreferences())
         } else {
             throw exception
@@ -41,7 +41,7 @@ class StorageRepository(private val context: Context) {
 
     val authRequest: Flow<AuthorizationRequest?> = context.dataStore.data.catch { exception ->
         if (exception is IOException) {
-            Timber.e(exception, "Error reading preferences.")
+            Timber.w(exception, "Error reading preferences.")
             emit(emptyPreferences())
         } else {
             throw exception
@@ -55,7 +55,7 @@ class StorageRepository(private val context: Context) {
 
     val clientId: Flow<String?> = context.dataStore.data.catch { exception ->
         if (exception is IOException) {
-            Timber.e(exception, "Error reading preferences.")
+            Timber.w(exception, "Error reading preferences.")
             emit(emptyPreferences())
         } else {
             throw exception
@@ -66,7 +66,7 @@ class StorageRepository(private val context: Context) {
 
     val lastKnownConfigHash: Flow<Int?> = context.dataStore.data.catch { exception ->
         if (exception is IOException) {
-            Timber.e(exception, "Error reading preferences.")
+            Timber.w(exception, "Error reading preferences.")
             emit(emptyPreferences())
         } else {
             throw exception

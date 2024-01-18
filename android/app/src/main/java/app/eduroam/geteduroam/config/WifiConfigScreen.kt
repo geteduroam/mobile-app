@@ -80,10 +80,18 @@ fun WifiConfigScreen(
         }
     }
     val activityLauncher = rememberLauncherForSuggestionIntent(snackbarHostState, viewModel)
+    val isRetryLaunch by viewModel.isRetryLaunch.collectAsState(initial = false)
     suggestionIntent?.let { intent ->
         LaunchedEffect(intent) {
             viewModel.consumeSuggestionIntent()
-            activityLauncher.launch(intent)
+            try {
+                activityLauncher.launch(intent)
+            } catch (ex: SecurityException) {
+                // Fallback for Honor devices
+                if (!isRetryLaunch) {
+                    viewModel.launchConfiguration(context, fallbackToSuggestions = true)
+                }
+            }
         }
     }
 

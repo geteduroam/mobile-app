@@ -63,7 +63,7 @@ class SelectOrganizationViewModel @Inject constructor(
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
                     }"
-                    Timber.e("Failed to load organizations: $failReason")
+                    Timber.w("Failed to load organizations: $failReason")
                     withContext(Dispatchers.Main) {
                         uiState = uiState.copy(
                             isLoading = false,
@@ -76,7 +76,7 @@ class SelectOrganizationViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Failed to get organizations")
+                Timber.w(e, "Failed to get organizations")
                 withContext(Dispatchers.Main) {
                     uiState = uiState.copy(
                         isLoading = false,
@@ -94,6 +94,7 @@ class SelectOrganizationViewModel @Inject constructor(
     fun onStepCompleted() {}
 
     fun onOrganizationSelect(organization: Organization) {
+        Timber.v("User has selected organization ${organization.name} (ID: ${organization.id})")
         uiState = uiState.copy(selectedOrganization = organization)
     }
 

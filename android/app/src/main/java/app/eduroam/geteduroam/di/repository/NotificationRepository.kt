@@ -37,7 +37,10 @@ class NotificationRepository(
         const val NOTIFICATION_ID = 100
     }
 
-    fun shouldRequestPushPermission(provider: EAPIdentityProvider): Boolean {
+    fun shouldRequestPushPermission(provider: EAPIdentityProvider, organizationId: String): Boolean {
+        if (organizationId.isEmpty()) {
+            return false
+        }
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             // We already have the permission
             return false
@@ -59,16 +62,19 @@ class NotificationRepository(
         }
         return null
     }
-    fun scheduleNotificationIfNeeded(provider: EAPIdentityProvider) {
+    fun scheduleNotificationIfNeeded(provider: EAPIdentityProvider, organizationId: String) {
+        if (organizationId.isEmpty()) {
+            return
+        }
         val reminderDate = getReminderDate(provider) ?: return
         createNotificationChannel()
         Timber.i("Posting reminder to date: $reminderDate")
-        postNotificationAtDate(reminderDate, provider)
+        postNotificationAtDate(reminderDate, organizationId)
     }
 
-    private fun postNotificationAtDate(reminderDate: Date, provider: EAPIdentityProvider) {
+    private fun postNotificationAtDate(reminderDate: Date, organizationId: String) {
         val intent = Intent(context, NotificationAlarmReceiver::class.java)
-        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, provider.ID)
+        intent.putExtra(NOTIFICATION_KEY_PROVIDER_ID, organizationId)
         val pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val alarmManager = context.applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.set(AlarmManager.RTC_WAKEUP, reminderDate.time, pendingIntent)

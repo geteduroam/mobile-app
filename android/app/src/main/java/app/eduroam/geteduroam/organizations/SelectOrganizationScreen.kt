@@ -56,7 +56,7 @@ fun SelectOrganizationScreen(
     viewModel: SelectOrganizationViewModel,
     openProfileModal: (String) -> Unit,
     goToOAuth: (Configuration) -> Unit,
-    goToConfigScreen: (EAPIdentityProviderList) -> Unit,
+    goToConfigScreen: (String, EAPIdentityProviderList) -> Unit,
 ) {
     val step: Step by remember { mutableStateOf(Step.Start) }
     var waitForVmEvent by rememberSaveable { mutableStateOf(false) }
@@ -72,7 +72,7 @@ fun SelectOrganizationScreen(
 
             is Step.DoConfig -> {
                 viewModel.onStepCompleted()
-                goToConfigScreen((step as Step.DoConfig).eapIdentityProviderList)
+                goToConfigScreen((step as Step.DoConfig).organizationId, (step as Step.DoConfig).eapIdentityProviderList)
             }
 
             is Step.PickProfileFrom -> {

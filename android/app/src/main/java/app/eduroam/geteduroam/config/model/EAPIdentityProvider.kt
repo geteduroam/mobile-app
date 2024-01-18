@@ -10,29 +10,28 @@ import java.util.Date
 
 @Root(name = "EAPIdentityProvider", strict = false)
 @JsonClass(generateAdapter = true)
-class EAPIdentityProvider {
-
+data class EAPIdentityProvider(
     @field:ElementList(name = "AuthenticationMethods", entry = "AuthenticationMethod")
-    var authenticationMethod: List<AuthenticationMethod>? = null
+    var authenticationMethod: List<AuthenticationMethod>? = null,
 
     @field:ElementList(name = "CredentialApplicability", entry = "IEEE80211")
-    var credentialApplicability: List<IEEE80211>? = null
+    var credentialApplicability: List<IEEE80211>? = null,
 
     @field:Element(name = "ValidUntil", required = false)
-    var validUntil: Date? = null
+    var validUntil: Date? = null,
 
     @field:Element(name = "ProviderInfo")
-    var providerInfo: ProviderInfo? = null
+    var providerInfo: ProviderInfo? = null,
 
     @field:Attribute
-    var ID: String? = null
+    var ID: String? = null,
 
     @field:Attribute
-    var namespace: String? = null
+    var namespace: String? = null,
 
     @field:Attribute
-    var version: Int? = null
+    var version: Int? = null,
 
     @field:Attribute
-    var lang: String? = null
-}
+    var lang: String? = null,
+)
