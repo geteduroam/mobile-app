@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -163,48 +165,46 @@ fun SelectProfileContent(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.Top,
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            institution?.name?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            institution?.location?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                )
-            }
-            Spacer(Modifier.height(24.dp))
+        institution?.name?.let {
             Text(
-                text = stringResource(R.string.profiles_title),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(4.dp))
-            HorizontalDivider(
+                text = it,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+                fontWeight = FontWeight.Bold
             )
-            if (inProgress) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-            Spacer(Modifier.height(4.dp))
-            profiles.forEach { profile ->
+        }
+        institution?.location?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+            )
+        }
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(R.string.profiles_title),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(4.dp))
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+        )
+        if (inProgress) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+        Spacer(Modifier.height(4.dp))
+        LazyColumn(Modifier.weight(1f)) {
+            items(profiles) { profile ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -234,8 +234,12 @@ fun SelectProfileContent(
         }
         if (providerInfo != null) {
             val scrollState = rememberScrollState()
-            Row(modifier = Modifier.padding(vertical = 16.dp).verticalScroll(scrollState),
-                verticalAlignment = Alignment.Top) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .verticalScroll(scrollState),
+                verticalAlignment = Alignment.Top
+            ) {
                 providerInfo.providerLogo?.convertToBitmap()?.let { logoBitmap ->
                     Surface(
                         modifier = Modifier.size(104.dp),
@@ -270,7 +274,7 @@ fun SelectProfileContent(
                         Text(
                             text = stringResource(id = R.string.helpdesk_title),
                             style = MaterialTheme.typography.titleSmall,
-                            )
+                        )
                         Spacer(modifier = Modifier.size(8.dp))
                         contactDetails.forEach {
                             LinkifyText(
@@ -298,12 +302,12 @@ fun SelectProfileContent(
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
         PrimaryButton(
             text = stringResource(R.string.button_connect),
             enabled = !inProgress,
             onClick = { connectWithSelectedProfile() },
             modifier = Modifier
-                .weight(1f, false)
                 .navigationBarsPadding()
         )
     }
