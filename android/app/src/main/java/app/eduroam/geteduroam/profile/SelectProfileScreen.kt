@@ -231,73 +231,73 @@ fun SelectProfileContent(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
                 )
             }
-        }
-        if (providerInfo != null) {
-            val scrollState = rememberScrollState()
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-                    .verticalScroll(scrollState),
-                verticalAlignment = Alignment.Top
-            ) {
-                providerInfo.providerLogo?.convertToBitmap()?.let { logoBitmap ->
-                    Surface(
-                        modifier = Modifier.size(104.dp),
-                        color = Color.White,
-                        shape = MaterialTheme.shapes.medium
+            if (providerInfo != null) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 16.dp),
+                        verticalAlignment = Alignment.Top
                     ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            bitmap = logoBitmap.asImageBitmap(),
-                            contentDescription = stringResource(id = R.string.content_description_provider_logo)
-                        )
-                    }
-                    Spacer(modifier = Modifier.size(16.dp))
-                }
-                Column(
-                    modifier = Modifier.fillMaxWidth(fraction = 1f)
-                ) {
-                    providerInfo.displayName?.let { displayName ->
-                        Text(
-                            text = displayName,
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
-                    val contactDetails = listOfNotNull(
-                        providerInfo.helpdesk?.webAddress,
-                        providerInfo.helpdesk?.emailAddress,
-                        providerInfo.helpdesk?.phone
-                    )
-                    if (contactDetails.isNotEmpty()) {
-                        Text(
-                            text = stringResource(id = R.string.helpdesk_title),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        contactDetails.forEach {
-                            LinkifyText(
-                                text = it,
-                                color = MaterialTheme.colorScheme.secondary,
-                                linkColor = MaterialTheme.colorScheme.secondary,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.size(4.dp))
+                        providerInfo.providerLogo?.convertToBitmap()?.let { logoBitmap ->
+                            Surface(
+                                modifier = Modifier.size(104.dp),
+                                color = Color.White,
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    bitmap = logoBitmap.asImageBitmap(),
+                                    contentDescription = stringResource(id = R.string.content_description_provider_logo)
+                                )
+                            }
+                            Spacer(modifier = Modifier.size(16.dp))
                         }
-                    }
-                    providerInfo.termsOfUse?.let { termsOfUse ->
-                        Text(
-                            text = stringResource(id = R.string.terms_of_use_dialog_title),
-                            style = MaterialTheme.typography.titleSmall,
-                        )
-                        Spacer(modifier = Modifier.size(4.dp))
-                        LinkifyText(
-                            text = termsOfUse,
-                            color = MaterialTheme.colorScheme.secondary,
-                            linkColor = MaterialTheme.colorScheme.secondary,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(fraction = 1f)
+                        ) {
+                            providerInfo.displayName?.let { displayName ->
+                                Text(
+                                    text = displayName,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                            }
+                            val contactDetails = listOfNotNull(
+                                providerInfo.helpdesk?.webAddress,
+                                providerInfo.helpdesk?.emailAddress,
+                                providerInfo.helpdesk?.phone
+                            )
+                            if (contactDetails.isNotEmpty()) {
+                                Text(
+                                    text = stringResource(id = R.string.helpdesk_title),
+                                    style = MaterialTheme.typography.titleSmall,
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                contactDetails.forEach {
+                                    LinkifyText(
+                                        text = it,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        linkColor = MaterialTheme.colorScheme.secondary,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Spacer(modifier = Modifier.size(4.dp))
+                                }
+                            }
+                            providerInfo.termsOfUse?.let { termsOfUse ->
+                                Text(
+                                    text = stringResource(id = R.string.terms_of_use_dialog_title),
+                                    style = MaterialTheme.typography.titleSmall,
+                                )
+                                Spacer(modifier = Modifier.size(4.dp))
+                                LinkifyText(
+                                    text = termsOfUse,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    linkColor = MaterialTheme.colorScheme.secondary,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
                     }
                 }
             }
