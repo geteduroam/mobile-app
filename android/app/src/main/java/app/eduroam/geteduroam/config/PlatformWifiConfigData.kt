@@ -109,7 +109,9 @@ private fun EAPIdentityProviderList.buildEnterpriseConfig(): WifiEnterpriseConfi
     enterpriseConfig.eapMethod = enterpriseEAP
 
     val caCertificates = authMethod?.serverSideCredential?.certData?.mapNotNull { it.value }
-    enterpriseConfig.caCertificates = getCertificates(caCertificates).toTypedArray()
+    enterpriseConfig.caCertificates = getCertificates(caCertificates)
+        .filter { isRootCertificate(it) }
+        .toTypedArray()
 
     val serverNames = authMethod?.serverSideCredential?.serverId
     assert(
