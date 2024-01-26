@@ -8,6 +8,8 @@
     <string name="profiles_title">Profilok</string>
     <string name="profiles_header">Válaszd ki a profilt</string>
     <string name="configuration_progress">WiFi kapcsolat létrehozása</string>
+    <string name="configuration_waiting_for_user_credentials">Várokozás felhasználói hozzéférési tokenre...</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 megköveteli, hogy a Silent értesítésen keresztül fogadja el az új Wi-Fi hálózatokat. A kapcsolódáshoz tekintse meg az értesítések részét az új hálózatokhoz való csatlakozáshoz.</string>
     <string name="configuration_success">WiFi konfiguráció kész</string>
     <string name="configuration_logs">Log üzenetek</string>
     <string name="configuration_canceled">Törlés</string>
@@ -69,4 +71,13 @@
     <string name="notification_channel_name">Újrakonfigurálási emlékeztető</string>
     <string name="notification_title"> %s újra konfigurálása</string>
     <string name="notification_message">%1$d nap múlva lejárt %2$s profilod, kattints az újrakonfigurálásért</string>
+
+    <string name="passphrase_dialog_title">Adja meg a jelszót</string>
+    <string name="passphrase_dialog_message">Ez a profil egy jelszót igényel</string>
+    <string name="passphrase_dialog_label_passphrase">Jelszó</string>
+    <string name="passphrase_dialog_button_cancel">Mégse</string>
+    <string name="passphrase_dialog_button_enter">Belépés</string>
+    <string name="passphrase_dialog_incorrect_passphrase">A megadott jelszó helytelen!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Jelszó elrejtése</string>
+    <string name="passphrase_accessibility_show_passphrase">Jelszó megjelenítése</string>
 </resources>

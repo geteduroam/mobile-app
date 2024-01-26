@@ -8,6 +8,8 @@
     <string name="profiles_title">Profile</string>
     <string name="profiles_header">Wählen Sie ein Profil aus</string>
     <string name="configuration_progress">WLAN-Verbindung wird hergestellt</string>
+    <string name="configuration_waiting_for_user_credentials">Warten auf Nutzerdaten...</string>
+    <string name="configuration_android_10_notification_disclaimer">In Android 10 müssen Sie neue WLANs in einer \"stillen Benachrichtigung\" akzeptieren. Sehen Sie sich den Benachrichtigungsbereich an, um mit den Netzen zu verbinden.</string>
     <string name="configuration_success">WLAN konfiguriert</string>
     <string name="configuration_logs">Logeinträge:</string>
     <string name="configuration_canceled">Abgebrochen</string>
@@ -69,4 +71,13 @@
     <string name="notification_channel_name">Ablauferinnerungen</string>
     <string name="notification_title">%s neu einrichten</string>
     <string name="notification_message">In %1$d Tagen läuft Ihr %2$s Profil ab, klicken Sie zum Erneuern</string>
+
+    <string name="passphrase_dialog_title">Import-Code eingeben</string>
+    <string name="passphrase_dialog_message">Dieses Profil benötigt einen Import-Code</string>
+    <string name="passphrase_dialog_label_passphrase">Import-Code</string>
+    <string name="passphrase_dialog_button_cancel">Abbrechen</string>
+    <string name="passphrase_dialog_button_enter">Eingabe</string>
+    <string name="passphrase_dialog_incorrect_passphrase">Der eingegebene Import-Code ist falsch!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Import-Code verbergen</string>
+    <string name="passphrase_accessibility_show_passphrase">Import-Code anzeigen</string>
 </resources>

@@ -1,0 +1,83 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="name">geteduroam</string>
+
+    <string name="welcome">Benvido</string>
+    <string name="organizations_no_results">Non se puido atopar ningunha organización.</string>
+    <string name="organization_search_text">Busca a túa organización</string>
+    <string name="institutions_choose_one">Selecciona a institución á que desexas conectarte.</string>
+    <string name="profiles_title">Perfís</string>
+    <string name="profiles_header">Selecciona un perfil</string>
+    <string name="configuration_progress">Establecendo a conexión WiFi</string>
+    <string name="configuration_waiting_for_user_credentials">Esperando as credenciais do usuario...</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 require que aceptes as novas redes Wi-Fi a través dunha notificación silenciosa. Consulta a sección de notificacións para conectarte ás novas redes.</string>
+    <string name="configuration_success">WiFi configurada</string>
+    <string name="configuration_logs">Mensaxes de log:</string>
+    <string name="configuration_canceled">Cancelado</string>
+    <string name="configuration_completed">Completado</string>
+    <string name="login_dialog_title">Acceso requirido</string>
+    <string name="login_dialog_text">Por favor, introduce o teu nome de usuario e contrasinal.</string>
+    <string name="login_dialog_username">Nome de usuario</string>
+    <string name="login_dialog_password">Contrasinal</string>
+    <string name="login_dialog_cancel">Cancelar</string>
+    <string name="login_dialog_login">Iniciar sesión</string>
+    <string name="terms_of_use_dialog_title">Termos de uso</string>
+    <string name="terms_of_use_dialog_text">Debes aceptar os termos de uso antes de poder usar esta rede.</string>
+    <string name="terms_of_use_dialog_agree">De acordo</string>
+    <string name="terms_of_use_dialog_disagree">Rexeitar</string>
+
+    <string name="err_title_auth_unexpected_fail">Erro inesperado</string>
+    <string name="err_msg_auth_init_fail">Fallou a inicialización de AppData. Por favor, ténteo de novo.</string>
+    <string name="err_msg_auth_init_fail_arg">Fallou a inicialización de AppData. Motivo: %s</string>
+    <string name="err_title_auth_invalid">Autorización non válida</string>
+    <string name="err_msg_auth_invalid">Non recibiu unha autenticación válida.</string>
+    <string name="err_title_auth_failed">A autorización fallou</string>
+    <string name="err_msg_auth_failed">Non se convserva o estado de autorización- é necesaria unha nova autorización.</string>
+    <string name="err_msg_auth_token_failed">O intercambio do código de autorización do token fallou.</string>
+    <string name="err_msg_auth_code_failed_arg">O intercambio do código de autorización fallou: %s.</string>
+    <string name="err_title_generic_fail">Non se pode completar a solicitude</string>
+    <string name="err_msg_generic_unexpected_with_arg">Erro inesperado: %s, por favor, tente novamente.</string>
+    <string name="err_msg_invalid_organization_id">Id de organización non válido. Non se pode continuar coa organización seleccionada.</string>
+    <string name="err_msg_cannot_find_organization">Non se pode atopar a organización co ID %s.</string>
+    <string name="err_msg_missing_eap_endpoint">O perfil seleccionado non ten punto final EAP.</string>
+    <string name="err_msg_no_valid_provider">Non se atopou ningún provedor EAP válido.</string>
+
+    <string name="oauth_title" tools:ignore="ExtraTranslation">Autenticar</string>
+    <string name="oauth_description" tools:ignore="ExtraTranslation">Autentícate coa túa conta para obter a configuración wifi.</string>
+    <string name="oauth_processing" tools:ignore="ExtraTranslation">Procesando...</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_retry">Reintentar</string>
+    <string name="button_connect">CONNECT</string>
+    <string name="button_back">Volver</string>
+    <string name="button_close_app">Pechar app</string>
+
+    <string name="content_description_provider_logo">Logotipo do provedor</string>
+    <string name="content_description_success_checkmark">Marca de verificación de éxito</string>
+
+    <string name="helpdesk_title">Centro de axuda técnica</string>
+
+    <string name="username_password_login_required">Acceso requirido</string>
+    <string name="username_password_please_enter">Por favor, introduce o teu nome de usuario e contrasinal.</string>
+    <string name="username_password_label_username">Nome de usuario</string>
+    <string name="username_password_label_password">Contrasinal</string>
+    <string name="username_password_button_cancel">Cancelar</string>
+    <string name="username_password_button_log_in">Iniciar sesión</string>
+
+    <string name="username_password_placeholder_username_example_suffix">example.com</string>
+    <string name="username_password_placeholder_username_before_suffix">nome de usuario</string>
+    <string name="username_password_accessibility_hide_password">Ocultar contrasinal</string>
+    <string name="username_password_accessibility_show_password">Mostrar contrasinal</string>
+    <string name="notification_channel_description">Lembrache cando a túa configuración expirará pronto</string>
+    <string name="notification_channel_name">Recordatorios de reconfiguración</string>
+    <string name="notification_title">Reconfigurar %s</string>
+    <string name="notification_message">Quedan %1$d días para que expire o teu perfil %2$s, fai clic para reconfiguralo</string>
+
+    <string name="passphrase_dialog_title">Introduza a passphrase</string>
+    <string name="passphrase_dialog_message">Este perfil require a passphrase</string>
+    <string name="passphrase_dialog_label_passphrase">Passphrase</string>
+    <string name="passphrase_dialog_button_cancel">Cancelar</string>
+    <string name="passphrase_dialog_button_enter">Enter</string>
+    <string name="passphrase_dialog_incorrect_passphrase">A passphrase que introduciches é incorrecta!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Ocultar a passphrase</string>
+    <string name="passphrase_accessibility_show_passphrase">Mostrar a passphrase</string>
+</resources>
