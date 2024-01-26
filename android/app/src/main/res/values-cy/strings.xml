@@ -8,6 +8,8 @@
     <string name="profiles_title">Proffiliau</string>
     <string name="profiles_header">Dewiswch proffil</string>
     <string name="configuration_progress">Sefydlu cysylltiad Wi-Fi</string>
+    <string name="configuration_waiting_for_user_credentials">Aros am fanylion y defnyddiwr…</string>
+    <string name="configuration_android_10_notification_disclaimer">Mae Android 10 yn gofyn ichi dderbyn y rhwydweithiau Wi-Fi newydd trwy hysbysiad distaw. Gweler eich adran Hysbysiadau i gysylltu â\'r rhwydweithiau newydd.</string>
     <string name="configuration_success">Wi-Fi wedi\'i ffurfweddu</string>
     <string name="configuration_logs">Negeseuon log:</string>
     <string name="configuration_canceled">Canslwyd</string>
@@ -69,4 +71,13 @@
     <string name="notification_channel_name">Nodiadau atgoffa ad-drefnu</string>
     <string name="notification_title">Ail-ffurfweddu %s</string>
     <string name="notification_message">Mae %1$d diwrnod ar ôl cyn i\'ch proffil %2$s ddod i ben, cliciwch i\'w ail-ffurfweddu</string>
+
+    <string name="passphrase_dialog_title">Rhowch cyfrin-ymadrodd</string>
+    <string name="passphrase_dialog_message">Mae\'r proffil hwn angen cyfrin-ymadrodd</string>
+    <string name="passphrase_dialog_label_passphrase">Cyfrin-ymadrodd</string>
+    <string name="passphrase_dialog_button_cancel">Canslo</string>
+    <string name="passphrase_dialog_button_enter">Enter</string>
+    <string name="passphrase_dialog_incorrect_passphrase">Mae\'r cyfrin-ymadrodd rydych chi wedi\'i roi yn anghywir!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Cuddio cyfrin-ymadrodd</string>
+    <string name="passphrase_accessibility_show_passphrase">Dangos cyfrin-ymadrodd</string>
 </resources>

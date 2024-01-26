@@ -8,6 +8,8 @@
     <string name="profiles_title">Profielen</string>
     <string name="profiles_header">Kies een profiel</string>
     <string name="configuration_progress">Bezig met WiFi configuratie</string>
+    <string name="configuration_waiting_for_user_credentials">Wachten op gebruikersgegevens...</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 vereist dat je de nieuwe Wi-Fi-netwerken accepteert via een stille melding. Bekijk uw meldingen om verbinding te maken met de nieuwe netwerken.</string>
     <string name="configuration_success">WiFi geconfigureerd</string>
     <string name="configuration_logs">Log berichten:</string>
     <string name="configuration_canceled">Geannuleerd</string>
@@ -69,4 +71,13 @@
     <string name="notification_channel_name">Herinnering om opnieuw in te stellen</string>
     <string name="notification_title">Stel %s opnieuw in</string>
     <string name="notification_message">Over %1$d dagen verloopt je %2$s profiel, klik hier om opnieuw in te stellen</string>
+
+    <string name="passphrase_dialog_title">Voer wachtwoord in</string>
+    <string name="passphrase_dialog_message">Dit profiel vereist een wachtwoord</string>
+    <string name="passphrase_dialog_label_passphrase">Wachtwoord</string>
+    <string name="passphrase_dialog_button_cancel">Annuleren</string>
+    <string name="passphrase_dialog_button_enter">Invoeren</string>
+    <string name="passphrase_dialog_incorrect_passphrase">Het ingevulde wachtwoord is onjuist!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Verberg wachtwoord</string>
+    <string name="passphrase_accessibility_show_passphrase">Toon wachtwoord</string>
 </resources>
