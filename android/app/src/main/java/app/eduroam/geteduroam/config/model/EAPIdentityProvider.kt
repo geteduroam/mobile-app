@@ -32,6 +32,6 @@ data class EAPIdentityProvider(
     @field:Attribute
     var version: Int? = null,
 
-    @field:Attribute
+    @field:Attribute(required = false)
     var lang: String? = null,
 )
