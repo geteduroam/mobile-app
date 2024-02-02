@@ -210,8 +210,9 @@ private fun EAPIdentityProviderList.handleEapTLS(enterpriseConfig: WifiEnterpris
 private fun EAPIdentityProviderList.getServerNamesDomainDependentOnAndroidVersion(): String? {
     val eapIdentityProvider = eapIdentityProvider?.first()
     val serverNames = eapIdentityProvider?.authenticationMethod?.bestMethod()?.serverSideCredential?.serverId ?: emptyList()
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        serverNames.joinToString(";")
+    val joinedServerNames = serverNames.joinToString(";")
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && joinedServerNames.length < 256) {
+        joinedServerNames
     } else {
         getLongestSuffix(serverNames)
     }
