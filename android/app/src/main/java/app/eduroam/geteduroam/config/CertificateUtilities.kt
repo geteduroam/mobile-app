@@ -25,7 +25,7 @@ fun isRootCertificate(certificate: X509Certificate): Boolean =
  * @param certificate The certificate to check
  * @return The certificate is a CA certificate
  */
-private fun isCA(certificate: X509Certificate): Boolean {
+fun isCA(certificate: X509Certificate): Boolean {
 
     val usage = certificate.keyUsage
 
