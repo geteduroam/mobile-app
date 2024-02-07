@@ -30,6 +30,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -73,7 +75,18 @@ fun UsernamePasswordDialog(
                 // Username / password input fields need to be LTR even in RTL languages
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     TextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                if (!focusState.isFocused && username.isNotEmpty()) {
+                                    if (username.isNotEmpty() &&
+                                        !requiredSuffix.isNullOrEmpty() &&
+                                        !username.contains("@")
+                                    ) {
+                                        username += "@$requiredSuffix"
+                                    }
+                                }
+                            },
                         value = username,
                         onValueChange = {
                             username = it
@@ -82,17 +95,6 @@ fun UsernamePasswordDialog(
                         maxLines = 1,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, autoCorrect = false, imeAction = ImeAction.Next),
-                        keyboardActions = KeyboardActions(
-                            onNext = {
-                                if (username.isNotEmpty() &&
-                                    !requiredSuffix.isNullOrEmpty() &&
-                                    !username.contains("@")
-                                ) {
-                                    username += "@$requiredSuffix"
-                                }
-                                defaultKeyboardAction(ImeAction.Next)
-                            }
-                        ),
                         placeholder = {
                             val exampleUsername =
                                 stringResource(id = R.string.username_password_placeholder_username_before_suffix)
@@ -173,9 +175,11 @@ fun UsernamePasswordDialog(
             }
         }
         // Spacer to slide the dialog up when the keyboard shows
-        Spacer(modifier = Modifier
-            .navigationBarsPadding()
-            .imePadding()
-            .size(16.dp))
+        Spacer(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .imePadding()
+                .size(16.dp)
+        )
     }
 }
