@@ -8,6 +8,8 @@
     <string name="profiles_title">Perfiles</string>
     <string name="profiles_header">Selecciona un perfil</string>
     <string name="configuration_progress">Estableciendo una conexión WiFi</string>
+    <string name="configuration_waiting_for_user_credentials">Esperando a las credenciales del usuario...</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 requiere que aceptes las nuevas redes Wi-Fi a través de una notificación silenciosa. Consulta la sección de notificaciones para conectarte a las nuevas redes.</string>
     <string name="configuration_success">WiFi configurado</string>
     <string name="configuration_logs">Registro de mensajes:</string>
     <string name="configuration_canceled">Cancelado</string>
@@ -69,4 +71,13 @@
     <string name="notification_channel_name">Recordatorios de reconfiguración</string>
     <string name="notification_title">Reconfigurar %s</string>
     <string name="notification_message">Quedan %1$d días para la caducidad del perfil %2$s. Haz click para reconfigurarlo.</string>
+
+    <string name="passphrase_dialog_title">Introducir contraseña</string>
+    <string name="passphrase_dialog_message">Este perfil requiere una contraseña</string>
+    <string name="passphrase_dialog_label_passphrase">Contraseña</string>
+    <string name="passphrase_dialog_button_cancel">Cancelar</string>
+    <string name="passphrase_dialog_button_enter">Introducir</string>
+    <string name="passphrase_dialog_incorrect_passphrase">La contraseña que has introducido es incorrecta</string>
+    <string name="passphrase_accessibility_hide_passphrase">Ocultar contraseña</string>
+    <string name="passphrase_accessibility_show_passphrase">Mostrar contraseña</string>
 </resources>
