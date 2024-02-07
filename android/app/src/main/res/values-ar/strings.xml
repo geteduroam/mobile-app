@@ -8,6 +8,8 @@
     <string name="profiles_title">الملفات التعريفية</string>
     <string name="profiles_header">اختر الملف التعريفي</string>
     <string name="configuration_progress">إنشاء اتصال لا سلكي WiFi </string>
+    <string name="configuration_waiting_for_user_credentials">بانتظار بيانات اعتماد المستخدم...</string>
+    <string name="configuration_android_10_notification_disclaimer">يتطلب Android 10 منك قبول شبكات Wi-Fi الجديدة من خلال إشعار صامت. راجع قسم الإشعارات للاتصال بالشبكات الجديدة.</string>
     <string name="configuration_success">تم تهيئة شبكة WiFi</string>
     <string name="configuration_logs"> رسائل السجل Log:</string>
     <string name="configuration_canceled">تم الإلغاء</string>
@@ -70,4 +72,12 @@
     <string name="notification_title">إعادة تهيئة %s</string>
     <string name="notification_message">تبقى %1$d يوم لانتهاء صلاحية ملف تعريف %2$s الخاص بك، انقر لإعادة تهيئتة.</string>
 
-    </resources>
+    <string name="passphrase_dialog_title">أدخل عبارة المرور</string>
+    <string name="passphrase_dialog_message">يتطلب ملف التعريف هذا عبارة مرور</string>
+    <string name="passphrase_dialog_label_passphrase">عبارة مرور</string>
+    <string name="passphrase_dialog_button_cancel">إلغاء</string>
+    <string name="passphrase_dialog_button_enter">إدخال</string>
+    <string name="passphrase_dialog_incorrect_passphrase">عبارة المرور التي أدخلتها غير صحيحة!</string>
+    <string name="passphrase_accessibility_hide_passphrase">إخفاء عبارة المرور</string>
+    <string name="passphrase_accessibility_show_passphrase">إظهار عبارة المرور</string>
+</resources>
