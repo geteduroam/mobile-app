@@ -36,8 +36,12 @@ fun isCA(certificate: X509Certificate): Boolean {
         return true
     } else {
         // Find out if this a CA according to Basic Constraints
-        val extension = certificate.getExtensionValue("2.5.29.19")
-        return (extension != null) && (extension.size > 1) && (extension[0].toInt() != 0)
+        if (certificate.getExtensionValue("2.5.29.19") != null) {
+            if (certificate.basicConstraints != -1) {
+                return true
+            }
+        }
+        return false
     }
 }
 
