@@ -61,7 +61,9 @@ fun SelectOrganizationScreen(
 ) {
     val step: Step by remember { mutableStateOf(Step.Start) }
     var waitForVmEvent by rememberSaveable { mutableStateOf(false) }
+
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val context = LocalContext.current
 
     LaunchedEffect(step) {
         when (step) {
@@ -97,6 +99,10 @@ fun SelectOrganizationScreen(
                     viewModel.clearSelection()
                 }
         }
+    }
+
+    LaunchedEffect(context) {
+        viewModel.initializeHelper(context)
     }
 
     SelectOrganizationContent(
@@ -179,12 +185,14 @@ fun SelectOrganizationContent(
             OrganizationSearchHeader(
                 searchText = searchText,
                 onSearchTextChange = onSearchTextChange,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
             if (isLoading) {
                 LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     trackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
                 )

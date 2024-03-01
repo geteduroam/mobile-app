@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.organizations
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
 import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.ui.ErrorData
+import app.eduroam.geteduroam.util.DatabaseHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +28,9 @@ class SelectOrganizationViewModel @Inject constructor(
 ) : ViewModel() {
 
     var uiState by mutableStateOf(UiState())
+        private set
+
+    var dbHelper: DatabaseHelper? by mutableStateOf(null)
         private set
 
     private var allOrganizations by mutableStateOf(emptyList<Organization>())
@@ -47,18 +52,9 @@ class SelectOrganizationViewModel @Inject constructor(
                             onSearchTextChange(uiState.filter)
                         }
                     }
-                    do {
-                        var canImproveSearchWords = false
-                        allOrganizations.forEach {
-                            val result = it.improveMatchWords()
-                            canImproveSearchWords =  canImproveSearchWords || result
-                        }
-                        withContext(Dispatchers.Main) {
-                            if (uiState.filter.isNotEmpty()) {
-                                onSearchTextChange(uiState.filter)
-                            }
-                        }
-                    } while (canImproveSearchWords)
+                    println("Started loading ${organizationResult.instances.size} orgs into db.")
+                    dbHelper!!.loadIntoDatabase(organizationResult.instances)
+                    println("Ended loading ${organizationResult.instances.size} orgs into db.")
                 } else {
                     val failReason = "${response.code()}/${response.message()}]${
                         response.errorBody()?.string()
@@ -91,6 +87,10 @@ class SelectOrganizationViewModel @Inject constructor(
         }
     }
 
+    fun initializeHelper(context: Context) {
+        dbHelper = DatabaseHelper(context)
+    }
+
     fun onStepCompleted() {}
 
     fun onOrganizationSelect(organization: Organization) {
@@ -99,17 +99,17 @@ class SelectOrganizationViewModel @Inject constructor(
     }
 
     fun onSearchTextChange(filter: String) {
+        println("Search start")
         val filtered = if (filter.isNotBlank()) {
-            val normalizedFilter = filter.removeNonSpacingMarks()
-            allOrganizations.filter { organization ->
-                organization.matchWords.any {
-                    it.startsWith(normalizedFilter, ignoreCase = true)
-                }
+            val matchingIndices = dbHelper!!.getIndicesForFilter(filter)
+            matchingIndices.map {
+                allOrganizations[it]
             }.sortedBy { it.nameOrId.lowercase() }
         } else {
             emptyList()
         }
         uiState = uiState.copy(filter = filter, organizations = filtered)
+        println("Search end")
     }
 
     fun clearDialog() {
