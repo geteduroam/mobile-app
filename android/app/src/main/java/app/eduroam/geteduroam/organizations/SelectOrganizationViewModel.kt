@@ -101,9 +101,20 @@ class SelectOrganizationViewModel @Inject constructor(
     fun onSearchTextChange(filter: String) {
         val filtered = if (filter.isNotBlank()) {
             val normalizedFilter = filter.removeNonSpacingMarks()
+            val filterWords = filter.split(" ")
             allOrganizations.filter { organization ->
-                organization.matchWords.any {
-                    it.startsWith(normalizedFilter, ignoreCase = true)
+                if (filterWords.size == 1) {
+                    organization.matchWords.any {
+                        it.startsWith(normalizedFilter, ignoreCase = true)
+                    }
+                } else {
+                    var containsAll = true
+                    for (filterWord in filterWords) {
+                        containsAll = containsAll && organization.matchWords.any {
+                            it.startsWith(filterWord, ignoreCase = true)
+                        }
+                    }
+                    containsAll
                 }
             }.sortedBy { it.nameOrId.lowercase() }
         } else {
