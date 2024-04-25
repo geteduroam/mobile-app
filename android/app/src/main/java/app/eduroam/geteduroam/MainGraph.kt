@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +23,7 @@ const val BASE_URI = "https://eduroam.org"
 @Composable
 fun MainGraph(
     navController: NavHostController = rememberNavController(),
+    openFileUri: (Uri) -> Unit,
     closeApp: () -> Unit
 ) : NavController {
     NavHost(
@@ -52,6 +54,7 @@ fun MainGraph(
                         )
                     )
                 },
+                openFileUri = openFileUri
             )
         }
         composable(
