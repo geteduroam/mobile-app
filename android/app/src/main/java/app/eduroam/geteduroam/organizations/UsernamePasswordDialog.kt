@@ -95,10 +95,10 @@ fun UsernamePasswordDialog(
                             username = it
                         },
                         supportingText = {
-                            if (usernameError != null) {
+                            usernameError?.let { nonNullError ->
                                 Text(
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                                    text = usernameError!!,
+                                    text = nonNullError,
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
