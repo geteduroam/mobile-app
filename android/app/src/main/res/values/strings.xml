@@ -62,6 +62,7 @@
     <string name="username_password_label_password">Password</string>
     <string name="username_password_button_cancel">Cancel</string>
     <string name="username_password_button_log_in">Log in</string>
+    <string name="username_password_error_required_suffix">Username should end with: %s</string>
 
     <string name="username_password_placeholder_username_example_suffix">example.com</string>
     <string name="username_password_placeholder_username_before_suffix">username</string>

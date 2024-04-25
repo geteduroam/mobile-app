@@ -59,7 +59,10 @@ fun UsernamePasswordDialog(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var usernameError by remember { mutableStateOf<String?>(null) }
+
     val keyboardController = LocalSoftwareKeyboardController.current
+    val requiredSuffixError = requiredSuffix?.let { stringResource(id = R.string.username_password_error_required_suffix, it) }
     Column {
         Surface(
             shape = MaterialTheme.shapes.medium
@@ -90,6 +93,15 @@ fun UsernamePasswordDialog(
                         value = username,
                         onValueChange = {
                             username = it
+                        },
+                        supportingText = {
+                            usernameError?.let { nonNullError ->
+                                Text(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                    text = nonNullError,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         },
                         textStyle = LocalTextStyle.current.copy(textDirection = TextDirection.Ltr),
                         maxLines = 1,
@@ -165,7 +177,12 @@ fun UsernamePasswordDialog(
                     Spacer(modifier = Modifier.size(8.dp))
                     Button(
                         onClick = {
-                            logIn(username, password)
+                            if (!requiredSuffix.isNullOrEmpty() && !username.endsWith(requiredSuffix, ignoreCase = false)) {
+                                usernameError = requiredSuffixError
+                            } else {
+                                usernameError = null
+                                logIn(username, password)
+                            }
                         },
                         enabled = username.isNotBlank() && password.isNotBlank()
                     ) {
