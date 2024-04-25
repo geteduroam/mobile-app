@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
@@ -27,6 +28,8 @@ class MainActivity : ComponentActivity() {
     val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
 
+    val coroutineScope = CoroutineScope(coroutineContext)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -38,7 +41,18 @@ class MainActivity : ComponentActivity() {
                 navController = MainGraph(
                     closeApp = {
                         this@MainActivity.finish()
-                    })
+                    },
+                    openFileUri = {
+                        coroutineScope.launch {
+                            Timber.d("User has opened an .eap-config file using the built-in button")
+                            if (!openFileUri(it)) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@MainActivity, R.string.err_msg_not_a_valid_eap_config_file, Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                )
             }
         }
         handleNewIntent(intent)
@@ -57,12 +71,11 @@ class MainActivity : ComponentActivity() {
     private fun handleNewIntent(intent: Intent?) {
         runOnUiThread {
             if (intent?.dataString?.startsWith("content://") == true) {
-                CoroutineScope(coroutineContext).launch {
-                    Timber.d("User has opened an .eap-config file...")
-                    Route.ConfigureWifi.buildDeepLink(this@MainActivity, intent.data!!)?.let {
-                        intent.data = Uri.parse(it)
+                coroutineScope.launch {
+                    Timber.d("User has opened an .eap-config file with the app...")
+                    if (!openFileUri(intent.data!!)) {
                         withContext(Dispatchers.Main) {
-                            navController?.handleDeepLink(intent)
+                            Toast.makeText(this@MainActivity, R.string.err_msg_not_a_valid_eap_config_file, Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -70,5 +83,15 @@ class MainActivity : ComponentActivity() {
                 navController?.handleDeepLink(intent)
             }
         }
+    }
+
+    private suspend fun openFileUri(fileUri: Uri): Boolean {
+        Route.ConfigureWifi.buildDeepLink(this@MainActivity, fileUri)?.let {
+            intent.data = Uri.parse(it)
+            return withContext(Dispatchers.Main) {
+                return@withContext navController?.handleDeepLink(intent) ?: false
+            }
+        }
+        return false
     }
 }

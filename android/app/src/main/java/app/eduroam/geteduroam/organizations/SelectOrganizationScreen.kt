@@ -1,5 +1,8 @@
 package app.eduroam.geteduroam.organizations
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
+import androidx.compose.material.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +45,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
@@ -58,6 +64,7 @@ fun SelectOrganizationScreen(
     openProfileModal: (String) -> Unit,
     goToOAuth: (Configuration) -> Unit,
     goToConfigScreen: (String, EAPIdentityProviderList) -> Unit,
+    openFileUri: (Uri) -> Unit
 ) {
     val step: Step by remember { mutableStateOf(Step.Start) }
     var waitForVmEvent by rememberSaveable { mutableStateOf(false) }
@@ -112,8 +119,9 @@ fun SelectOrganizationScreen(
         onCredsAvailable = { username, password ->
             viewModel.creds.value = Pair(username, password)
         },
-        errorData = viewModel.uiState.errorData
-        )
+        errorData = viewModel.uiState.errorData,
+        openFileUri = openFileUri
+    )
 }
 
 
@@ -128,8 +136,18 @@ fun SelectOrganizationContent(
     onSearchTextChange: (String) -> Unit = {},
     onClearDialog: () -> Unit = {},
     onCredsAvailable: (String, String) -> Unit = { _, _ -> },
+    openFileUri: (Uri) -> Unit = {}
 ) = Surface(color = MaterialTheme.colorScheme.surface) {
     val context = LocalContext.current
+    var showExtraActionsPopup by remember { mutableStateOf(false) }
+    var popupPosition by remember { mutableStateOf(IntOffset(0, 0)) }
+    val pickEapConfigFileLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { fileUri ->
+        if (fileUri != null) {
+            openFileUri(fileUri)
+        }
+    }
     if (showDialog) {
         LoginDialog({ username, password ->
             onCredsAvailable(username, password)
@@ -179,12 +197,20 @@ fun SelectOrganizationContent(
             OrganizationSearchHeader(
                 searchText = searchText,
                 onSearchTextChange = onSearchTextChange,
-                modifier = Modifier.fillMaxWidth()
+                onPositionDetermined = { position ->
+                    popupPosition = position
+                },
+                showExtraActionsPopup = {
+                    showExtraActionsPopup = true
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
             if (isLoading) {
                 LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     trackColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
                 )
@@ -219,7 +245,32 @@ fun SelectOrganizationContent(
             }
         }
     }
+    if (showExtraActionsPopup) {
+        Popup(
+            offset = popupPosition,
+            onDismissRequest = {
+                showExtraActionsPopup = false
+            }
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    TextButton(
+                        onClick = {
+                            showExtraActionsPopup = false
+                            // Open file chooser
+                            pickEapConfigFileLauncher.launch("*/*") // It would be nice to filter on .eap-config files, but it is currently not possible
+                        }
+                    ) {
+                        Text(text = stringResource(id = R.string.open_eap_config_file))
+                    }
+                }
+            }
+        }
+    }
 }
+
 
 @Preview
 @Composable
