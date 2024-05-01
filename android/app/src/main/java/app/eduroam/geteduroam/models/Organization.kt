@@ -6,24 +6,30 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import java.util.Locale
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class Organization(
-    @Json(name = "cat_idp")
-    val catIdp: Int,
     val country: String,
     val id: String,
-    val name: String?,
+    val name: Map<String, String>,
     val profiles: List<Profile>,
 ) : Parcelable {
-    val nameOrId get() = name ?: id
 
     @IgnoredOnParcel
     var matchWordsLevel: Int = 0
 
     @IgnoredOnParcel
     var matchWords : List<String> = emptyList()
+
+    fun getLocalizedName(): String {
+        val userLanguage = Locale.getDefault().language.lowercase()
+        return name[userLanguage] ?: // 1st option: the name in the user's language
+            name[LANGUAGE_KEY_FALLBACK] ?: // 2nd option: the name in the fallback language (english)
+            name.values.firstOrNull() ?: // 3rd option: any name we can find
+            id // 4th option: the ID, which is always set
+    }
 
     /**
      * Improves the word matching list.
@@ -32,26 +38,32 @@ data class Organization(
      */
     fun improveMatchWords() : Boolean {
         if (matchWordsLevel == 0) {
-            matchWords = listOf(nameOrId)
+            matchWords = name.values.toList()
             matchWordsLevel = 1
             return true
         } else if (matchWordsLevel == 1) {
             // Split on anything which is non-alphanumeric
-            val words = nameOrId.split(DELIMITER).filter { it.isNotEmpty() }.toMutableList()
-            val abbreviation = words.map { it.first() }.joinToString("")
-            words += nameOrId
-            words += abbreviation
+            val namesWords = name.values.map {  it.split(DELIMITER).filter { it.isNotEmpty() }}.toMutableList()
+            val namesAbbreviations = namesWords.map { nameWords -> nameWords.map { word -> word.first() }.joinToString("") }
+            val words = mutableListOf<String>()
+            words += name.values.toList()
+            words += namesAbbreviations
             matchWords = words
             matchWordsLevel = 2
             return true
         } else if (matchWordsLevel == 2) {
             matchWords = matchWords.map { it.removeNonSpacingMarks() }
             matchWordsLevel = 3
+            if (id == "cat_idp_168") {
+                println("Match words: $matchWords, name values: ${name.values}")
+            }
         }
         return false
     }
 
     companion object {
         private val DELIMITER = "\\W+".toRegex()
+
+        private const val LANGUAGE_KEY_FALLBACK = "any"
     }
 }
