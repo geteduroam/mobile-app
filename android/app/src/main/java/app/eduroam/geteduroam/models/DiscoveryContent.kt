@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class OrganizationResult(
-    val instances: List<Organization>,
-    val version: Int,
+data class DiscoveryContent(
+    val institutions: List<Organization>,
+    val seq: Long
 ) : Parcelable

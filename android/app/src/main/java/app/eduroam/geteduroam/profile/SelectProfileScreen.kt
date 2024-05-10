@@ -214,7 +214,7 @@ fun SelectProfileContent(
                         }), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = profile.profile.name,
+                        text = profile.profile.getLocalizedName(),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth(0.9f)
                     )
@@ -326,6 +326,6 @@ private fun Preview_SelectProfileModal() {
 }
 
 private val profileList = listOf(
-    PresentProfile(Profile(id = "id", name = "First profile"), true),
-    PresentProfile(Profile(id = "id", name = "Second profile"), false),
+    PresentProfile(Profile(id = "id", name = mapOf("any" to "First profile")), true),
+    PresentProfile(Profile(id = "id", name = mapOf("any" to "Second profile")), false),
 )

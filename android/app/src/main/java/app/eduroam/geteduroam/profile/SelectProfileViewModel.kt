@@ -1,6 +1,5 @@
 package app.eduroam.geteduroam.profile
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,13 +9,10 @@ import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
-import app.eduroam.geteduroam.config.model.ClientSideCredential
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.config.model.bestMethod
-import app.eduroam.geteduroam.config.requiresUsernamePrompt
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
-import app.eduroam.geteduroam.models.OrganizationResult
+import app.eduroam.geteduroam.models.DiscoveryResult
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,8 +56,8 @@ class SelectProfileViewModel @Inject constructor(
     private fun loadData() = viewModelScope.launch {
         uiState = uiState.copy(inProgress = true)
         var responseError: String? = null
-        val institutionResult: OrganizationResult? = try {
-            val response = api.getOrganizations()
+        val institutionResult: DiscoveryResult? = try {
+            val response = api.discover()
             if (!response.isSuccessful) {
                 responseError = "${response.code()}/${response.message()}]${response.errorBody()?.string()}"
             }
@@ -71,7 +67,7 @@ class SelectProfileViewModel @Inject constructor(
             null
         }
         if (institutionResult != null) {
-            val selectedInstitution = institutionResult.instances.find { it.id == organizationId }
+            val selectedInstitution = institutionResult.content.institutions.find { it.id == organizationId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
                 val presentProfiles = selectedInstitution.profiles.mapIndexed { index, profile ->
@@ -83,7 +79,7 @@ class SelectProfileViewModel @Inject constructor(
                     inProgress = isSingleProfile,
                     profiles = presentProfiles,
                     organization = PresentOrganization(
-                        name = selectedInstitution.name, location = selectedInstitution.country
+                        name = selectedInstitution.getLocalizedName(), location = selectedInstitution.country
                     )
                 )
                 if (isSingleProfile) {

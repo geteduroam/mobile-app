@@ -34,7 +34,7 @@ fun OrganizationRow(
         .clickable { onSelectOrganization(organization) }) {
         Spacer(Modifier.height(8.dp))
         Text(
-            text = organization.nameOrId,
+            text = organization.getLocalizedName(),
             style = MaterialTheme.typography.titleMedium,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,

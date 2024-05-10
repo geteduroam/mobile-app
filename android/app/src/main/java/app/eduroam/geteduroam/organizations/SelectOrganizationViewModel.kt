@@ -37,11 +37,11 @@ class SelectOrganizationViewModel @Inject constructor(
         uiState = uiState.copy(isLoading = true)
         viewModelScope.launch (Dispatchers.IO) {
             try {
-                val response = api.getOrganizations()
-                val organizationResult = response.body()
-                if (response.isSuccessful && organizationResult != null) {
+                val response = api.discover()
+                val discoveryResult = response.body()
+                if (response.isSuccessful && discoveryResult != null) {
                     withContext(Dispatchers.Main) {
-                        allOrganizations = organizationResult.instances
+                        allOrganizations = discoveryResult.content.institutions
                         uiState = uiState.copy(isLoading = false)
                         if (uiState.filter.isNotEmpty()) {
                             onSearchTextChange(uiState.filter)
@@ -53,6 +53,7 @@ class SelectOrganizationViewModel @Inject constructor(
                             val result = it.improveMatchWords()
                             canImproveSearchWords =  canImproveSearchWords || result
                         }
+                        println("Match words pass")
                         withContext(Dispatchers.Main) {
                             if (uiState.filter.isNotEmpty()) {
                                 onSearchTextChange(uiState.filter)
@@ -116,7 +117,7 @@ class SelectOrganizationViewModel @Inject constructor(
                     }
                     containsAll
                 }
-            }.sortedBy { it.nameOrId.lowercase() }
+            }.sortedBy { it.getLocalizedName().lowercase() }
         } else {
             emptyList()
         }
