@@ -19,8 +19,19 @@ data class Profile(
     val authorizationEndpoint: String? = null,
     @Json(name = "token_endpoint")
     val tokenEndpoint: String? = null,
-    val redirect: String? = null
+    val redirect: String? = null,
+    val type: Type,
+    @Json(name = "letswifi_endpoint")
+    val letswifiEndpoint: String? = null
 ) : Parcelable {
+
+    enum class Type {
+        @Json(name = "letswifi")
+        letswifi,
+        @Json(name = "eap-config")
+        eapConfig,
+        unknown
+    }
 
     fun getLocalizedName(): String {
         val userLanguage = Locale.getDefault().language.lowercase()

@@ -148,6 +148,7 @@ dependencies {
     implementation(libs.simpleframework.xml.parser)
 
     implementation(libs.moshi.moshi)
+    implementation(libs.moshi.adapters)
     ksp(libs.moshi.codegen)
 
     //OkHttp client

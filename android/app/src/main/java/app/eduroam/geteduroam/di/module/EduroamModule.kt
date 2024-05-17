@@ -7,7 +7,10 @@ import app.eduroam.geteduroam.di.api.response.ApiResponseAdapterFactory
 import app.eduroam.geteduroam.di.assist.AuthenticationAssistant
 import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.di.repository.StorageRepository
+import app.eduroam.geteduroam.models.Profile
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.EnumJsonAdapter
+import com.squareup.moshi.addAdapter
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -85,5 +88,7 @@ internal object EduroamModule {
 
     @Provides
     @Singleton
-    internal fun provideMoshi(): Moshi = Moshi.Builder().build()
+    internal fun provideMoshi(): Moshi = Moshi.Builder()
+        .add(Profile.Type::class.java, EnumJsonAdapter.create(Profile.Type::class.java).withUnknownFallback(Profile.Type.unknown))
+        .build()
 }

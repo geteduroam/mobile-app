@@ -70,10 +70,27 @@ class SelectProfileViewModel @Inject constructor(
             val selectedInstitution = institutionResult.content.institutions.find { it.id == organizationId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
-                val presentProfiles = selectedInstitution.profiles.mapIndexed { index, profile ->
-                    PresentProfile(
-                        profile = profile, isSelected = isSingleProfile || index == 0
-                    )
+                var isFirstProfile = true
+                val presentProfiles = selectedInstitution.profiles.map { profile ->
+                    val result: PresentProfile
+                    if (profile.type == Profile.Type.letswifi) {
+                        try {
+                            result = PresentProfile(profile = resolveLetswifiProfile(profile), isSelected = isFirstProfile)
+                        } catch (ex: Exception) {
+                            Timber.w(ex, "Could not fetch letswifi profile!")
+                            uiState = uiState.copy(
+                                errorData = ErrorData(
+                                    titleId = R.string.err_title_generic_fail,
+                                    messageId = R.string.err_msg_could_not_discover_profile_configuration
+                                )
+                            )
+                            return@launch
+                        }
+                    } else {
+                        result = PresentProfile(profile = profile, isSelected = isFirstProfile)
+                    }
+                    isFirstProfile = false
+                    result
                 }
                 uiState = uiState.copy(
                     inProgress = isSingleProfile,
@@ -84,7 +101,7 @@ class SelectProfileViewModel @Inject constructor(
                 )
                 if (isSingleProfile) {
                     Timber.i("Single profile for institution. Continue with configuration")
-                    connectWithProfile(selectedInstitution.profiles[0], startOAuthFlowIfNoAccess = true)
+                    connectWithProfile(presentProfiles[0].profile, startOAuthFlowIfNoAccess = true)
                 }
             } else {
                 Timber.w("Could not find institution with id $organizationId")
@@ -109,6 +126,23 @@ class SelectProfileViewModel @Inject constructor(
             )
 
         }
+    }
+
+    private suspend fun resolveLetswifiProfile(letswifiProfile: Profile): Profile {
+        val endpoint = letswifiProfile.letswifiEndpoint
+        if (endpoint.isNullOrEmpty()) {
+            throw IllegalArgumentException("Missing letswifi endpoint!")
+        }
+        val response = api.getLetswifiConfig(endpoint).body()?.content ?: throw IllegalStateException("Could not fetch letswifi config!")
+        return Profile(
+            eapconfigEndpoint = response.eapConfigEndpoint,
+            id = letswifiProfile.id,
+            name = letswifiProfile.name,
+            oauth = true,
+            authorizationEndpoint = response.authorizationEndpoint,
+            tokenEndpoint =  response.tokenEndpoint,
+            type = Profile.Type.eapConfig
+        )
     }
 
     fun setProfileSelected(profile: PresentProfile) {

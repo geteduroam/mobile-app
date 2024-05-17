@@ -39,6 +39,7 @@
     <string name="err_msg_invalid_organization_id">Invalid organization id. Cannot continue for selected organization.</string>
     <string name="err_msg_cannot_find_organization">Cannot find organization with id %s.</string>
     <string name="err_msg_missing_eap_endpoint">Selected profile is missing EAP endpoint.</string>
+    <string name="err_msg_could_not_discover_profile_configuration">Unable to resolve profile configuration. Please check your connection and try again.</string>
     <string name="err_msg_no_valid_provider">No valid EAP provider was found.</string>
 
     <string name="oauth_title" tools:ignore="ExtraTranslation">Authenticate</string>
