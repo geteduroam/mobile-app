@@ -47,6 +47,7 @@ data class Organization(
             val namesAbbreviations = namesWords.map { nameWords -> nameWords.map { word -> word.first() }.joinToString("") }
             val words = mutableListOf<String>()
             words += name.values.toList()
+            words += namesWords.flatten()
             words += namesAbbreviations
             matchWords = words
             matchWordsLevel = 2
@@ -54,9 +55,6 @@ data class Organization(
         } else if (matchWordsLevel == 2) {
             matchWords = matchWords.map { it.removeNonSpacingMarks() }
             matchWordsLevel = 3
-            if (id == "cat_idp_168") {
-                println("Match words: $matchWords, name values: ${name.values}")
-            }
         }
         return false
     }

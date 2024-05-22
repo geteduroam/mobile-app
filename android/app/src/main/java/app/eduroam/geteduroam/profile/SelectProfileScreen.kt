@@ -326,6 +326,6 @@ private fun Preview_SelectProfileModal() {
 }
 
 private val profileList = listOf(
-    PresentProfile(Profile(id = "id", name = mapOf("any" to "First profile")), true),
-    PresentProfile(Profile(id = "id", name = mapOf("any" to "Second profile")), false),
+    PresentProfile(Profile(id = "id", name = mapOf("any" to "First profile"), type = Profile.Type.eapConfig), true),
+    PresentProfile(Profile(id = "id", name = mapOf("any" to "Second profile"), type = Profile.Type.eapConfig), false),
 )
