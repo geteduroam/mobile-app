@@ -25,6 +25,7 @@ data class Profile(
     val letswifiEndpoint: String? = null
 ) : Parcelable {
 
+    @JsonClass(generateAdapter = false)
     enum class Type {
         @Json(name = "letswifi")
         letswifi,
