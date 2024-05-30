@@ -100,7 +100,7 @@ fun SelectProfileScreen(
         snapshotFlow { viewModel.uiState }.distinctUntilChanged()
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
                 val providerList = state.goToConfigScreenWithProviderList!!
-                goToConfigScreen(viewModel.organizationId, providerList)
+                goToConfigScreen(viewModel.institutionId!!, providerList)
                 viewModel.didGoToConfigScreen()
             }
     }

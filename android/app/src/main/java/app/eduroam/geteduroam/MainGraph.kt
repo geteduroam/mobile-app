@@ -37,7 +37,7 @@ fun MainGraph(
                 openProfileModal = { institutionId ->
                     // Remove the focus from the search field (if it was there)
                     focusManager.clearFocus(force = true)
-                    navController.navigate(Route.SelectProfile.encodeArgument(institutionId))
+                    navController.navigate(Route.SelectProfile.encodeInstitutionIdArgument(institutionId))
                 },
                 goToOAuth = { configuration ->
                     navController.navigate(
@@ -54,7 +54,10 @@ fun MainGraph(
                         )
                     )
                 },
-                openFileUri = openFileUri
+                openFileUri = openFileUri,
+                discoverUrl = {
+                    navController.navigate(Route.SelectProfile.encodeCustomHostArgument(it))
+                }
             )
         }
         composable(

@@ -10,4 +10,5 @@ data class UiState(
     val selectedOrganization: Organization? = null,
     val promptAuth: Unit? = null,
     val errorData: ErrorData? = null,
+    val showConnectCta: Boolean = false
 )

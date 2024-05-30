@@ -1,8 +1,11 @@
 package app.eduroam.geteduroam.profile
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,9 +16,11 @@ import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
 import app.eduroam.geteduroam.models.DiscoveryResult
+import app.eduroam.geteduroam.models.Organization
 import app.eduroam.geteduroam.models.Profile
 import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -27,6 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectProfileViewModel @Inject constructor(
+    @ApplicationContext context: Context,
     savedStateHandle: SavedStateHandle,
     val api: GetEduroamApi,
     private val repository: StorageRepository,
@@ -36,13 +42,17 @@ class SelectProfileViewModel @Inject constructor(
 
     var uiState by mutableStateOf(UiState())
         private set
-    val organizationId: String
+    val institutionId: String?
+    val customHost: Uri?
     private var didAgreeToTerms = false
 
     init {
-        organizationId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
-        if (organizationId.isNotBlank()) {
-            loadData()
+        institutionId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
+        customHost = savedStateHandle.get<String>(Route.SelectProfile.customHostArg)?.let { Uri.parse(it) }
+        if (institutionId.isNotBlank()) {
+            loadDataFromInstitution()
+        } else if (customHost != null) {
+            loadDataFromCustomHost(context)
         } else {
             uiState = uiState.copy(
                 inProgress = false, errorData = ErrorData(
@@ -53,7 +63,7 @@ class SelectProfileViewModel @Inject constructor(
         }
     }
 
-    private fun loadData() = viewModelScope.launch {
+    private fun loadDataFromInstitution() = viewModelScope.launch {
         uiState = uiState.copy(inProgress = true)
         var responseError: String? = null
         val institutionResult: DiscoveryResult? = try {
@@ -67,7 +77,7 @@ class SelectProfileViewModel @Inject constructor(
             null
         }
         if (institutionResult != null) {
-            val selectedInstitution = institutionResult.content.institutions.find { it.id == organizationId }
+            val selectedInstitution = institutionResult.content.institutions.find { it.id == institutionId }
             if (selectedInstitution != null) {
                 val isSingleProfile = selectedInstitution.profiles.size == 1
                 var isFirstProfile = true
@@ -79,6 +89,7 @@ class SelectProfileViewModel @Inject constructor(
                         } catch (ex: Exception) {
                             Timber.w(ex, "Could not fetch letswifi profile!")
                             uiState = uiState.copy(
+                                inProgress = false,
                                 errorData = ErrorData(
                                     titleId = R.string.err_title_generic_fail,
                                     messageId = R.string.err_msg_could_not_discover_profile_configuration
@@ -104,13 +115,13 @@ class SelectProfileViewModel @Inject constructor(
                     connectWithProfile(presentProfiles[0].profile, startOAuthFlowIfNoAccess = true)
                 }
             } else {
-                Timber.w("Could not find institution with id $organizationId")
+                Timber.w("Could not find institution with id $institutionId")
                 uiState = uiState.copy(
                     inProgress = false,
                     errorData = ErrorData(
                         titleId = R.string.err_title_generic_fail,
                         messageId = R.string.err_msg_cannot_find_organization,
-                        messageArg = organizationId
+                        messageArg = institutionId
                     )
                 )
             }
@@ -127,6 +138,38 @@ class SelectProfileViewModel @Inject constructor(
 
         }
     }
+
+    private fun loadDataFromCustomHost(context: Context) = viewModelScope.launch {
+        uiState = uiState.copy(inProgress = true)
+        try {
+            val profile = resolveLetswifiProfile(Profile(
+                id = customHost.toString(),
+                name = mapOf("any" to context.getString(R.string.name)),
+                type = Profile.Type.letswifi,
+                letswifiEndpoint = customHost.toString()
+            ))
+            uiState = uiState.copy(
+                inProgress = true,
+                profiles = listOf(PresentProfile(profile, true)),
+                organization = PresentOrganization(
+                    name = customHost?.host, location = ""
+                )
+            )
+            connectWithSelectedProfile()
+        } catch (ex: Exception) {
+            Timber.w(ex, "Could not fetch letswifi profile!")
+            uiState = uiState.copy(
+                inProgress = false,
+                errorData = ErrorData(
+                    titleId = R.string.err_title_generic_fail,
+                    messageId = R.string.err_msg_could_not_discover_profile_configuration
+                )
+            )
+            return@launch
+        }
+
+    }
+
 
     private suspend fun resolveLetswifiProfile(letswifiProfile: Profile): Profile {
         val endpoint = letswifiProfile.letswifiEndpoint
