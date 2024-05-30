@@ -89,6 +89,7 @@ class SelectProfileViewModel @Inject constructor(
                         } catch (ex: Exception) {
                             Timber.w(ex, "Could not fetch letswifi profile!")
                             uiState = uiState.copy(
+                                inProgress = false,
                                 errorData = ErrorData(
                                     titleId = R.string.err_title_generic_fail,
                                     messageId = R.string.err_msg_could_not_discover_profile_configuration
@@ -158,6 +159,7 @@ class SelectProfileViewModel @Inject constructor(
         } catch (ex: Exception) {
             Timber.w(ex, "Could not fetch letswifi profile!")
             uiState = uiState.copy(
+                inProgress = false,
                 errorData = ErrorData(
                     titleId = R.string.err_title_generic_fail,
                     messageId = R.string.err_msg_could_not_discover_profile_configuration
