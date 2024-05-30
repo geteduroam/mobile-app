@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,8 +21,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +68,8 @@ fun SelectOrganizationScreen(
     openProfileModal: (String) -> Unit,
     goToOAuth: (Configuration) -> Unit,
     goToConfigScreen: (String, EAPIdentityProviderList) -> Unit,
-    openFileUri: (Uri) -> Unit
+    openFileUri: (Uri) -> Unit,
+    discoverUrl: (Uri) -> Unit
 ) {
     val step: Step by remember { mutableStateOf(Step.Start) }
     var waitForVmEvent by rememberSaveable { mutableStateOf(false) }
@@ -120,7 +125,9 @@ fun SelectOrganizationScreen(
             viewModel.creds.value = Pair(username, password)
         },
         errorData = viewModel.uiState.errorData,
-        openFileUri = openFileUri
+        openFileUri = openFileUri,
+        showConnectCta = viewModel.uiState.showConnectCta,
+        discoverUrl = discoverUrl
     )
 }
 
@@ -131,12 +138,14 @@ fun SelectOrganizationContent(
     isLoading: Boolean = false,
     showDialog: Boolean = false,
     errorData: ErrorData? = null,
+    showConnectCta: Boolean = false,
     onSelectOrganization: (Organization) -> Unit,
     searchText: String,
     onSearchTextChange: (String) -> Unit = {},
     onClearDialog: () -> Unit = {},
     onCredsAvailable: (String, String) -> Unit = { _, _ -> },
-    openFileUri: (Uri) -> Unit = {}
+    openFileUri: (Uri) -> Unit = {},
+    discoverUrl: (Uri) -> Unit = {}
 ) = Surface(color = MaterialTheme.colorScheme.surface) {
     val context = LocalContext.current
     var showExtraActionsPopup by remember { mutableStateOf(false) }
@@ -217,7 +226,7 @@ fun SelectOrganizationContent(
             }
             Spacer(Modifier.height(8.dp))
             LazyColumn(Modifier.weight(1f)) {
-                 if (errorData != null) {
+                if (errorData != null) {
                     item {
                         Text(
                             modifier = Modifier.padding(16.dp),
@@ -226,19 +235,54 @@ fun SelectOrganizationContent(
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
-                } else if (!isLoading) {
-                    if (organizations.isEmpty() && searchText.isNotEmpty()) {
+                } else {
+                    if (showConnectCta) {
                         item {
-                            Text(
-                                modifier = Modifier.padding(16.dp),
-                                color = MaterialTheme.colorScheme.secondary,
-                                text = stringResource(id = R.string.organizations_no_results),
-                                fontWeight = FontWeight.Medium
-                            )
+                            TextButton(
+                                onClick = {
+                                    var uri = Uri.parse(searchText)
+                                    if (uri.scheme == null) {
+                                        uri = Uri.parse("https://$searchText")
+                                    }
+                                    discoverUrl(uri)
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.weight(1f),
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        text = stringResource(id = R.string.connect_to_server, searchText),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowForward,
+                                        contentDescription = "",
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                }
+                            }
                         }
-                    } else {
-                        items(organizations) { organization ->
-                            OrganizationRow(organization, onSelectOrganization)
+
+                    }
+                    if (!isLoading) {
+                        if (organizations.isEmpty() && searchText.isNotEmpty() && !showConnectCta) {
+                            item {
+                                Text(
+                                    modifier = Modifier.padding(16.dp),
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    text = stringResource(id = R.string.organizations_no_results),
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        } else {
+                            items(organizations) { organization ->
+                                OrganizationRow(organization, onSelectOrganization)
+                            }
                         }
                     }
                 }

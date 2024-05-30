@@ -15,6 +15,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import timber.log.Timber
 import java.io.StringReader
+import java.net.URL
 import java.util.Date
 
 
@@ -22,17 +23,25 @@ sealed class Route(val route: String) {
     object SelectInstitution : Route(route = "select_institution")
     object SelectProfile : Route(route = "select_profile") {
         const val institutionIdArg = "institutionIdArg"
-        val routeWithArgs = "$route/{$institutionIdArg}"
+        const val customHostArg = "customHostArg"
+        val routeWithArgs = "$route/?institutionId={$institutionIdArg}&customHost={$customHostArg}"
         val arguments = listOf(
             navArgument(institutionIdArg) {
                 type = NavType.StringType
-                nullable = false
+                nullable = true
                 defaultValue = ""
             },
+            navArgument(customHostArg) {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = ""
+            }
         )
-        val deepLinkUrl = "$BASE_URI/${route}/{${institutionIdArg}}"
-        fun buildDeepLink(institutionId: String) = "$BASE_URI/${route}/${Uri.encode(institutionId)}"
-        fun encodeArgument(id: String) = "$route/${Uri.encode(id)}"
+        val deepLinkUrl = "$BASE_URI/${route}/?institutionId={${institutionIdArg}}&customHost={$customHostArg}"
+        fun buildDeepLink(institutionId: String) = "$BASE_URI/${route}/?institutionId=${Uri.encode(institutionId)}"
+        fun buildDeepLink(customHost: Uri) = "$BASE_URI/${route}/?customHost=${Uri.encode(customHost.toString())}"
+        fun encodeInstitutionIdArgument(id: String) = "$route/?institutionId=${Uri.encode(id)}"
+        fun encodeCustomHostArgument(customHost: Uri) = "$route/?customHost=${Uri.encode(customHost.toString())}"
     }
 
     object OAuth : Route(route = "oauth_prompt") {

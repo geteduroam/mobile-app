@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.organizations
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -121,7 +122,21 @@ class SelectOrganizationViewModel @Inject constructor(
         } else {
             emptyList()
         }
-        uiState = uiState.copy(filter = filter, organizations = filtered)
+        // Search contains at least two dots
+        var showConnectCta = filter.count { '.' == it } > 1
+        if (showConnectCta) {
+            try {
+                Uri.parse(filter)
+            } catch (ex: Exception) {
+                // Not a valid URI!
+                showConnectCta = false
+            }
+        }
+        uiState = uiState.copy(
+            filter = filter,
+            organizations = filtered,
+            showConnectCta = showConnectCta
+        )
     }
 
     fun clearDialog() {
