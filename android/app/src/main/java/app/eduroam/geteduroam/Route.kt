@@ -2,6 +2,7 @@ package app.eduroam.geteduroam
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.NavType
@@ -46,32 +47,78 @@ sealed class Route(val route: String) {
 
     object OAuth : Route(route = "oauth_prompt") {
         const val configurationArg = "configurationArg"
+        const val redirectUriArg = "redirectUriArg"
 
-        val routeWithArgs = "$route?config={$configurationArg}"
+        val routeWithArgs = "$route?config={$configurationArg}&redirectUri={$redirectUriArg}"
         val arguments = listOf(
             navArgument(configurationArg) {
+                type = NavType.StringType
+                nullable = false
+                defaultValue = ""
+            },
+            navArgument(redirectUriArg) {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = ""
+            }
+        )
+
+        fun encodeArguments(configuration: Configuration, redirectUri: Uri?): String {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
+            val serializedConfig = adapter.toJson(configuration)
+            val encodedConfig = Uri.encode(serializedConfig)
+            if (redirectUri == null) {
+                return "$route?config=$encodedConfig"
+            } else {
+                val encodedUri = Uri.encode(redirectUri.toString())
+                return "$route?config=$encodedConfig&redirectUri=$encodedUri"
+            }
+        }
+
+        fun decodeConfigurationArgument(encodedConfiguration: String): Configuration {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
+            val decodedConfiguration = Uri.decode(encodedConfiguration)
+            return adapter.fromJson(decodedConfiguration)!!
+        }
+    }
+
+    object WebViewFallback : Route(route = "webview_fallback") {
+        const val urlArg = "urlArg"
+        const val configurationArg = "configurationArg"
+
+        val routeWithArgs = "$route/{$configurationArg}?url={$urlArg}"
+        val arguments = listOf(
+            navArgument(configurationArg) {
+                type = NavType.StringType
+                nullable = false
+                defaultValue = ""
+            },
+            navArgument(urlArg) {
                 type = NavType.StringType
                 nullable = false
                 defaultValue = ""
             }
         )
 
-        fun encodeArguments(configuration: Configuration): String {
-            val moshi = Moshi.Builder().build()
-            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
-            val serializedConfig = adapter.toJson(configuration)
-            val encodedConfig = Uri.encode(serializedConfig)
-            return "$route?config=$encodedConfig"
-        }
-
-        fun decodeUrlArgument(encodedConfiguration: String): Configuration {
+        fun decodeConfigurationArgument(encodedConfiguration: String): Configuration {
             val moshi = Moshi.Builder().build()
             val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
             val decodedConfiguration = Uri.decode(encodedConfiguration)
             return adapter.fromJson(decodedConfiguration)!!
         }
 
+        fun encodeArguments(configuration: Configuration, uri: Uri): String {
+            val moshi = Moshi.Builder().build()
+            val adapter: JsonAdapter<Configuration> = moshi.adapter(Configuration::class.java)
+            val serializedConfig = adapter.toJson(configuration)
+            val encodedConfig = Uri.encode(serializedConfig)
+            val encodedUri = Uri.encode(uri.toString())
+            return "$route/$encodedConfig?url=$encodedUri"
+        }
     }
+
 
     object ConfigureWifi : Route(route = "configure_wifi") {
         const val organizationIdArg = "organizationid"

@@ -23,6 +23,7 @@ import app.eduroam.geteduroam.ui.ErrorData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationException
@@ -54,19 +55,46 @@ class OAuthViewModel @Inject constructor(
     private val usePKCE = true
     private var service: AuthorizationService? = null
     private var configuration: Configuration = Configuration.EMPTY
+
     init {
         val configurationArg = savedStateHandle.get<String>(Route.OAuth.configurationArg) ?: ""
-        configuration = Route.OAuth.decodeUrlArgument(configurationArg)
-        prepareAppAuth(context)
+        configuration = Route.OAuth.decodeConfigurationArgument(configurationArg)
+        val redirectUriArg = savedStateHandle.get<String>(Route.OAuth.redirectUriArg) ?: ""
+        val redirectUri: Uri?
+        if (redirectUriArg.isNotEmpty()) {
+            redirectUri = Uri.parse(Uri.decode(redirectUriArg))
+        } else {
+            redirectUri = null
+        }
+        prepareAppAuth(context, redirectUri)
     }
 
-    fun prepareAppAuth(context: Context) = viewModelScope.launch {
+    fun prepareAppAuth(context: Context, redirectUri: Uri?) = viewModelScope.launch {
         uiState = UiState(OAuthStep.Loading)
         try {
             checkIfConfigurationChanged()
-            initializeAppAuth(context)
+            initializeAppAuth(context, redirectUri != null)
+            if (redirectUri != null) {
+                val authRequest = repository.authRequest.first()
+                uiState = if (authRequest != null) {
+                    UiState(OAuthStep.GetTokensFromRedirectUri(redirectUri, authRequest))
+                } else {
+                    UiState(
+                        OAuthStep.Error, ErrorData(
+                            titleId = R.string.err_title_auth_unexpected_fail,
+                            messageId = R.string.err_msg_auth_init_fail_arg,
+                            messageArg = context.getString(R.string.err_msg_auth_no_matching_auth_request)
+                        )
+                    )
+                }
+                return@launch
+            }
             val authorizationIntent = createAuthorizationIntent(context)
-            uiState = UiState(OAuthStep.Initialized(authorizationIntent))
+            if (authorizationIntent != null) {
+                uiState = UiState(OAuthStep.Initialized(authorizationIntent))
+            } else {
+                uiState = UiState(OAuthStep.WebViewFallback(configuration, repository.authRequest.first()!!.toUri()))
+            }
         } catch (e: Exception) {
             Timber.w(e, "Unable to initialize AppAuth!")
             val argument = e.message ?: e.localizedMessage
@@ -106,7 +134,7 @@ class OAuthViewModel @Inject constructor(
     }
 
 
-    private suspend fun createAuthorizationIntent(context: Context): Intent {
+    private suspend fun createAuthorizationIntent(context: Context): Intent? {
         val currentAuthRequest = repository.authRequest.first()
             ?: throw IllegalStateException("AuthorizationRequest not available when trying to create authorization request Intent")
         val availableService = service
@@ -117,8 +145,7 @@ class OAuthViewModel @Inject constructor(
             val customTabIntent = warmupBrowser()
             return availableService.getAuthorizationRequestIntent(currentAuthRequest, customTabIntent)
         } else {
-            val launchIntent = Intent(Intent.ACTION_VIEW, requestUri)
-            return AuthorizationManagementActivity.createStartForResultIntent(context, currentAuthRequest, launchIntent)
+            return null
         }
     }
 
@@ -246,9 +273,12 @@ class OAuthViewModel @Inject constructor(
         repository.saveCurrentAuthRequest(null)
     }
 
-    private suspend fun initializeAppAuth(context: Context) {
+    private suspend fun initializeAppAuth(context: Context, hasRedirectUri: Boolean) {
         Timber.d("Initializing AppAuth")
         recreateAuthorizationService(context)
+        if (hasRedirectUri) {
+            return
+        }
 
         val currentAuthState = repository.authState.first()
         if (currentAuthState?.authorizationServiceConfiguration != null) {
@@ -375,87 +405,7 @@ class OAuthViewModel @Inject constructor(
         service?.dispose()
     }
 
-    fun authorizationLaunched() {
+    fun didGoToNextScreen() {
         uiState = uiState.copy(oauthStep = OAuthStep.Launched)
     }
-
-//     fun onNavigatedToRedirectUri(
-//        code: String,
-//        institutionId: String,
-//        error: String,
-//        profile: Profile,
-//    ) {
-//        viewModelScope.launch {
-//            val token = institutionsRepository.postToken(
-//                tokenUrl = profile.token_endpoint.orEmpty(),
-//                code = code,
-//                redirectUri = Screens.OAuth.redirectUrl,
-//                clientId = Screens.OAuth.APP_ID,
-//                codeVerifier = OAuth2Android.getCodeVerifier()
-//            )
-//            val eapData = institutionsRepository.getEapData(
-//                id = institutionId,
-//                profileId = profile.id,
-//                eapconfigEndpoint = profile.eapconfig_endpoint.orEmpty(),
-//                accessToken = token.access_token
-//            )
-//            configData.value = configParser.parse(eapData)
-//        }
-//    }
-//
-//    fun clearWifiConfigData() {
-//        configData.value = null
-//    }
-//
-//    private fun receivedToken(institutionId: String, profile: Profile, token: String) =
-//        viewModelScope.launch {
-//            val eapData = institutionsRepository.getEapData(
-//                id = institutionId,
-//                profileId = profile.id,
-//                eapconfigEndpoint = profile.eapconfig_endpoint.orEmpty(),
-//                accessToken = token
-//            )
-//            configData.value = configParser.parse(eapData)
-//        }
-//
-//    private fun receivedIntentData(
-//        intentData: Intent,
-//        institutionId: String,
-//        profile: Profile,
-//    ) {
-//        val response = AuthorizationResponse.fromIntent(intentData)
-//        val exception = AuthorizationException.fromIntent(intentData)
-//
-//        if (response?.authorizationCode != null) {
-//            viewModelScope.launch {
-//                contract?.service?.performTokenRequest(response.createTokenExchangeRequest()) { tokenResponse: TokenResponse?, exception: AuthorizationException? ->
-//                    Log.e(
-//                        "OAuthContract",
-//                        "performTokenRequest() called with: tokenResponse = $tokenResponse, exception = $exception"
-//                    )
-//                    receivedToken(institutionId, profile, tokenResponse?.accessToken.orEmpty())
-//                }
-//
-//            }
-//
-//        } else if (exception != null) {
-//            Log.e("OAuthContract", "Authorization flow failed: ", exception)
-//        } else {
-//            Log.e("OAuthContract", "No authorization state retained - reauthorization required")
-//        }
-//    }
-//
-//    fun generateContract(
-//        url: String,
-//        profile: Profile,
-//        institutionId: String,
-//    ): OAuthContract {
-//        contract = OAuthContract(
-//            url,
-//            profile.token_endpoint.orEmpty(),
-//        ) { intentData ->
-//            receivedIntentData(intentData, institutionId, profile)
-//        }
-//        return contract!!
-//    }
 }

@@ -1,6 +1,7 @@
 package app.eduroam.geteduroam.oauth
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,31 +22,53 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
+import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.PrimaryButton
+import app.eduroam.geteduroam.webview_fallback.WebViewDataHandlingActivity
 
 @Composable
 fun OAuthScreen(
     viewModel: OAuthViewModel,
     goToPrevious: () -> Unit,
+    goToWebViewFallback: (Configuration, Uri) -> Unit,
 ) = EduTopAppBar(onBackClicked = goToPrevious) {
     var oAuthUiStages by rememberSaveable { mutableStateOf(OAuthUiStages()) }
     val context = LocalContext.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     val launcher =
-        rememberLauncherForActivityResult(contract = OAuthContract(), onResult = { intent ->
-            viewModel.continueWithFetchToken(intent)
+        rememberLauncherForActivityResult(contract = OAuthContract(), onResult = { resultIntent ->
+            viewModel.continueWithFetchToken(resultIntent)
             oAuthUiStages = OAuthUiStages(
                 isAuthorizationLaunched = false, isFetchingToken = true
             )
         })
+
+    LaunchedEffect(viewModel, lifecycle) {
+        snapshotFlow { viewModel.uiState }
+            .flowWithLifecycle(lifecycle)
+            .collect { state ->
+                if (state.oauthStep is OAuthStep.WebViewFallback) {
+                    goToWebViewFallback(state.oauthStep.configuration, state.oauthStep.requestUri)
+                    viewModel.didGoToNextScreen()
+                } else if (state.oauthStep is OAuthStep.GetTokensFromRedirectUri) {
+                    launcher.launch(WebViewDataHandlingActivity.createIntent(context, state.oauthStep.authRequest, state.oauthStep.redirectUri))
+                    viewModel.didGoToNextScreen()
+                }
+            }
+    }
 
     if (oAuthUiStages.isFetchingToken && viewModel.uiState.oauthStep is OAuthStep.Authorized) {
         val currentGoToPrevious by rememberUpdatedState(newValue = goToPrevious)
@@ -64,11 +87,11 @@ fun OAuthScreen(
             oAuthUiStages = OAuthUiStages(
                 isAuthorizationLaunched = true,
             )
-            viewModel.authorizationLaunched()
+            viewModel.didGoToNextScreen()
             launcher.launch(intentAvailable)
         },
         dismissError = viewModel::dismissError,
-        onRetry = { viewModel.prepareAppAuth(context) },
+        onRetry = { viewModel.prepareAppAuth(context, null) },
     )
 }
 
@@ -138,3 +161,9 @@ private fun OAuthContent(
         }
     }
 }
+
+@Preview
+@Composable
+fun PreviewOAuthScreenContent() =
+    OAuthContent(uiState = UiState(OAuthStep.Loading), isAuthorizationLaunched = false, launchAuthorization = {}, dismissError = { }) {
+    }

@@ -18,6 +18,8 @@ import app.eduroam.geteduroam.organizations.SelectOrganizationScreen
 import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.geteduroam.profile.SelectProfileViewModel
+import app.eduroam.geteduroam.webview_fallback.WebViewFallbackScreen
+import app.eduroam.geteduroam.webview_fallback.WebViewFallbackViewModel
 
 const val BASE_URI = "https://eduroam.org"
 @Composable
@@ -42,7 +44,8 @@ fun MainGraph(
                 goToOAuth = { configuration ->
                     navController.navigate(
                         Route.OAuth.encodeArguments(
-                            configuration = configuration
+                            configuration = configuration,
+                            redirectUri = null
                         )
                     )
                 },
@@ -71,7 +74,7 @@ fun MainGraph(
             SelectProfileScreen(
                 viewModel = viewModel,
                 goToOAuth = { configuration ->
-                    navController.navigate(Route.OAuth.encodeArguments(configuration))
+                    navController.navigate(Route.OAuth.encodeArguments(configuration, null))
                 },
                 goToConfigScreen = { organizationId, provider ->
                     navController.navigate(
@@ -86,10 +89,36 @@ fun MainGraph(
             route = Route.OAuth.routeWithArgs, arguments = Route.OAuth.arguments
         ) { _ ->
             val viewModel = hiltViewModel<OAuthViewModel>()
-            OAuthScreen(viewModel = viewModel, goToPrevious = {
-                navController.popBackStack()
-            })
+            OAuthScreen(
+                viewModel = viewModel,
+                goToPrevious = {
+                    navController.popBackStack()
+                },
+                goToWebViewFallback = { configuration, navigationUri ->
+                    navController.navigate(
+                        Route.WebViewFallback.encodeArguments(configuration, navigationUri)
+                    )
+                }
+            )
         }
+        composable(
+            route = Route.WebViewFallback.routeWithArgs, arguments = Route.WebViewFallback.arguments
+        ) { _ ->
+            val viewModel = hiltViewModel<WebViewFallbackViewModel>()
+            WebViewFallbackScreen(
+                viewModel = viewModel,
+                onRedirectUriFound = { configuration, uri ->
+                    navController.popBackStack() // this screen
+                    navController.popBackStack() // OAuth screen
+                    navController.navigate(Route.OAuth.encodeArguments(configuration, uri)) // OAuth screen again
+                },
+                onCancel = {
+                    navController.navigateUp() // OAuth screen
+                    navController.navigateUp() // Profile screen
+                }
+            )
+        }
+
         composable(
             route = Route.ConfigureWifi.routeWithArgs, arguments = Route.ConfigureWifi.arguments,
             deepLinks = listOf(navDeepLink {

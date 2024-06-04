@@ -30,6 +30,8 @@
     <string name="err_title_auth_unexpected_fail">Unexpected error</string>
     <string name="err_msg_auth_init_fail">Failed to initialize AppData. Please retry.</string>
     <string name="err_msg_auth_init_fail_arg">Failed to initialize AppData. Reason: %s</string>
+    <string name="err_msg_auth_no_saved_configuration">Saved configuration not found</string>
+    <string name="err_msg_auth_no_matching_auth_request">No authorization request for redirect URI found</string>
     <string name="err_title_auth_invalid">Authorization invalid</string>
     <string name="err_msg_auth_invalid">Did not receive valid authentication.</string>
     <string name="err_title_auth_failed">Authorization failed</string>

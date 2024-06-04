@@ -1,7 +1,10 @@
 package app.eduroam.geteduroam.oauth
 
 import android.content.Intent
+import android.net.Uri
+import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.ui.ErrorData
+import net.openid.appauth.AuthorizationRequest
 
 /**
  * Loading
@@ -12,7 +15,9 @@ import app.eduroam.geteduroam.ui.ErrorData
  * */
 sealed class OAuthStep {
     object Loading : OAuthStep()
-    class Initialized(val intent: Intent) : OAuthStep()
+    data class Initialized(val intent: Intent) : OAuthStep()
+    data class WebViewFallback(val configuration: Configuration, val requestUri: Uri): OAuthStep()
+    data class GetTokensFromRedirectUri(val redirectUri: Uri, val authRequest: AuthorizationRequest): OAuthStep()
     object Launched : OAuthStep()
     object ExchangingTokenRequest : OAuthStep()
     object Authorized : OAuthStep()
