@@ -68,6 +68,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".webview_fallback.WebViewDataHandlingActivity"
+            android:exported="false"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"/>
+
         <receiver
             android:name=".di.repository.NotificationAlarmReceiver"
             android:exported="false" />
