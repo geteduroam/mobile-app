@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
-
     <string name="welcome">Bienvenido</string>
     <string name="organizations_no_results">No se ha encontrado ninguna organización.</string>
     <string name="organization_search_text">Busca tu organización</string>

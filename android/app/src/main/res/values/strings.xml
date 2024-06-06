@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
+    <string name="name" translatable="false">geteduroam</string>
 
     <string name="welcome">Welcome</string>
     <string name="organizations_no_results">Could not find any organizations.</string>

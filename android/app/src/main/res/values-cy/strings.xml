@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
-
     <string name="welcome">Croeso</string>
     <string name="organizations_no_results">Methu dod o hyd i unrhyw sefydliadau</string>
     <string name="organization_search_text">Chwiliwch am eich sefydliad</string>

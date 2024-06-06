@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
-
     <string name="welcome">Üdvözlet</string>
     <string name="organizations_no_results">Nem találom a szervezetet.</string>
     <string name="organization_search_text">Intézmény keresés</string>
