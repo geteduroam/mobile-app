@@ -3,6 +3,7 @@ package app.eduroam.geteduroam.ui
 import android.net.Uri
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -21,11 +22,13 @@ fun OAuthWebView(startUrl: Uri, onRedirectUriFound: (Uri) -> Unit) {
         WebView(it).apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
-            this.layoutParams = ViewGroup.MarginLayoutParams(
+            settings.databaseEnabled = true
+            this.layoutParams = MarginLayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             this.webViewClient = RedirectUriInterceptingWebViewClient(onRedirectUriFound)
+            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         }
     }, update = {
         it.loadUrl(startUrl.toString())
