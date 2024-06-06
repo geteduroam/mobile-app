@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="name">getgovroam</string>
+    <string name="name" translatable="false">getgovroam</string>
 </resources>

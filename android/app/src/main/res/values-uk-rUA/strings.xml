@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
-
     <string name="welcome">Ласкаво просимо</string>
     <string name="organizations_no_results">Не вдалося знайти жодної організації.</string>
     <string name="organization_search_text">Знайдіть свою організацію</string>

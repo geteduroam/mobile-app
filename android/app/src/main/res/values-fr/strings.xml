@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">Geteduroam</string>
-
     <string name="welcome">Bienvenue</string>
     <string name="organizations_no_results">Nous n\'avons pas pu trouver votre établissement.</string>
     <string name="organization_search_text">Rechercher votre établissement</string>

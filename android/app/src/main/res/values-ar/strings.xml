@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="name">geteduroam</string>
-
     <string name="welcome">مرحباً</string>
     <string name="organizations_no_results">تعذر العثور على أي مؤسسة.</string>
     <string name="organization_search_text">ابحث عن مؤسستك</string>

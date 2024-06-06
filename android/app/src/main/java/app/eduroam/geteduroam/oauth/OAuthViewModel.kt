@@ -1,5 +1,6 @@
 package app.eduroam.geteduroam.oauth
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -97,6 +98,23 @@ class OAuthViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Timber.w(e, "Unable to initialize AppAuth!")
+            if (e is ActivityNotFoundException) {
+                // Could not find a browser good enough to open, we continue with WebView fallback
+                try {
+                    uiState = UiState(OAuthStep.WebViewFallback(configuration, repository.authRequest.first()!!.toUri()))
+                    return@launch
+                } catch (ex: Exception) {
+                    Timber.e(ex,"Could not launch WebView fallback!")
+                    uiState = UiState(
+                        OAuthStep.Error, ErrorData(
+                            titleId = R.string.err_title_auth_unexpected_fail,
+                            messageId =  R.string.err_msg_auth_init_fail_arg,
+                            messageArg = ex.toString()
+                        )
+                    )
+                    return@launch
+                }
+            }
             val argument = e.message ?: e.localizedMessage
             uiState = UiState(
                 OAuthStep.Error, ErrorData(
