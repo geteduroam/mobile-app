@@ -177,6 +177,7 @@ fun WifiConfigScreen(
     if (showUsernameDialog) {
         UsernamePasswordDialog(
             requiredSuffix = viewModel.eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.requiredSuffix(),
+            enforceRequiredSuffix = viewModel.eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.enforceRequiredSuffix() == true,
             cancel = goBack, // Go back to the previous screen
             logIn = { username, password ->
                 viewModel.didEnterLoginDetails(username = username, password = password)

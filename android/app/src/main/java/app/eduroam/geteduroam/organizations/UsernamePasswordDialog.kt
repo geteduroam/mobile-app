@@ -49,6 +49,7 @@ import app.eduroam.geteduroam.R
 @Composable
 fun UsernamePasswordDialog(
     requiredSuffix: String?,
+    enforceRequiredSuffix: Boolean,
     cancel: () -> Unit = { },
     logIn: (String, String) -> Unit = { _, _ -> }
 ) = Dialog(
@@ -82,7 +83,8 @@ fun UsernamePasswordDialog(
                             .fillMaxWidth()
                             .onFocusChanged { focusState ->
                                 if (!focusState.isFocused && username.isNotEmpty()) {
-                                    if (username.isNotEmpty() &&
+                                    if (enforceRequiredSuffix &&
+                                        username.isNotEmpty() &&
                                         !requiredSuffix.isNullOrEmpty() &&
                                         !username.contains("@")
                                     ) {
@@ -178,7 +180,16 @@ fun UsernamePasswordDialog(
                     Button(
                         onClick = {
                             if (!requiredSuffix.isNullOrEmpty() && !username.endsWith(requiredSuffix, ignoreCase = false)) {
-                                usernameError = requiredSuffixError
+                                if (enforceRequiredSuffix) {
+                                    usernameError = requiredSuffixError
+                                } else {
+                                    val usernameAndSuffix = "$username@$requiredSuffix"
+                                    if (usernameAndSuffix.endsWith(requiredSuffix, ignoreCase = false)) {
+                                        usernameError = requiredSuffixError
+                                    } else {
+                                        logIn(usernameAndSuffix, password)
+                                    }
+                                }
                             } else {
                                 usernameError = null
                                 logIn(username, password)
