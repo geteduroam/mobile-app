@@ -144,6 +144,10 @@ fun EAPIdentityProvider.requiredSuffix(): String? {
     return authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentitySuffix
 }
 
+fun EAPIdentityProvider.enforceRequiredSuffix(): Boolean {
+    return authenticationMethod?.bestMethod()?.clientSideCredential?.innerIdentityHint == "true"
+}
+
 /**
  * Converts an internal EAP method type to the one used by Android
  */
