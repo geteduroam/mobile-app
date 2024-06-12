@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,11 @@ fun UsernamePasswordDialog(
     var password by remember { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var usernameError by remember { mutableStateOf<String?>(null) }
+    val requireSuffix by remember {
+        derivedStateOf {
+            enforceRequiredSuffix && username.isNotEmpty() && !requiredSuffix.isNullOrEmpty() && !username.contains("@")
+        }
+    }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val requiredSuffixError = requiredSuffix?.let { stringResource(id = R.string.username_password_error_required_suffix, it) }
@@ -82,14 +88,8 @@ fun UsernamePasswordDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .onFocusChanged { focusState ->
-                                if (!focusState.isFocused && username.isNotEmpty()) {
-                                    if (enforceRequiredSuffix &&
-                                        username.isNotEmpty() &&
-                                        !requiredSuffix.isNullOrEmpty() &&
-                                        !username.contains("@")
-                                    ) {
-                                        username += "@$requiredSuffix"
-                                    }
+                                if (!focusState.isFocused && requireSuffix) {
+                                    username += "@$requiredSuffix"
                                 }
                             },
                         value = username,
