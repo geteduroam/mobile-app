@@ -190,6 +190,12 @@ fun UsernamePasswordDialog(
                                         logIn(usernameAndSuffix, password)
                                     }
                                 }
+                            } else if (!requiredSuffix.isNullOrEmpty() &&
+                                enforceRequiredSuffix &&
+                                !username.endsWith("@$requiredSuffix", ignoreCase = false)) {
+                                // Username does end with the suffix, but it has a subdomain. When enforcing the username (InnerIdentityHint == true),
+                                // this is not allowed, and we need to show the same error
+                                usernameError = requiredSuffixError
                             } else {
                                 usernameError = null
                                 logIn(username, password)
