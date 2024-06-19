@@ -2,6 +2,8 @@
     <string name="welcome">Welkom</string>
     <string name="organizations_no_results">Geen organisaties gevonden</string>
     <string name="organization_search_text">Zoek jouw organisatie</string>
+    <string name="open_eap_config_file">Open .eap-config bestand</string>
+    <string name="connect_to_server">Verbinden met %s</string>
     <string name="institutions_choose_one">Kies de instelling waarmee je verbinding wil maken.</string>
     <string name="profiles_title">Profielen</string>
     <string name="profiles_header">Kies een profiel</string>
@@ -26,6 +28,8 @@
     <string name="err_title_auth_unexpected_fail">Onverwachte fout</string>
     <string name="err_msg_auth_init_fail">Kan AppData niet initialiseren. Probeer het opnieuw.</string>
     <string name="err_msg_auth_init_fail_arg">Kan AppData niet initialiseren. Reden: %s</string>
+    <string name="err_msg_auth_no_saved_configuration">Opgeslagen configuratie niet gevonden</string>
+    <string name="err_msg_auth_no_matching_auth_request">Geen authorisatieverzoek voor redirect URI gevonden</string>
     <string name="err_title_auth_invalid">Authorisatie ongeldig</string>
     <string name="err_msg_auth_invalid">Geen geldige authenticatie ontvangen.</string>
     <string name="err_title_auth_failed">Authorisatie mislukt</string>
@@ -37,7 +41,9 @@
     <string name="err_msg_invalid_organization_id">Onjuiste organisatie id. Kan niet doorgaan met de geselecteerde organisatie.</string>
     <string name="err_msg_cannot_find_organization">Kan organisatie met id %s niet vinden.</string>
     <string name="err_msg_missing_eap_endpoint">Geselecteerde profiel mist het EAP endpoint.</string>
+    <string name="err_msg_could_not_discover_profile_configuration">Kan de profielconfiguratie niet vinden. Controleer je verbinding en probeer het opnieuw.</string>
     <string name="err_msg_no_valid_provider">Geen geldige EAP-provider gevonden.</string>
+    <string name="err_msg_not_a_valid_eap_config_file">Geen geldig .eap-config bestand.</string>
 
     <string name="oauth_title" tools:ignore="ExtraTranslation">Authenticeer</string>
     <string name="oauth_description" tools:ignore="ExtraTranslation">Authenticeer met uw account om uw wifi-configuratie te verkrijgen.</string>
@@ -60,6 +66,7 @@
     <string name="username_password_label_password">Wachtwoord</string>
     <string name="username_password_button_cancel">Annuleren</string>
     <string name="username_password_button_log_in">Log in</string>
+    <string name="username_password_error_required_suffix">Gebruikersnaam moet eindigen op: %s</string>
 
     <string name="username_password_placeholder_username_example_suffix">voorbeeld.com</string>
     <string name="username_password_placeholder_username_before_suffix">gebruikersnaam</string>
