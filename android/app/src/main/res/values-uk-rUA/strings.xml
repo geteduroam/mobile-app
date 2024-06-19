@@ -6,6 +6,8 @@
     <string name="profiles_title">Профілі</string>
     <string name="profiles_header">Виберіть профіль</string>
     <string name="configuration_progress">Встановлення з\'єднання з WiFi</string>
+    <string name="configuration_waiting_for_user_credentials">Очікування облікових даних користувача…</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 вимагає від вас прийняти нові мережі Wi-Fi за допомогою за допомогою беззвучного сповіщення. Щоб підключитися до нових мереж, перейдіть до розділу сповіщень.</string>
     <string name="configuration_success">WiFi налаштований</string>
     <string name="configuration_logs">Повідомлення журналу</string>
     <string name="configuration_canceled">Скасовано</string>
@@ -36,7 +38,6 @@
     <string name="err_msg_cannot_find_organization">Не вдається знайти організацію з ідентифікатором %s.</string>
     <string name="err_msg_missing_eap_endpoint">У вибраному профілі відсутня кінцева точка EAP.</string>
     <string name="err_msg_no_valid_provider">Не знайдено жодного дійсного постачальника послуг EAP.</string>
-
     <string name="oauth_title" tools:ignore="ExtraTranslation">Автентифікація</string>
     <string name="oauth_description" tools:ignore="ExtraTranslation">Авторизуйтесь у своєму обліковому записі, щоб отримати конфігурацію wifi.</string>
     <string name="oauth_processing" tools:ignore="ExtraTranslation">Обробка...</string>
@@ -58,7 +59,6 @@
     <string name="username_password_label_password">Пароль</string>
     <string name="username_password_button_cancel">Скасувати</string>
     <string name="username_password_button_log_in">Увійдіть у систему</string>
-
     <string name="username_password_placeholder_username_example_suffix">example.com</string>
     <string name="username_password_placeholder_username_before_suffix">ім\'я користувача</string>
     <string name="username_password_accessibility_hide_password">Приховати пароль</string>
@@ -67,4 +67,13 @@
     <string name="notification_channel_name">Нагадування про зміну конфігурації</string>
     <string name="notification_title">Змінити конфігурацію%s</string>
     <string name="notification_message">До закінчення терміну дії вашого %2$sпрофілю залишилося %1$d днів, натисніть, щоб переналаштувати його</string>
+
+    <string name="passphrase_dialog_title">Введіть кодову фразу</string>
+    <string name="passphrase_dialog_message">Для цього профілю потрібна кодова фраза</string>
+    <string name="passphrase_dialog_label_passphrase">Кодова фраза</string>
+    <string name="passphrase_dialog_button_cancel">Відмінити</string>
+    <string name="passphrase_dialog_button_enter">Введіть</string>
+    <string name="passphrase_dialog_incorrect_passphrase">Ви ввели неправильний пароль!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Приховати пароль</string>
+    <string name="passphrase_accessibility_show_passphrase">Показати пароль</string>
 </resources>

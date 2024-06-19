@@ -6,6 +6,8 @@
     <string name="profiles_title">Profili</string>
     <string name="profiles_header">Seleziona un profilo</string>
     <string name="configuration_progress">Sto instaurando la connessione Wi-Fi</string>
+    <string name="configuration_waiting_for_user_credentials">In attesa delle credenziali dell\'utente...</string>
+    <string name="configuration_android_10_notification_disclaimer">Android 10 richiede l\'accettazione delle nuove reti Wi-Fi tramite una notifica silenziosa. Consulta la sezione notifiche per connetterti alle nuove reti.</string>
     <string name="configuration_success">WiFi configurato</string>
     <string name="configuration_logs">Messaggi di Log:</string>
     <string name="configuration_canceled">Annullato</string>
@@ -36,7 +38,6 @@
     <string name="err_msg_cannot_find_organization">Impossibile trovare l\'organizzazione con ID %s.</string>
     <string name="err_msg_missing_eap_endpoint">Nel profilo selezionato manca l\'endpoint EAP.</string>
     <string name="err_msg_no_valid_provider">Non è stato trovato alcun provider EAP valido.</string>
-
     <string name="oauth_title" tools:ignore="ExtraTranslation">Autenticare</string>
     <string name="oauth_description" tools:ignore="ExtraTranslation">Autenticati con il tuo account per ottenere la configurazione wifi.</string>
     <string name="oauth_processing" tools:ignore="ExtraTranslation">Processando...</string>
@@ -58,7 +59,6 @@
     <string name="username_password_label_password">Password</string>
     <string name="username_password_button_cancel">Annulla</string>
     <string name="username_password_button_log_in">Accedi</string>
-
     <string name="username_password_placeholder_username_example_suffix">example.com</string>
     <string name="username_password_placeholder_username_before_suffix">nome utente</string>
     <string name="username_password_accessibility_hide_password">Nascondi password</string>
@@ -67,4 +67,13 @@
     <string name="notification_channel_name">Promemoria di riconfigurazione</string>
     <string name="notification_title">Riconfigura %s</string>
     <string name="notification_message">Mancano %1$d giorni alla scadenza del tuo profilo %2$s, clicca per riconfigurarlo</string>
+
+    <string name="passphrase_dialog_title">Inserisci la passphrase</string>
+    <string name="passphrase_dialog_message">Questo profilo richiede una passphrase</string>
+    <string name="passphrase_dialog_label_passphrase">Passphrase</string>
+    <string name="passphrase_dialog_button_cancel">Annulla</string>
+    <string name="passphrase_dialog_button_enter">Invio</string>
+    <string name="passphrase_dialog_incorrect_passphrase">La passphrase che hai inserito non è corretta!</string>
+    <string name="passphrase_accessibility_hide_passphrase">Nascondi la passphrase</string>
+    <string name="passphrase_accessibility_show_passphrase">Visualizza la passphrase</string>
 </resources>
