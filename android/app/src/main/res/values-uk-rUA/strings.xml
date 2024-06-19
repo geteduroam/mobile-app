@@ -68,9 +68,9 @@
     <string name="notification_title">Змінити конфігурацію%s</string>
     <string name="notification_message">До закінчення терміну дії вашого %2$sпрофілю залишилося %1$d днів, натисніть, щоб переналаштувати його</string>
 
-    <string name="passphrase_dialog_title">Введіть кодову фразу</string>
-    <string name="passphrase_dialog_message">Для цього профілю потрібна кодова фраза</string>
-    <string name="passphrase_dialog_label_passphrase">Кодова фраза</string>
+    <string name="passphrase_dialog_title">Введіть пароль</string>
+    <string name="passphrase_dialog_message">Для цього профілю потрібен пароль</string>
+    <string name="passphrase_dialog_label_passphrase">Пароль</string>
     <string name="passphrase_dialog_button_cancel">Відмінити</string>
     <string name="passphrase_dialog_button_enter">Введіть</string>
     <string name="passphrase_dialog_incorrect_passphrase">Ви ввели неправильний пароль!</string>
