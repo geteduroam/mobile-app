@@ -31,7 +31,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -69,7 +68,36 @@ fun UsernamePasswordDialog(
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val requiredSuffixError = requiredSuffix?.let { stringResource(id = R.string.username_password_error_required_suffix, it) }
+    val requiredSuffixError = requiredSuffix?.let {
+        val suffix = if (enforceRequiredSuffix) "@$it" else it
+        stringResource(id = R.string.username_password_error_required_suffix, suffix)
+    }
+
+    fun checkLoginDetailsValidity() {
+        if (!requiredSuffix.isNullOrEmpty() && !username.endsWith(requiredSuffix, ignoreCase = false)) {
+            if (enforceRequiredSuffix) {
+                usernameError = requiredSuffixError
+            } else {
+                val usernameAndSuffix = "$username@$requiredSuffix"
+                if (usernameAndSuffix.endsWith(requiredSuffix, ignoreCase = false)) {
+                    usernameError = requiredSuffixError
+                } else {
+                    logIn(usernameAndSuffix, password)
+                }
+            }
+        } else if (!requiredSuffix.isNullOrEmpty() &&
+            enforceRequiredSuffix &&
+            !username.endsWith("@$requiredSuffix", ignoreCase = false)) {
+            // Username does end with the suffix, but it has a subdomain. When enforcing the username (InnerIdentityHint == true),
+            // this is not allowed, and we need to show the same error
+            usernameError = requiredSuffixError
+        } else {
+            usernameError = null
+            logIn(username, password)
+        }
+        keyboardController?.hide()
+    }
+
     Column {
         Surface(
             shape = MaterialTheme.shapes.medium
@@ -136,11 +164,7 @@ fun UsernamePasswordDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrect = false, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(
                             onDone = {
-                                if (username.isNotBlank() && password.isNotBlank()) {
-                                    logIn(username, password)
-                                } else {
-                                    keyboardController?.hide()
-                                }
+                                checkLoginDetailsValidity()
                             }
                         ),
                         label = {
@@ -179,27 +203,7 @@ fun UsernamePasswordDialog(
                     Spacer(modifier = Modifier.size(8.dp))
                     Button(
                         onClick = {
-                            if (!requiredSuffix.isNullOrEmpty() && !username.endsWith(requiredSuffix, ignoreCase = false)) {
-                                if (enforceRequiredSuffix) {
-                                    usernameError = requiredSuffixError
-                                } else {
-                                    val usernameAndSuffix = "$username@$requiredSuffix"
-                                    if (usernameAndSuffix.endsWith(requiredSuffix, ignoreCase = false)) {
-                                        usernameError = requiredSuffixError
-                                    } else {
-                                        logIn(usernameAndSuffix, password)
-                                    }
-                                }
-                            } else if (!requiredSuffix.isNullOrEmpty() &&
-                                enforceRequiredSuffix &&
-                                !username.endsWith("@$requiredSuffix", ignoreCase = false)) {
-                                // Username does end with the suffix, but it has a subdomain. When enforcing the username (InnerIdentityHint == true),
-                                // this is not allowed, and we need to show the same error
-                                usernameError = requiredSuffixError
-                            } else {
-                                usernameError = null
-                                logIn(username, password)
-                            }
+                            checkLoginDetailsValidity()
                         },
                         enabled = username.isNotBlank() && password.isNotBlank()
                     ) {
