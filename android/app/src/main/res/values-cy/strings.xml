@@ -2,24 +2,24 @@
     <string name="welcome">Croeso</string>
     <string name="organizations_no_results">Methu dod o hyd i unrhyw sefydliadau</string>
     <string name="organization_search_text">Chwiliwch am eich sefydliad</string>
-    <string name="institutions_choose_one">Dewiswch y sefydliad yr ydych am gysylltu ag ef.</string>
+    <string name="institutions_choose_one">Dewiswch y sefydliad yr ydych am cysylltu ag ef.</string>
     <string name="profiles_title">Proffiliau</string>
     <string name="profiles_header">Dewiswch proffil</string>
     <string name="configuration_progress">Sefydlu cysylltiad Wi-Fi</string>
     <string name="configuration_waiting_for_user_credentials">Aros am fanylion y defnyddiwr…</string>
-    <string name="configuration_android_10_notification_disclaimer">Mae Android 10 yn gofyn ichi dderbyn y rhwydweithiau Wi-Fi newydd trwy hysbysiad distaw. Gweler eich adran Hysbysiadau i gysylltu â\'r rhwydweithiau newydd.</string>
+    <string name="configuration_android_10_notification_disclaimer">Mae Android 10 yn gofyn ichi dderbyn y rhwydweithiau Wi-Fi newydd trwy hysbysiad distaw. Gweler eich adran Hysbysiadau i cysylltu â\'r rhwydweithiau newydd.</string>
     <string name="configuration_success">Wi-Fi wedi\'i ffurfweddu</string>
     <string name="configuration_logs">Negeseuon log:</string>
     <string name="configuration_canceled">Canslwyd</string>
     <string name="configuration_completed">Cwblhawyd</string>
     <string name="login_dialog_title">Mae angen mewngofnodi</string>
-    <string name="login_dialog_text">Rhowch eich enw defnyddiwr a chyfrinair</string>
+    <string name="login_dialog_text">Rhowch eich enw defnyddiwr a cyfrinair</string>
     <string name="login_dialog_username">Enw defnyddiwr</string>
     <string name="login_dialog_password">Cyfrinair</string>
     <string name="login_dialog_cancel">Canslo</string>
     <string name="login_dialog_login">Mewngofnodi</string>
     <string name="terms_of_use_dialog_title">Telerau defnyddio</string>
-    <string name="terms_of_use_dialog_text">Rhaid i chi gytuno i\'r telerau defnyddio cyn y gallwch ddefnyddio\'r rhwydwaith hwn</string>
+    <string name="terms_of_use_dialog_text">Rhaid i chi cytuno i\'r telerau defnyddio cyn y gallwch ddefnyddio\'r rhwydwaith hwn</string>
     <string name="terms_of_use_dialog_agree">Cytuno</string>
     <string name="terms_of_use_dialog_disagree">Anghytuno</string>
 
@@ -31,14 +31,13 @@
     <string name="err_title_auth_failed">Methodd awdurdodiad</string>
     <string name="err_msg_auth_failed">Dim cyflwr awdurdodi wedi\'i gadw - angen ail-awdurdodi.</string>
     <string name="err_msg_auth_token_failed">Methodd cyfnewid cod tocyn awdurdodi.</string>
-    <string name="err_msg_auth_code_failed_arg">Methodd cyfnewid cod awdurdodi %s.</string>
+    <string name="err_msg_auth_code_failed_arg">Methodd cyfnewid cod awdurdodi: %s.</string>
     <string name="err_title_generic_fail">Methu cwblhau\'r cais</string>
     <string name="err_msg_generic_unexpected_with_arg">Gwall annisgwyl: %s, rhowch gynnig arall arni.</string>
     <string name="err_msg_invalid_organization_id">ID sefydliad annilys. Methu parhau ar gyfer y sefydliad a ddewiswyd.</string>
     <string name="err_msg_cannot_find_organization">Methu dod o hyd i sefydliad ag ID %s.</string>
     <string name="err_msg_missing_eap_endpoint">Mae pwynt terfyn EAP ar goll o\'r proffil a ddewiswyd.</string>
     <string name="err_msg_no_valid_provider">Ni chanfuwyd darparwr EAP dilys.</string>
-
     <string name="oauth_title" tools:ignore="ExtraTranslation">Dilysu</string>
     <string name="oauth_description" tools:ignore="ExtraTranslation">Dilyswch gyda\'ch cyfrif i noi eich ffurfweddiad Wi-Fi.</string>
     <string name="oauth_processing" tools:ignore="ExtraTranslation">Prosesu...</string>
@@ -55,12 +54,11 @@
     <string name="helpdesk_title">Desg helpu</string>
 
     <string name="username_password_login_required">Angen mewngofnodi</string>
-    <string name="username_password_please_enter">Rhowch eich enw defnyddiwr a chyfrinair.</string>
+    <string name="username_password_please_enter">Rhowch eich enw defnyddiwr a cyfrinair.</string>
     <string name="username_password_label_username">Enw defnyddiwr</string>
     <string name="username_password_label_password">Cyfrinair</string>
     <string name="username_password_button_cancel">Canslo</string>
     <string name="username_password_button_log_in">Mewngofnodi</string>
-
     <string name="username_password_placeholder_username_example_suffix">example.com</string>
     <string name="username_password_placeholder_username_before_suffix">enw defnyddiwr</string>
     <string name="username_password_accessibility_hide_password">Cuddio cyfrinair</string>
