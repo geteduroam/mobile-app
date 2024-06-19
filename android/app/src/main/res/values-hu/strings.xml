@@ -2,6 +2,8 @@
     <string name="welcome">Üdvözlet</string>
     <string name="organizations_no_results">Nem találom a szervezetet.</string>
     <string name="organization_search_text">Intézmény keresés</string>
+    <string name="open_eap_config_file">.eap-config fájl megnyitása</string>
+    <string name="connect_to_server">Kapcsolódás ehhez: %s</string>
     <string name="institutions_choose_one">Válaszd ki azt az intézményt amelyhez csatlakozol.</string>
     <string name="profiles_title">Profilok</string>
     <string name="profiles_header">Válaszd ki a profilt</string>
@@ -26,6 +28,8 @@
     <string name="err_title_auth_unexpected_fail">Ismeretlen hiba</string>
     <string name="err_msg_auth_init_fail">Az AppData inicializálása nem sikerült. Próbáld újra.</string>
     <string name="err_msg_auth_init_fail_arg">Az AppData inicializálása nem sikerült. Hibaok: %s</string>
+    <string name="err_msg_auth_no_saved_configuration">Mentett konfiguráció hiányzik</string>
+    <string name="err_msg_auth_no_matching_auth_request">Autorizációs kérés nem található a visszatérési címhez</string>
     <string name="err_title_auth_invalid">Érvénytelen jogosultság.</string>
     <string name="err_msg_auth_invalid">Nem sikerült az azonosítás/belépés.</string>
     <string name="err_title_auth_failed">Jogosultság ellenőrzés sikertelen.</string>
@@ -37,8 +41,10 @@
     <string name="err_msg_invalid_organization_id">Érvénytelen intézmény azonosító. Nem lehetséges ezzel az intézménnyel továbblépni.</string>
     <string name="err_msg_cannot_find_organization">Nem találok intézményt %s azonosítóval.</string>
     <string name="err_msg_missing_eap_endpoint">A kiválasztott profilhoz nincsen EAP konfiguráció.</string>
+    <string name="err_msg_could_not_discover_profile_configuration">A profil konfigurációt nem sikerült megtalálni. Ellenőrizd az internetkapcsolatot és próbáld újra.</string>
     <string name="err_msg_no_valid_provider">Nem találtam megfelelő EAP beállítást.</string>
 
+    <string name="err_msg_not_a_valid_eap_config_file">Ez az .eap-config fájl nem értelmezhető</string>
     <string name="oauth_title" tools:ignore="ExtraTranslation">Azonosítás</string>
     <string name="oauth_description" tools:ignore="ExtraTranslation">Lépj be az azonosítóddal, hogy be tudjuk állítani a WiFi-t</string>
     <string name="oauth_processing" tools:ignore="ExtraTranslation">Egy pillanat...</string>
@@ -61,6 +67,7 @@
     <string name="username_password_button_cancel">Törlés</string>
     <string name="username_password_button_log_in">Belépés</string>
 
+    <string name="username_password_error_required_suffix">Felhasználónév végződjön a következőre: %s</string>
     <string name="username_password_placeholder_username_example_suffix">example.com</string>
     <string name="username_password_placeholder_username_before_suffix">felhasznaloinev</string>
     <string name="username_password_accessibility_hide_password">Rejtsd el a jelszót</string>
