@@ -4,9 +4,15 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
+import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
+import app.eduroam.geteduroam.status.ConfigSource
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -15,6 +21,8 @@ import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
 import timber.log.Timber
 import java.io.IOException
+import java.util.Date
+import kotlin.math.exp
 
 class StorageRepository(private val context: Context) {
 
@@ -75,6 +83,76 @@ class StorageRepository(private val context: Context) {
         preferences[PreferencesKeys.LAST_KNOWN_CONFIG_HASH]
     }
 
+    val configuredOrganizationName: Flow<String?> = context.dataStore.data.catch { exception ->
+        if (exception is IOException) {
+            Timber.w(exception, "Error reading preferences.")
+            emit(emptyPreferences())
+        } else {
+            throw exception
+        }
+    }.map { preferences ->
+        preferences[PreferencesKeys.CONFIGURED_ORGANIZATION_NAME]
+    }
+
+    val configuredOrganizationId: Flow<String?> = context.dataStore.data.catch { exception ->
+        if (exception is IOException) {
+            Timber.w(exception, "Error reading preferences.")
+            emit(emptyPreferences())
+        } else {
+            throw exception
+        }
+    }.map { preferences ->
+        preferences[PreferencesKeys.CONFIGURED_ORGANIZATION_ID]
+    }
+
+    val configuredProfileSource: Flow<ConfigSource> = context.dataStore.data.catch { exception ->
+        if (exception is IOException) {
+            Timber.w(exception, "Error reading preferences.")
+            emit(emptyPreferences())
+        } else {
+            throw exception
+        }
+    }.map { preferences ->
+        try {
+            return@map preferences[PreferencesKeys.CONFIGURED_PROFILE_SOURCE]?.let {
+                ConfigSource.valueOf(it)
+            } ?: ConfigSource.Unknown
+        } catch (ex: Exception){
+            return@map ConfigSource.Unknown
+        }
+    }
+
+    val profileExpiryTimestampMs: Flow<Long?> = context.dataStore.data.catch { exception ->
+        if (exception is IOException) {
+            Timber.w(exception, "Error reading preferences.")
+            emit(emptyPreferences())
+        } else {
+            throw exception
+        }
+    }.map { preferences ->
+        preferences[PreferencesKeys.CONFIGURED_PROFILE_EXPIRY_TIMESTAMP_MS]
+    }
+
+    val configuredProfileLastConfig: Flow<EAPIdentityProviderList?> = context.dataStore.data.catch { exception ->
+        if (exception is IOException) {
+            Timber.w(exception, "Error reading preferences.")
+            emit(emptyPreferences())
+        } else {
+            throw exception
+        }
+    }.map { preferences ->
+        val savedConfig = preferences[PreferencesKeys.CONFIGURED_PROFILE_LAST_CONFIG] ?: return@map null
+        try {
+            val moshi = Moshi.Builder()
+                .add(Date::class.java, DateJsonAdapter())
+                .build()
+            val jsonAdapter = moshi.adapter(EAPIdentityProviderList::class.java)
+            return@map jsonAdapter.fromJson(savedConfig)
+        } catch (ex: Exception) {
+            return@map null
+        }
+    }
+
     suspend fun clearInvalidAuth() = context.dataStore.edit { settings ->
         settings.remove(PreferencesKeys.CURRENT_AUTHREQUEST)
         settings.remove(PreferencesKeys.CURRENT_AUTHSTATE)
@@ -108,10 +186,45 @@ class StorageRepository(private val context: Context) {
         return config.hashCode() == lastKnownHash && isAuthorized.first()
     }
 
+    suspend fun saveConfigForStatusScreen(
+        organizationId: String,
+        organizationName: String?,
+        expiryTimestampMs: Long?,
+        config: EAPIdentityProviderList,
+        source: ConfigSource
+    ) {
+        context.dataStore.edit { settings ->
+            settings[PreferencesKeys.CONFIGURED_ORGANIZATION_ID] = organizationId
+            if (organizationName == null) {
+                settings.remove(PreferencesKeys.CONFIGURED_ORGANIZATION_NAME)
+            } else {
+                settings[PreferencesKeys.CONFIGURED_ORGANIZATION_NAME] = organizationName
+            }
+            if (expiryTimestampMs == null) {
+                settings.remove(PreferencesKeys.CONFIGURED_PROFILE_EXPIRY_TIMESTAMP_MS)
+            } else {
+                settings[PreferencesKeys.CONFIGURED_PROFILE_EXPIRY_TIMESTAMP_MS] = expiryTimestampMs
+            }
+            val moshi = Moshi.Builder()
+                .add(Date::class.java, DateJsonAdapter())
+                .build()
+            val jsonAdapter = moshi.adapter(EAPIdentityProviderList::class.java)
+            val serializedConfig = jsonAdapter.toJson(config)
+            settings[PreferencesKeys.CONFIGURED_PROFILE_LAST_CONFIG] = serializedConfig
+            settings[PreferencesKeys.CONFIGURED_PROFILE_SOURCE] = source.name
+        }
+    }
+
     private object PreferencesKeys {
         val CURRENT_AUTHSTATE = stringPreferencesKey("current_authstate")
         val CURRENT_AUTHREQUEST = stringPreferencesKey("current_authrequest")
         val CLIENT_ID = stringPreferencesKey("currentClientId")
+
         val LAST_KNOWN_CONFIG_HASH = intPreferencesKey("last_known_configuration_hash")
+        val CONFIGURED_ORGANIZATION_ID = stringPreferencesKey("configuredOrganizationId")
+        val CONFIGURED_ORGANIZATION_NAME = stringPreferencesKey("configuredOrganizationName")
+        val CONFIGURED_PROFILE_LAST_CONFIG = stringPreferencesKey("configuredProfileLastConfig")
+        val CONFIGURED_PROFILE_EXPIRY_TIMESTAMP_MS = longPreferencesKey("configuredProfileExpiryTimestampMs")
+        val CONFIGURED_PROFILE_SOURCE = stringPreferencesKey("configuredProfileSource")
     }
 }

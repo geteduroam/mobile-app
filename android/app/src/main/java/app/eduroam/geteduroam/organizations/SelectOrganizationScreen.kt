@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -57,6 +56,7 @@ import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.models.Organization
+import app.eduroam.geteduroam.status.ConfigSource
 import app.eduroam.geteduroam.ui.ErrorData
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,7 +67,7 @@ fun SelectOrganizationScreen(
     viewModel: SelectOrganizationViewModel,
     openProfileModal: (String) -> Unit,
     goToOAuth: (Configuration) -> Unit,
-    goToConfigScreen: (String, EAPIdentityProviderList) -> Unit,
+    goToConfigScreen: (ConfigSource, String, String, EAPIdentityProviderList) -> Unit,
     openFileUri: (Uri) -> Unit,
     discoverUrl: (Uri) -> Unit
 ) {
@@ -85,7 +85,11 @@ fun SelectOrganizationScreen(
 
             is Step.DoConfig -> {
                 viewModel.onStepCompleted()
-                goToConfigScreen((step as Step.DoConfig).organizationId, (step as Step.DoConfig).eapIdentityProviderList)
+                goToConfigScreen(
+                    (step as Step.DoConfig).source,
+                    (step as Step.DoConfig).organizationId,
+                    (step as Step.DoConfig).organizationName,
+                    (step as Step.DoConfig).eapIdentityProviderList)
             }
 
             is Step.PickProfileFrom -> {

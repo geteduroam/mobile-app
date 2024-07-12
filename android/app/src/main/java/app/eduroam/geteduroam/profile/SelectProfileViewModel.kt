@@ -43,6 +43,7 @@ class SelectProfileViewModel @Inject constructor(
     var uiState by mutableStateOf(UiState())
         private set
     val institutionId: String?
+
     val customHost: Uri?
     private var didAgreeToTerms = false
 

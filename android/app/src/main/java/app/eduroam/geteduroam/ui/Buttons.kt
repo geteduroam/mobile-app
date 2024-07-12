@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -23,6 +24,7 @@ fun PrimaryButton(
     text: String, onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    buttonBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
     buttonTextColor: Color = Color.White,
     buttonBorderColor: Color = Color.Transparent,
 ) = Button(
@@ -30,11 +32,12 @@ fun PrimaryButton(
     enabled = enabled,
     shape = RoundedCornerShape(CornerSize(16.dp)),
     border = BorderStroke(1.dp, buttonBorderColor),
-    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-    modifier = modifier.requiredHeight(height = 60.dp).defaultMinSize(minWidth = 180.dp)
+    colors = ButtonDefaults.buttonColors(containerColor = buttonBackgroundColor),
+    modifier = modifier.defaultMinSize(minWidth = 180.dp, minHeight = 52.dp)
 ) {
     Text(
         text = text,
+        textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodyLarge.copy(
             color = buttonTextColor, fontWeight = FontWeight.SemiBold, fontSize = 20.sp
         ),
