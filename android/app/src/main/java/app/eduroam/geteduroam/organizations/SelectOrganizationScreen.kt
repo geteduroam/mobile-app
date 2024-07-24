@@ -21,14 +21,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
@@ -76,20 +76,19 @@ fun SelectOrganizationScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     LaunchedEffect(step) {
-        when (step) {
+        when (val currentStep = step) {
             is Step.DoOAuthFor -> {
                 viewModel.onStepCompleted()
-                val doAuth = step as Step.DoOAuthFor
-                goToOAuth(doAuth.configuration)
+                goToOAuth(currentStep.configuration)
             }
 
             is Step.DoConfig -> {
                 viewModel.onStepCompleted()
                 goToConfigScreen(
-                    (step as Step.DoConfig).source,
-                    (step as Step.DoConfig).organizationId,
-                    (step as Step.DoConfig).organizationName,
-                    (step as Step.DoConfig).eapIdentityProviderList)
+                    currentStep.source,
+                    currentStep.organizationId,
+                    currentStep.organizationName,
+                    currentStep.eapIdentityProviderList)
             }
 
             is Step.PickProfileFrom -> {

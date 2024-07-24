@@ -1,6 +1,5 @@
 package app.eduroam.geteduroam.status
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,20 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -36,11 +32,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.EduTopAppBar
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.ui.PrimaryButton
 import app.eduroam.geteduroam.ui.theme.AppTheme
+import kotlinx.coroutines.flow.stateIn
 import java.text.DateFormat
 import java.time.Duration
 import java.time.Instant
@@ -60,11 +60,13 @@ fun StatusScreen(
     withBackIcon = false
 ) { paddingValues ->
 
-    val organizationId by viewModel.organizationId.collectAsState(initial = null)
-    val organizationName by viewModel.organizationName.collectAsState(initial = null)
-    val configSource by viewModel.configSource.collectAsState(initial = null)
-    val lastConfig by viewModel.lastConfig.collectAsState(initial = null)
-    val expiryTimestampMs by viewModel.expiryTimestampMs.collectAsState(initial = null)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val organizationId by viewModel.organizationId
+        .collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+    val organizationName by viewModel.organizationName.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+    val configSource by viewModel.configSource.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+    val lastConfig by viewModel.lastConfig.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+    val expiryTimestampMs by viewModel.expiryTimestampMs.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
 
     Column(
         modifier = Modifier
@@ -159,7 +161,7 @@ fun StatusScreenContent(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineSmall,
         )
-        var isExpired = false
+        val isExpired: Boolean
         if (expiryTimestampMs != null) {
             val configuration = LocalConfiguration.current
             Spacer(modifier = Modifier.size(16.dp))
@@ -167,6 +169,7 @@ fun StatusScreenContent(
             val expiryDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(expiryTimestampMs), ZoneOffset.UTC)
             val expiryDate = Date(expiryTimestampMs)
             if (nowDate.isBefore(expiryDateTime)) {
+                isExpired = false
                 val duration = formatDuration(date1 = nowDate, date2 = expiryDateTime)
                 if (duration != null) {
                     Text(
@@ -198,6 +201,8 @@ fun StatusScreenContent(
                     )
                 }
             }
+        } else {
+            isExpired = false
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -270,16 +275,17 @@ fun formatDuration(date1: LocalDateTime, date2: LocalDateTime): String? {
     val hours = duration.toHours().toInt()
     val minutes = (duration.toMinutes() % 60).toInt()
     val seconds = (duration.seconds % 60).toInt()
-    if (years > 0 || months > 0) {
-        return null
+    return if (years > 0 || months > 0) {
+        null
     } else if (days > 0) {
-        return "$days ${pluralStringResource(id = R.plurals.time_days, days)}"
+        "$days ${pluralStringResource(id = R.plurals.time_days, days)}"
     } else if (hours > 0) {
-        return "$hours ${pluralStringResource(id = R.plurals.time_hours, hours)}"
+        "$hours ${pluralStringResource(id = R.plurals.time_hours, hours)}"
     } else if (minutes > 0) {
-        return "$minutes ${pluralStringResource(id = R.plurals.time_minutes, minutes)}"
+        "$minutes ${pluralStringResource(id = R.plurals.time_minutes, minutes)}"
+    } else {
+        "$seconds ${pluralStringResource(id = R.plurals.time_seconds, seconds)}"
     }
-    return "$seconds ${pluralStringResource(id = R.plurals.time_seconds, seconds)}"
 }
 
 
