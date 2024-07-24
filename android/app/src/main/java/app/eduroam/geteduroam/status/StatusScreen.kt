@@ -55,7 +55,7 @@ fun StatusScreen(
     viewModel: StatusScreenViewModel,
     goToInstitutionSelection: () -> Unit,
     renewAccount: (String) -> Unit,
-    repairConfig: (ConfigSource, String?, String?, EAPIdentityProviderList) -> Unit
+    repairConfig: (ConfigSource, String, String?, EAPIdentityProviderList) -> Unit
 ) = EduTopAppBar(
     withBackIcon = false
 ) { paddingValues ->
@@ -87,7 +87,7 @@ fun StatusScreen(
             repairConfig = { config ->
                 repairConfig(
                     configSource ?: ConfigSource.Unknown,
-                    organizationId,
+                    organizationId.orEmpty(),
                     organizationName,
                     config
                 )

@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.di.assist.AuthenticationAssistant
@@ -58,14 +59,13 @@ class OAuthViewModel @Inject constructor(
     private var configuration: Configuration = Configuration.EMPTY
 
     init {
-        val configurationArg = savedStateHandle.get<String>(Route.OAuth.configurationArg) ?: ""
-        configuration = Route.OAuth.decodeConfigurationArgument(configurationArg)
-        val redirectUriArg = savedStateHandle.get<String>(Route.OAuth.redirectUriArg) ?: ""
-        val redirectUri: Uri?
-        if (redirectUriArg.isNotEmpty()) {
-            redirectUri = Uri.parse(Uri.decode(redirectUriArg))
+        val data = savedStateHandle.toRoute<Route.OAuth>()
+        configuration = data.configuration
+        val redirectUriArg = data.redirectUri ?: ""
+        val redirectUri = if (redirectUriArg.isNotEmpty()) {
+            Uri.parse(Uri.decode(redirectUriArg))
         } else {
-            redirectUri = null
+            null
         }
         prepareAppAuth(context, redirectUri)
     }

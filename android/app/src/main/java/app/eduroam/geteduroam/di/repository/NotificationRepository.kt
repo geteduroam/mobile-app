@@ -12,6 +12,7 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -35,6 +36,7 @@ class NotificationRepository(
         const val NOTIFICATION_CHANNEL_ID = "reconfiguration_reminders"
         const val REMIND_DAYS_BEFORE_EXPIRY = 5
         const val NOTIFICATION_ID = 100
+        const val KEY_EXTRA_PAYLOAD = "extra_payload"
     }
 
     fun shouldRequestPushPermission(provider: EAPIdentityProvider, organizationId: String): Boolean {
@@ -99,7 +101,7 @@ class NotificationAlarmReceiver : BroadcastReceiver() {
         }
         val tapResultIntent = Intent(context, MainActivity::class.java)
         intent?.getStringExtra(NotificationRepository.NOTIFICATION_KEY_PROVIDER_ID)?.let {
-            tapResultIntent.data = Uri.parse(Route.SelectProfile.buildDeepLink(it))
+            tapResultIntent.putExtra(NotificationRepository.KEY_EXTRA_PAYLOAD, Route.SelectProfile(institutionId = it, customHostUri = null))
         }
         tapResultIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingIntent: PendingIntent = getActivity( context, 0, tapResultIntent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
