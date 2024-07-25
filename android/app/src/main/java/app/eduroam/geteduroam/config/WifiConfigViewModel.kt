@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
+import app.eduroam.geteduroam.di.repository.StorageRepository
+import app.eduroam.geteduroam.status.ConfigSource
 import app.eduroam.geteduroam.ui.theme.IS_EDUROAM
 import app.eduroam.geteduroam.ui.theme.isChromeOs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,11 +30,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WifiConfigViewModel @Inject constructor(
-    private val notificationRepository: NotificationRepository
-    ) : ViewModel() {
+    private val notificationRepository: NotificationRepository,
+    private val storageRepository: StorageRepository
+) : ViewModel() {
 
     lateinit var eapIdentityProviderList: EAPIdentityProviderList
     lateinit var organizationId: String
+    lateinit var source: ConfigSource
+    var organizationName: String? = null
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage = MutableStateFlow("")
@@ -69,6 +74,7 @@ class WifiConfigViewModel @Inject constructor(
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
                 handleAndroid11ChromeOs()
             }
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM && !fallbackToSuggestions -> {
                 // We will use Intent for SSID, and Suggestion for Passpoint.
                 // It would've been possible to use Intent for both SSID and Passpoint,
@@ -253,7 +259,7 @@ class WifiConfigViewModel @Inject constructor(
             } catch (e: Exception) {
                 progressMessage.value =
                     "Failed to add/connect WifiConfiguration. Exception: ${e.message}"
-                Timber.w( e, "Failed to add/connect WifiConfiguration")
+                Timber.w(e, "Failed to add/connect WifiConfiguration")
             }
         }
         passpointConfig?.install(context)
@@ -309,7 +315,7 @@ class WifiConfigViewModel @Inject constructor(
         didEnterUserCredentials.value = true
     }
 
-    fun shouldRequestPushPermission() : Boolean {
+    fun shouldRequestPushPermission(): Boolean {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
             return notificationRepository.shouldRequestPushPermission(it, organizationId)
         }
@@ -318,7 +324,19 @@ class WifiConfigViewModel @Inject constructor(
 
     fun scheduleReminderNotification() {
         eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.let {
-             notificationRepository.scheduleNotificationIfNeeded(it, organizationId)
+            notificationRepository.scheduleNotificationIfNeeded(it, organizationId)
+        }
+    }
+
+    fun saveConfigForStatusScreen() {
+        viewModelScope.launch {
+            storageRepository.saveConfigForStatusScreen(
+                organizationId = organizationId,
+                organizationName = organizationName ?: eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.providerInfo?.displayName,
+                expiryTimestampMs = eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.validUntil?.time,
+                config = eapIdentityProviderList,
+                source = source
+            )
         }
     }
 

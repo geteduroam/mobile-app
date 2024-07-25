@@ -18,6 +18,8 @@ import app.eduroam.geteduroam.organizations.SelectOrganizationScreen
 import app.eduroam.geteduroam.organizations.SelectOrganizationViewModel
 import app.eduroam.geteduroam.profile.SelectProfileScreen
 import app.eduroam.geteduroam.profile.SelectProfileViewModel
+import app.eduroam.geteduroam.status.StatusScreen
+import app.eduroam.geteduroam.status.StatusScreenViewModel
 import app.eduroam.geteduroam.webview_fallback.WebViewFallbackScreen
 import app.eduroam.geteduroam.webview_fallback.WebViewFallbackViewModel
 
@@ -29,8 +31,23 @@ fun MainGraph(
     closeApp: () -> Unit
 ) : NavController {
     NavHost(
-        navController = navController, startDestination = Route.SelectInstitution.route
+        navController = navController, startDestination = Route.StatusScreen.route
     ) {
+        composable(Route.StatusScreen.route) { entry -> 
+            val viewModel = hiltViewModel<StatusScreenViewModel>()
+            StatusScreen(
+                viewModel = viewModel,
+                goToInstitutionSelection = {
+                    navController.navigate(Route.SelectInstitution.route)
+                },
+                renewAccount = { organizationId ->
+                    navController.navigate(Route.SelectProfile.encodeInstitutionIdArgument(organizationId))
+                },
+                repairConfig = { source, organizationId, organizationName, eapIdentityProviderList ->
+                    navController.navigate(Route.ConfigureWifi.encodeArguments(source, organizationId, organizationName, eapIdentityProviderList))
+                })
+
+        }
         composable(Route.SelectInstitution.route) { entry ->
             val viewModel = hiltViewModel<SelectOrganizationViewModel>(entry)
             val focusManager = LocalFocusManager.current
@@ -49,11 +66,11 @@ fun MainGraph(
                         )
                     )
                 },
-                goToConfigScreen = { organizationId, wifiConfigData ->
+                goToConfigScreen = { source, organizationId, organizationName, wifiConfigData ->
                     navController.popBackStack()
                     navController.navigate(
                         Route.ConfigureWifi.encodeArguments(
-                            organizationId, wifiConfigData
+                            source, organizationId, organizationName, wifiConfigData
                         )
                     )
                 },
@@ -76,9 +93,14 @@ fun MainGraph(
                 goToOAuth = { configuration ->
                     navController.navigate(Route.OAuth.encodeArguments(configuration, null))
                 },
-                goToConfigScreen = { organizationId, provider ->
+                goToConfigScreen = { source, organizationId, organizationName, provider ->
                     navController.navigate(
-                        Route.ConfigureWifi.encodeArguments(organizationId, provider)
+                        Route.ConfigureWifi.encodeArguments(
+                            source,
+                            organizationId,
+                            organizationName,
+                            provider
+                        )
                     )
                 },
                 goToPrevious = {
@@ -127,9 +149,13 @@ fun MainGraph(
         ) { backStackEntry ->
             val wifiConfigData = Route.ConfigureWifi.decodeUrlArgument(backStackEntry.arguments)
             val organizationId = Route.ConfigureWifi.decodeOrganizationIdArgument(backStackEntry.arguments)
+            val organizationName = Route.ConfigureWifi.decodeOrganizationNameArgument(backStackEntry.arguments)
+            val source = Route.ConfigureWifi.decodeSourceArgument(backStackEntry.arguments)
             val viewModel = hiltViewModel<WifiConfigViewModel>()
             viewModel.eapIdentityProviderList = wifiConfigData
             viewModel.organizationId = organizationId
+            viewModel.source = source
+            viewModel.organizationName = organizationName
             WifiConfigScreen(
                 viewModel,
                 closeApp = closeApp,

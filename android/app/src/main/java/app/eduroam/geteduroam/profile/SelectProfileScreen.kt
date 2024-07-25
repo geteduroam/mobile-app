@@ -53,6 +53,7 @@ import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.organizations.TermsOfUseDialog
 import app.eduroam.geteduroam.organizations.UsernamePasswordDialog
 import app.eduroam.geteduroam.models.Profile
+import app.eduroam.geteduroam.status.ConfigSource
 import app.eduroam.geteduroam.ui.AlertDialogWithSingleButton
 import app.eduroam.geteduroam.ui.ErrorData
 import app.eduroam.geteduroam.ui.LinkifyText
@@ -65,9 +66,9 @@ import kotlinx.coroutines.flow.filter
 @Composable
 fun SelectProfileScreen(
     viewModel: SelectProfileViewModel,
-    goToOAuth: (Configuration) -> Unit = { _ -> },
-    goToConfigScreen: (String, EAPIdentityProviderList) -> Unit = { _, _ -> },
-    goToPrevious: () -> Unit = {}
+    goToOAuth: (Configuration) -> Unit,
+    goToConfigScreen: (ConfigSource, String, String?, EAPIdentityProviderList) -> Unit,
+    goToPrevious: () -> Unit
 ) = EduTopAppBar(
     title = stringResource(id = R.string.profiles_header),
     onBackClicked = goToPrevious
@@ -100,7 +101,16 @@ fun SelectProfileScreen(
         snapshotFlow { viewModel.uiState }.distinctUntilChanged()
             .filter { it.goToConfigScreenWithProviderList != null }.flowWithLifecycle(lifecycle).collect { state ->
                 val providerList = state.goToConfigScreenWithProviderList!!
-                goToConfigScreen(viewModel.institutionId!!, providerList)
+                val source = if (viewModel.customHost != null) {
+                    ConfigSource.Url
+                } else {
+                    ConfigSource.Discovery
+                }
+                goToConfigScreen(
+                    source,
+                    viewModel.institutionId!!,
+                    viewModel.uiState.organization?.name,
+                    providerList)
                 viewModel.didGoToConfigScreen()
             }
     }

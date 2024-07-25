@@ -12,6 +12,7 @@ import app.eduroam.geteduroam.config.model.EAPIdentityProvider
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
+import app.eduroam.geteduroam.status.ConfigSource
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import timber.log.Timber
@@ -22,6 +23,7 @@ import java.util.Date
 
 sealed class Route(val route: String) {
     object SelectInstitution : Route(route = "select_institution")
+    object StatusScreen : Route(route = "status_screen")
     object SelectProfile : Route(route = "select_profile") {
         const val institutionIdArg = "institutionIdArg"
         const val customHostArg = "customHostArg"
@@ -121,10 +123,12 @@ sealed class Route(val route: String) {
 
 
     object ConfigureWifi : Route(route = "configure_wifi") {
-        const val organizationIdArg = "organizationid"
+        const val organizationIdArg = "organizationId"
+        const val organizationNameArg = "organizationName"
         const val wifiConfigDataArg = "wificonfigdata"
+        const val sourceArg = "source"
         const val emptyOrganization = "no_organization_id"
-        val routeWithArgs = "$route/{$wifiConfigDataArg}?organization={$organizationIdArg}"
+        val routeWithArgs = "$route/{$wifiConfigDataArg}?organizationId={$organizationIdArg}&source=${sourceArg}&organizationName={$organizationNameArg}"
         val arguments = listOf(
             navArgument(organizationIdArg) {
                 type = NavType.StringType
@@ -133,9 +137,20 @@ sealed class Route(val route: String) {
             navArgument(wifiConfigDataArg) {
                 type = NavType.StringType
                 defaultValue = ""
-            })
+            },
+            navArgument(sourceArg) {
+                type = NavType.StringType
+                defaultValue = ""
+            },
+            navArgument(organizationNameArg) {
+                type = NavType.StringType
+                nullable = true
+            }
+        )
 
-        val deepLinkUrl = "$BASE_URI/$route/{$wifiConfigDataArg}?organization={$organizationIdArg}"
+        val deepLinkUrl =
+            "$BASE_URI/$route/{$wifiConfigDataArg}?organizationId={$organizationIdArg}&source=${sourceArg}&organizationName={$organizationNameArg}"
+
         suspend fun buildDeepLink(context: Context, fileUri: Uri): String? {
             // Read the contents of the file as XML
             val inputStream = context.contentResolver.openInputStream(fileUri) ?: return null
@@ -144,15 +159,20 @@ sealed class Route(val route: String) {
             return try {
                 val provider = configParser.parse(bytes)
                 inputStream.close()
-                "${BASE_URI}/${encodeArguments(null, provider)}"
+                "${BASE_URI}/${encodeArguments(ConfigSource.File, null, null, provider)}"
             } catch (ex: Exception) {
                 Timber.w(ex, "Could not parse file opened!")
                 null
             }
         }
 
-
-        fun encodeArguments(organizationId: String?, eapIdentityProviderList: EAPIdentityProviderList): String {
+        fun encodeArguments(
+            source: ConfigSource,
+            organizationId: String?,
+            organizationName: String?,
+            eapIdentityProviderList: EAPIdentityProviderList
+        ): String {
+            // TODO use type-safe navigation because this is something crashing, and we don't know why
             val moshi = Moshi.Builder()
                 .add(Date::class.java, DateJsonAdapter())
                 .build()
@@ -166,15 +186,29 @@ sealed class Route(val route: String) {
             val adapter: JsonAdapter<EAPIdentityProviderList> = moshi.adapter(EAPIdentityProviderList::class.java)
             val wifiConfigDataJson = adapter.toJson(listWithoutLogos)
             val encodedWifiConfig = Uri.encode(wifiConfigDataJson)
-            return if (organizationId.isNullOrEmpty()) {
-                "$route/$encodedWifiConfig"
+            val baseRoute = if (organizationId.isNullOrEmpty()) {
+                "$route/$encodedWifiConfig?source=${source.name}&organizationName="
             } else {
-                "$route/$encodedWifiConfig?organization=$organizationId"
+                "$route/$encodedWifiConfig?organizationId=$organizationId&source=${source.name}&organizationName="
             }
+            return baseRoute + Uri.encode(organizationName ?: eapIdentityProviderList.eapIdentityProvider?.firstOrNull()?.providerInfo?.displayName)
         }
 
         fun decodeOrganizationIdArgument(arguments: Bundle?): String {
             return arguments?.getString(organizationIdArg).orEmpty()
+        }
+
+        fun decodeOrganizationNameArgument(arguments: Bundle?): String {
+            return Uri.decode(arguments?.getString(organizationNameArg).orEmpty())
+        }
+
+        fun decodeSourceArgument(arguments: Bundle?): ConfigSource {
+            val sourceString = arguments?.getString(sourceArg).orEmpty()
+            return try {
+                ConfigSource.valueOf(sourceString)
+            } catch (ex: Exception) {
+                ConfigSource.Unknown
+            }
         }
 
         fun decodeUrlArgument(arguments: Bundle?): EAPIdentityProviderList {

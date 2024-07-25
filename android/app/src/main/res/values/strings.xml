@@ -87,4 +87,35 @@
     <string name="passphrase_dialog_incorrect_passphrase">The passphrase you have entered is incorrect!</string>
     <string name="passphrase_accessibility_hide_passphrase">Hide passphrase</string>
     <string name="passphrase_accessibility_show_passphrase">Show passphrase</string>
+
+    <string name="status_authenticated_by">You are authenticated by:\n%s</string>
+    <string name="status_account_valid_for">Your login is valid for %s</string>
+    <string name="status_account_valid_until">Your login is valid until %s</string>
+    <string name="status_account_expired_ago">Your login expired %s ago</string>
+    <string name="status_account_expired_on">Your login expired on %s</string>
+    <string name="status_select_different_organization">Select a different organization</string>
+    <string name="status_reauthenticate_my_account">Reauthenticate my account</string>
+    <string name="status_update_my_password">Update my password</string>
+    <string name="status_repair">Repair</string>
+    <string name="status_renew_my_accout">Renew my account</string>
+    <string name="status_show_debug_options">Show debug options</string>
+    <string name="status_username_label">Username: </string>
+    <string name="status_ssid_label">SSID: </string>
+
+    <plurals name="time_days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <plurals name="time_hours">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="time_minutes">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="time_seconds">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
 </resources>

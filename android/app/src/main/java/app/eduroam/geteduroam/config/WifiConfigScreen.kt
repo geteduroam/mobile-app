@@ -130,6 +130,7 @@ fun WifiConfigScreen(
             )
         } else {
             LaunchedEffect(Unit) {
+                viewModel.saveConfigForStatusScreen()
                 if (viewModel.shouldRequestPushPermission()) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         launcher.launch(Manifest.permission.POST_NOTIFICATIONS)

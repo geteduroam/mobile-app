@@ -130,7 +130,7 @@ play {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material)
@@ -146,6 +146,8 @@ dependencies {
     implementation(libs.accompanist.bottomsheet)
     implementation(libs.appauth)
     implementation(libs.simpleframework.xml.parser)
+
+    implementation(libs.coroutines)
 
     implementation(libs.moshi.moshi)
     implementation(libs.moshi.adapters)
