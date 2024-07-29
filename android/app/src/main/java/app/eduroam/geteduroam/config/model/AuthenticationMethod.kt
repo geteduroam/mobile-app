@@ -4,11 +4,13 @@ import android.net.wifi.WifiEnterpriseConfig
 import app.eduroam.geteduroam.config.convertEAPMethod
 import app.eduroam.geteduroam.config.getClientCertificate
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 
 @Root(name = "AuthenticationMethod")
 @JsonClass(generateAdapter = true)
+@Serializable
 class AuthenticationMethod {
 
     @field:Element(name = "EAPMethod", required = false)

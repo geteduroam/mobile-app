@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
+import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -25,10 +26,10 @@ class MainActivity : ComponentActivity() {
     private var navController: NavController? = null
 
     private val job = Job()
-    val coroutineContext: CoroutineContext
+    private val coroutineContext: CoroutineContext
         get() = job + Dispatchers.IO
 
-    val coroutineScope = CoroutineScope(coroutineContext)
+    private val coroutineScope = CoroutineScope(coroutineContext)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +80,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            } else if (intent?.hasExtra(NotificationRepository.KEY_EXTRA_PAYLOAD) == true) {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra<Route.SelectProfile>(NotificationRepository.KEY_EXTRA_PAYLOAD)?.let { payload ->
+                    navController?.navigate(payload)
+                }
             } else {
                 navController?.handleDeepLink(intent)
             }
@@ -86,10 +92,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun openFileUri(fileUri: Uri): Boolean {
-        Route.ConfigureWifi.buildDeepLink(this@MainActivity, fileUri)?.let {
-            intent.data = Uri.parse(it)
+        Route.ConfigureWifi.buildDeepLink(this@MainActivity, fileUri)?.let { entry ->
             return withContext(Dispatchers.Main) {
-                return@withContext navController?.handleDeepLink(intent) ?: false
+                navController?.navigate(entry)
+                return@withContext true
             }
         }
         return false

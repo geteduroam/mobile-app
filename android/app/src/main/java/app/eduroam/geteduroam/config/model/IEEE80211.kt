@@ -1,9 +1,11 @@
 package app.eduroam.geteduroam.config.model
 
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Element
 
 @JsonClass(generateAdapter = true)
+@Serializable
 class IEEE80211 {
 
     @field:Element(name = "SSID", required = false)

@@ -4,11 +4,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Text
 
 
 @JsonClass(generateAdapter = true)
+@Serializable
 class ProviderLogo {
 
     @field:Text

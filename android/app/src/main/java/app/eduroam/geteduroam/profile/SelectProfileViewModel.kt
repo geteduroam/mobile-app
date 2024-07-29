@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
@@ -48,8 +49,9 @@ class SelectProfileViewModel @Inject constructor(
     private var didAgreeToTerms = false
 
     init {
-        institutionId = savedStateHandle.get<String>(Route.SelectProfile.institutionIdArg) ?: ""
-        customHost = savedStateHandle.get<String>(Route.SelectProfile.customHostArg)?.let { Uri.parse(it) }
+        val data = savedStateHandle.toRoute<Route.SelectProfile>()
+        institutionId = data.institutionId ?: ""
+        customHost = data.customHostUri?.let { Uri.parse(it) }
         if (institutionId.isNotBlank()) {
             loadDataFromInstitution()
         } else if (customHost != null) {

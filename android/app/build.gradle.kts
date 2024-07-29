@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt)
+    alias(libs.plugins.serialization)
     id("kotlin-parcelize")
     alias(libs.plugins.protobuf)
     id("com.google.gms.google-services")
@@ -151,6 +152,7 @@ dependencies {
 
     implementation(libs.moshi.moshi)
     implementation(libs.moshi.adapters)
+    implementation(libs.kotlin.serialization)
     ksp(libs.moshi.codegen)
 
     //OkHttp client

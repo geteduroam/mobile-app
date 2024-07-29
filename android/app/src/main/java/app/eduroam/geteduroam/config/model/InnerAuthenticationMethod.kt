@@ -1,11 +1,13 @@
 package app.eduroam.geteduroam.config.model
 
 import com.squareup.moshi.JsonClass
+import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 
 @Root(name = "InnerAuthenticationMethod")
 @JsonClass(generateAdapter = true)
+@Serializable
 class InnerAuthenticationMethod {
 
     @field:Element(name = "NonEAPAuthMethod", required = false)
