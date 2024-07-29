@@ -8,19 +8,18 @@ import app.eduroam.geteduroam.di.assist.AuthenticationAssistant
 import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.di.repository.StorageRepository
 import app.eduroam.geteduroam.models.Profile
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.EnumJsonAdapter
-import com.squareup.moshi.addAdapter
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -76,19 +75,21 @@ internal object EduroamModule {
 
     @Provides
     @Singleton
-    internal fun provideEduroamRetrofit(
-        client: Lazy<OkHttpClient>, moshi: Moshi,
-    ): Retrofit {
-        return Retrofit.Builder().callFactory { client.get().newCall(it) }
-            .addCallAdapterFactory(ApiResponseAdapterFactory.create())
-            .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(BuildConfig.DISCOVERY_BASE_URL).build()
+    internal fun provideJson() = Json {
+        coerceInputValues = true
+        ignoreUnknownKeys = true
     }
 
     @Provides
     @Singleton
-    internal fun provideMoshi(): Moshi = Moshi.Builder()
-        .add(Profile.Type::class.java, EnumJsonAdapter.create(Profile.Type::class.java).withUnknownFallback(Profile.Type.unknown))
-        .build()
+    internal fun provideEduroamRetrofit(
+        client: Lazy<OkHttpClient>,
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder().callFactory { client.get().newCall(it) }
+            .addCallAdapterFactory(ApiResponseAdapterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
+            .baseUrl(BuildConfig.DISCOVERY_BASE_URL).build()
+    }
 }

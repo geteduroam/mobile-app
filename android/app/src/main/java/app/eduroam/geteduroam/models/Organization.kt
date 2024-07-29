@@ -2,14 +2,13 @@ package app.eduroam.geteduroam.models
 
 import android.os.Parcelable
 import app.eduroam.geteduroam.extensions.removeNonSpacingMarks
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import java.util.Locale
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Organization(
     val country: String,
     val id: String,

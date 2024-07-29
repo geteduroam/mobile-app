@@ -1,13 +1,11 @@
 package app.eduroam.geteduroam.config.model
 
-import com.squareup.moshi.JsonClass
 import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
 
 @Root(name = "ProviderInfo")
-@JsonClass(generateAdapter = true)
 @Serializable
 data class ProviderInfo(
     @field:Element(name = "DisplayName", required = false)

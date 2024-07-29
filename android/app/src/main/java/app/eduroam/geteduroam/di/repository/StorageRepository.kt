@@ -8,15 +8,14 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import app.eduroam.geteduroam.models.Configuration
 import app.eduroam.geteduroam.status.ConfigSource
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.openid.appauth.AuthState
 import net.openid.appauth.AuthorizationRequest
 import timber.log.Timber
@@ -143,11 +142,7 @@ class StorageRepository(private val context: Context) {
     }.map { preferences ->
         val savedConfig = preferences[PreferencesKeys.CONFIGURED_PROFILE_LAST_CONFIG] ?: return@map null
         try {
-            val moshi = Moshi.Builder()
-                .add(Date::class.java, DateJsonAdapter())
-                .build()
-            val jsonAdapter = moshi.adapter(EAPIdentityProviderList::class.java)
-            return@map jsonAdapter.fromJson(savedConfig)
+            return@map Json.decodeFromString(savedConfig)
         } catch (ex: Exception) {
             return@map null
         }
@@ -205,11 +200,7 @@ class StorageRepository(private val context: Context) {
             } else {
                 settings[PreferencesKeys.CONFIGURED_PROFILE_EXPIRY_TIMESTAMP_MS] = expiryTimestampMs
             }
-            val moshi = Moshi.Builder()
-                .add(Date::class.java, DateJsonAdapter())
-                .build()
-            val jsonAdapter = moshi.adapter(EAPIdentityProviderList::class.java)
-            val serializedConfig = jsonAdapter.toJson(config)
+            val serializedConfig = Json.encodeToString(config)
             settings[PreferencesKeys.CONFIGURED_PROFILE_LAST_CONFIG] = serializedConfig
             settings[PreferencesKeys.CONFIGURED_PROFILE_SOURCE] = source.name
         }
