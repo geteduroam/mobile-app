@@ -7,7 +7,6 @@ android-gradle-plugin = "8.2.2"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
 google-services-plugin = "4.3.15"
-serialization-plugin = "2.0.0"
 junit = "4.13.2"
 protobuf = "3.23.0"
 kotlin-gradle-plugin = "1.9.22"
@@ -87,7 +86,7 @@ android-library = { id = "com.android.library", version.ref = "android-gradle-pl
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-gradle-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-plugin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt-android" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization-plugin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-gradle-plugin" }
 google-gms-gradle = { id = "com.google.gms.google-services", version.ref = "google-services-plugin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher-plugin"}
