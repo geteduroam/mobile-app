@@ -10,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import app.eduroam.geteduroam.NavTypes
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.AndroidConfigParser
@@ -49,7 +50,7 @@ class SelectProfileViewModel @Inject constructor(
     private var didAgreeToTerms = false
 
     init {
-        val data = savedStateHandle.toRoute<Route.SelectProfile>()
+        val data = savedStateHandle.toRoute<Route.SelectProfile>(NavTypes.allTypesMap)
         institutionId = data.institutionId ?: ""
         customHost = data.customHostUri?.let { Uri.parse(it) }
         if (institutionId.isNotBlank()) {

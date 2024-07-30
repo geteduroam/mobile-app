@@ -17,8 +17,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import java.net.URLDecoder
-import java.net.URLEncoder
+import kotlin.reflect.typeOf
 
 object NavTypes {
     val ConfigurationNavType = object: NavType<Configuration>(isNullableAllowed = false) {
@@ -32,13 +31,13 @@ object NavTypes {
         }
 
         override fun parseValue(value: String): Configuration {
-            val decoded = URLDecoder.decode(value, Charsets.UTF_8.name())
+            val decoded = Uri.decode(value)
             return Json.decodeFromString(decoded)
         }
 
         override fun serializeAsValue(value: Configuration): String {
             val string = Json.encodeToString(value)
-            return URLEncoder.encode(string, Charsets.UTF_8.name())
+            return Uri.encode(string)
         }
 
         override fun put(bundle: Bundle, key: String, value: Configuration) {
@@ -73,28 +72,34 @@ object NavTypes {
             return if (string.isNullOrEmpty()) {
                 null
             } else {
-                val decodedString = URLDecoder.decode(string, Charsets.UTF_8.name())
+                val decodedString = Uri.decode(string)
                 Json.decodeFromString(decodedString)
             }
         }
 
         override fun parseValue(value: String): EAPIdentityProviderList {
-            val decoded = URLDecoder.decode(value, Charsets.UTF_8.name())
+            val decoded = Uri.decode(value)
             return Json.decodeFromString(decoded)
         }
 
         override fun serializeAsValue(value: EAPIdentityProviderList): String {
             val string = Json.encodeToString(value)
-            return URLEncoder.encode(string, Charsets.UTF_8.name())
+            return Uri.encode(string)
 
         }
 
         override fun put(bundle: Bundle, key: String, value: EAPIdentityProviderList) {
             val string = Json.encodeToString(value)
-            val encodedString = URLEncoder.encode(string, Charsets.UTF_8.name())
+            val encodedString = Uri.encode(string)
             bundle.putString(key, encodedString)
         }
     }
+
+    val allTypesMap = mapOf(
+        typeOf<Configuration>() to ConfigurationNavType,
+        typeOf<EAPIdentityProviderList>() to EAPIdentityProviderListNavType,
+        typeOf<ConfigSource>() to ConfigSourceNavType
+    )
 }
 
 sealed class Route {

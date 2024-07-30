@@ -16,6 +16,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import app.eduroam.geteduroam.NavTypes
 import app.eduroam.geteduroam.R
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.di.assist.AuthenticationAssistant
@@ -43,6 +44,7 @@ import timber.log.Timber
 import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.inject.Inject
+import kotlin.reflect.typeOf
 
 
 @HiltViewModel
@@ -59,7 +61,7 @@ class OAuthViewModel @Inject constructor(
     private var configuration: Configuration = Configuration.EMPTY
 
     init {
-        val data = savedStateHandle.toRoute<Route.OAuth>()
+        val data = savedStateHandle.toRoute<Route.OAuth>(NavTypes.allTypesMap)
         configuration = data.configuration
         val redirectUriArg = data.redirectUri ?: ""
         val redirectUri = if (redirectUriArg.isNotEmpty()) {

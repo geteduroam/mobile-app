@@ -1,19 +1,19 @@
 package app.eduroam.geteduroam.models
 
 import android.os.Parcelable
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Parcelize
-@JsonClass(generateAdapter = true)
+@Serializable
 data class LetswifiConfig(
-    @Json(name = "eapconfig_endpoint")
+    @SerialName("eapconfig_endpoint")
     val eapConfigEndpoint: String?,
-    @Json(name = "mobileconfig_endpoint")
+    @SerialName("mobileconfig_endpoint")
     val mobileConfigEndpoint: String?,
-    @Json(name = "authorization_endpoint")
+    @SerialName("authorization_endpoint")
     val authorizationEndpoint: String?,
-    @Json(name = "token_endpoint")
+    @SerialName("token_endpoint")
     val tokenEndpoint: String?
 ) : Parcelable

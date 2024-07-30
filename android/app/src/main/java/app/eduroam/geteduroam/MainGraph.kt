@@ -38,8 +38,8 @@ fun MainGraph(
     NavHost(
         navController = navController, startDestination = Route.StatusScreen
     ) {
-        composable<Route.StatusScreen> { _ ->
-            val viewModel = hiltViewModel<StatusScreenViewModel>()
+        composable<Route.StatusScreen>(NavTypes.allTypesMap) { entry ->
+            val viewModel = hiltViewModel<StatusScreenViewModel>(entry)
             StatusScreen(
                 viewModel = viewModel,
                 goToInstitutionSelection = {
@@ -58,7 +58,7 @@ fun MainGraph(
                 })
 
         }
-        composable<Route.SelectInstitution> { entry ->
+        composable<Route.SelectInstitution>(NavTypes.allTypesMap) { entry ->
             val viewModel = hiltViewModel<SelectOrganizationViewModel>(entry)
             val focusManager = LocalFocusManager.current
             SelectOrganizationScreen(
@@ -90,7 +90,7 @@ fun MainGraph(
                 }
             )
         }
-        composable<Route.SelectProfile> { entry ->
+        composable<Route.SelectProfile>(NavTypes.allTypesMap) { entry ->
             val viewModel = hiltViewModel<SelectProfileViewModel>(entry)
             SelectProfileScreen(
                 viewModel = viewModel,
@@ -111,12 +111,8 @@ fun MainGraph(
                     navController.popBackStack()
                 })
         }
-        composable<Route.OAuth>(
-            typeMap = mapOf(
-                typeOf<Configuration>() to NavTypes.ConfigurationNavType
-            )
-        ) { _ ->
-            val viewModel = hiltViewModel<OAuthViewModel>()
+        composable<Route.OAuth>(NavTypes.allTypesMap) { entry ->
+            val viewModel = hiltViewModel<OAuthViewModel>(entry)
             OAuthScreen(
                 viewModel = viewModel,
                 goToPrevious = {
@@ -129,12 +125,8 @@ fun MainGraph(
                 }
             )
         }
-        composable<Route.WebViewFallback>(
-            typeMap = mapOf(
-                typeOf<Configuration>() to NavTypes.ConfigurationNavType
-            )
-        ) { _ ->
-            val viewModel = hiltViewModel<WebViewFallbackViewModel>()
+        composable<Route.WebViewFallback>(NavTypes.allTypesMap) { entry ->
+            val viewModel = hiltViewModel<WebViewFallbackViewModel>(entry)
             WebViewFallbackScreen(
                 viewModel = viewModel,
                 onRedirectUriFound = { configuration, uri ->
@@ -149,18 +141,9 @@ fun MainGraph(
             )
         }
 
-        composable<Route.ConfigureWifi>(
-            typeMap = mapOf(
-                typeOf<ConfigSource>() to NavTypes.ConfigSourceNavType,
-                typeOf<EAPIdentityProviderList>() to NavTypes.EAPIdentityProviderListNavType
-            )
-        ) { backStackEntry ->
-            val data: Route.ConfigureWifi = backStackEntry.toRoute()
-            val viewModel = hiltViewModel<WifiConfigViewModel>()
-            viewModel.eapIdentityProviderList = data.eapIdentityProviderList
-            viewModel.organizationId = data.organizationId
-            viewModel.source = data.source
-            viewModel.organizationName = data.organizationName
+        composable<Route.ConfigureWifi>(NavTypes.allTypesMap) { entry ->
+            val viewModel = hiltViewModel<WifiConfigViewModel>(entry)
+
             WifiConfigScreen(
                 viewModel,
                 closeApp = closeApp,

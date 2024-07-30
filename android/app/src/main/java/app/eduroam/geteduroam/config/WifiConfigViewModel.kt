@@ -13,8 +13,12 @@ import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import app.eduroam.geteduroam.NavTypes
+import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
 import app.eduroam.geteduroam.di.repository.NotificationRepository
 import app.eduroam.geteduroam.di.repository.StorageRepository
@@ -31,13 +35,14 @@ import javax.inject.Inject
 @HiltViewModel
 class WifiConfigViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
-    private val storageRepository: StorageRepository
+    private val storageRepository: StorageRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    lateinit var eapIdentityProviderList: EAPIdentityProviderList
-    lateinit var organizationId: String
-    lateinit var source: ConfigSource
-    var organizationName: String? = null
+    val eapIdentityProviderList: EAPIdentityProviderList
+    val organizationId: String
+    val source: ConfigSource
+    val organizationName: String?
 
     val launch: MutableStateFlow<Unit?> = MutableStateFlow(null)
     val progressMessage = MutableStateFlow("")
@@ -52,6 +57,11 @@ class WifiConfigViewModel @Inject constructor(
 
     init {
         launch.value = Unit
+        val data = savedStateHandle.toRoute<Route.ConfigureWifi>(NavTypes.allTypesMap)
+        eapIdentityProviderList = data.eapIdentityProviderList
+        organizationId = data.organizationId
+        source = data.source
+        organizationName = data.organizationName
     }
 
     fun launchConfiguration(context: Context, fallbackToSuggestions: Boolean = false) = viewModelScope.launch {

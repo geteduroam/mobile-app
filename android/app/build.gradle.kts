@@ -149,19 +149,15 @@ dependencies {
     implementation(libs.simpleframework.xml.parser)
 
     implementation(libs.coroutines)
-
-    implementation(libs.moshi.moshi)
-    implementation(libs.moshi.adapters)
     implementation(libs.kotlin.serialization)
-    ksp(libs.moshi.codegen)
 
     //OkHttp client
     implementation(libs.okhttp.okhttp)
     implementation(libs.okhttp.logging)
 
-    //Retrofit with moshi for API calls
+    //Retrofit with kotlinx serialization for API calls
     implementation(libs.retrofit.retrofit)
-    implementation(libs.retrofit.converter.moshi)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
     implementation(libs.retrofit.converter.scalars)
 
     //Compose BOM dependencies

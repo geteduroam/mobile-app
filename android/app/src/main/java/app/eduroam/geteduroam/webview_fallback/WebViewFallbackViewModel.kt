@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
+import app.eduroam.geteduroam.NavTypes
 import app.eduroam.geteduroam.Route
 import app.eduroam.geteduroam.di.api.GetEduroamApi
 import app.eduroam.geteduroam.di.repository.StorageRepository
@@ -29,7 +30,7 @@ class WebViewFallbackViewModel @Inject constructor(
     val configuration: Configuration
 
     init {
-        val data = savedStateHandle.toRoute<Route.WebViewFallback>()
+        val data = savedStateHandle.toRoute<Route.WebViewFallback>(NavTypes.allTypesMap)
         configuration = data.configuration
         uiState = UiState(startUri =  Uri.parse(data.urlToLoad))
     }

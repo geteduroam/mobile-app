@@ -1,7 +1,6 @@
 package app.eduroam.geteduroam.config.model
 
 import app.eduroam.geteduroam.util.serializer.DateSerializer
-import com.squareup.moshi.JsonClass
 import kotlinx.serialization.Serializable
 import org.simpleframework.xml.Attribute
 import org.simpleframework.xml.Element
@@ -11,7 +10,6 @@ import java.util.Date
 
 
 @Root(name = "EAPIdentityProvider", strict = false)
-@JsonClass(generateAdapter = true)
 @Serializable
 data class EAPIdentityProvider(
     @field:ElementList(name = "AuthenticationMethods", entry = "AuthenticationMethod")

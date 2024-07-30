@@ -3,27 +3,25 @@ package app.eduroam.geteduroam.models
 import android.net.Uri
 import android.os.Parcelable
 import app.eduroam.geteduroam.util.serializer.UriSerializer
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
 @Parcelize
-@JsonClass(generateAdapter = true)
 @Serializable
 data class Configuration(
-    @Json(name = "client_id") val clientId: String?,
-    @Json(name = "authorization_scope") val scope: String,
-    @Json(name = "redirect_uri") val redirect: String,
-    @Json(name = "end_session_redirect_uri") val endSessionRedirect: String? = null,
-    @Json(name = "discovery_uri") val discovery: String? = null,
-    @Json(name = "authorization_endpoint_uri") val authEndpoint: String,
-    @Json(name = "token_endpoint_uri") val tokenEndpoint: String,
-    @Json(name = "user_info_endpoint_uri") val endSessionEndpoint: String? = null,
-    @Json(name = "registration_endpoint_uri") val registrationEndpoint: String? = null,
-    @Json(name = "https_required") val isHttpsRequired: Boolean = true,
+    @SerialName("client_id") val clientId: String?,
+    @SerialName("authorization_scope") val scope: String,
+    @SerialName("redirect_uri") val redirect: String,
+    @SerialName("end_session_redirect_uri") val endSessionRedirect: String? = null,
+    @SerialName("discovery_uri") val discovery: String? = null,
+    @SerialName("authorization_endpoint_uri") val authEndpoint: String,
+    @SerialName("token_endpoint_uri") val tokenEndpoint: String,
+    @SerialName("user_info_endpoint_uri") val endSessionEndpoint: String? = null,
+    @SerialName("registration_endpoint_uri") val registrationEndpoint: String? = null,
+    @SerialName("https_required") val isHttpsRequired: Boolean = true,
 ) : Parcelable {
     @IgnoredOnParcel
     @Serializable(with = UriSerializer::class)

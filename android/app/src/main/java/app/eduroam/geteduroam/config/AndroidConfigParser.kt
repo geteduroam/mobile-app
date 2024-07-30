@@ -1,7 +1,6 @@
 package app.eduroam.geteduroam.config
 
 import app.eduroam.geteduroam.config.model.EAPIdentityProviderList
-import app.eduroam.geteduroam.extensions.DateJsonAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simpleframework.xml.core.Persister
@@ -18,6 +17,12 @@ import java.util.TimeZone
 
 
 class AndroidConfigParser {
+
+    companion object {
+        val SERVER_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+    }
 
     class DateFormatTransformer(private val dateFormat: DateFormat) : Transform<Date?> {
         override fun read(value: String?): Date? {
@@ -38,7 +43,7 @@ class AndroidConfigParser {
 
     suspend fun parse(source: ByteArray): EAPIdentityProviderList = withContext(Dispatchers.IO) {
         val registryMatcher = RegistryMatcher()
-        registryMatcher.bind(Date::class.java, DateFormatTransformer(DateJsonAdapter.SERVER_DATE_FORMAT))
+        registryMatcher.bind(Date::class.java, DateFormatTransformer(SERVER_DATE_FORMAT))
         val persister = Persister(registryMatcher)
         persister.read(EAPIdentityProviderList::class.java, source.inputStream())
     }
