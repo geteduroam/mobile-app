@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,11 +63,17 @@ fun StatusScreen(
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val organizationId by viewModel.organizationId
-        .collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+        .collectAsStateWithLifecycle(initialValue = "", lifecycle = lifecycle)
     val organizationName by viewModel.organizationName.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
     val configSource by viewModel.configSource.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
     val lastConfig by viewModel.lastConfig.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
     val expiryTimestampMs by viewModel.expiryTimestampMs.collectAsStateWithLifecycle(initialValue = null, lifecycle = lifecycle)
+
+    LaunchedEffect(organizationId) {
+        if (organizationId == null) {
+            goToInstitutionSelection()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -244,6 +251,7 @@ fun StatusScreenContent(
                 })
         }
         Spacer(modifier = Modifier.weight(1f))
+        /** TODO implement debug options
         if (!debugOptionsEnabled) {
             TextButton(
                 onClick = {
@@ -258,6 +266,7 @@ fun StatusScreenContent(
         } else {
             // TODO show username, suggestion / app intent, SSID
         }
+        **/
         Spacer(modifier = Modifier.size(12.dp))
     }
 
