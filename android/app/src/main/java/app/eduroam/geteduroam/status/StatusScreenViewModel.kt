@@ -19,7 +19,7 @@ class StatusScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     val organizationId = repository.configuredOrganizationId
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "")
     val organizationName = repository.configuredOrganizationName
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val configSource = repository.configuredProfileSource
