@@ -74,7 +74,6 @@ fun StatusScreen(
             goToInstitutionSelection()
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -155,6 +154,12 @@ fun StatusScreenContent(
             )
         }
     }
+
+    if (organizationId.isNullOrEmpty()) {
+        // Do not draw any actual content yet while we are waiting for the value
+        return@Surface
+    }
+
     // OAuth logins expire after a specific time, regular logins do not, we show different texts for these two
     Column(
         modifier = Modifier

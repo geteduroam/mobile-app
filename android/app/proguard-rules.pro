@@ -11,3 +11,6 @@
 }
 -keepattributes Signature
 -keepattributes ElementList, Root, *Annotation*
+# Required by safe navigation types (otherwise it will throw IllegalArgumentException's when building the graph)
+-keepnames class * extends android.os.Parcelable
+-keepnames class * extends java.io.Serializable
