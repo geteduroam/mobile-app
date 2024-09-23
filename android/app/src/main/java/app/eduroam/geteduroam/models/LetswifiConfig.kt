@@ -9,11 +9,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LetswifiConfig(
     @SerialName("eapconfig_endpoint")
-    val eapConfigEndpoint: String?,
+    val eapConfigEndpoint: String? = null,
     @SerialName("mobileconfig_endpoint")
-    val mobileConfigEndpoint: String?,
+    val mobileConfigEndpoint: String? = null,
     @SerialName("authorization_endpoint")
-    val authorizationEndpoint: String?,
+    val authorizationEndpoint: String? = null,
     @SerialName("token_endpoint")
-    val tokenEndpoint: String?
+    val tokenEndpoint: String? = null
 ) : Parcelable
