@@ -1,12 +1,12 @@
 [versions]
-android-sdk-compile = "33"
-android-sdk-target = "33"
+android-sdk-compile = "34"
+android-sdk-target = "34"
 android-sdk-min = "26"
 
-android-gradle-plugin = "8.2.2"
+android-gradle-plugin = "8.5.2"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
-google-services-plugin = "4.3.15"
+google-services-plugin = "4.4.2"
 junit = "4.13.2"
 protobuf = "3.23.0"
 kotlin-gradle-plugin = "1.9.22"
