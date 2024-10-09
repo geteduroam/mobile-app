@@ -245,6 +245,11 @@ class SelectProfileViewModel @Inject constructor(
                 inProgress = false,
                 openUrlInBrowser = profile.redirect
             )
+        } else if (profile.type == Profile.Type.webview && !profile.webviewEndpoint.isNullOrEmpty()) {
+            uiState = uiState.copy(
+                inProgress = false,
+                openUrlInBrowser = profile.webviewEndpoint
+            )
         } else {
             Timber.w("Missing EAP endpoint in profile configuration. Cannot continue with selected profile.")
             uiState = uiState.copy(

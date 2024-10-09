@@ -22,7 +22,9 @@ data class Profile(
     val redirect: String? = null,
     val type: Type = Profile.Type.unknown,
     @SerialName("letswifi_endpoint")
-    val letswifiEndpoint: String? = null
+    val letswifiEndpoint: String? = null,
+    @SerialName("webview_endpoint")
+    val webviewEndpoint: String? = null
 ) : Parcelable {
 
     @Serializable
@@ -31,6 +33,8 @@ data class Profile(
         letswifi,
         @SerialName("eap-config")
         eapConfig,
+        @SerialName("webview")
+        webview,
         unknown
     }
 
