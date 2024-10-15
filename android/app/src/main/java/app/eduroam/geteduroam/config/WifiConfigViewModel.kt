@@ -79,13 +79,16 @@ class WifiConfigViewModel @Inject constructor(
         }
         passphraseDialogRetryCount.value = 0
 
+        val intentsNotAllowed = Build.BRAND.startsWith("oneplus", ignoreCase = true) && Build.VERSION.SDK_INT == Build.VERSION_CODES.R // OnePlus devices running Android 11 (https://github.com/geteduroam/mobile-app/issues/113)
+                // Feel free to add more cases here if needed
+
         when {
             //Android 11 and higher - API 30 - ChromeOS - we show everything in one intent
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && context.isChromeOs() -> {
                 handleAndroid11ChromeOs()
             }
 
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM && !fallbackToSuggestions -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && IS_EDUROAM && !fallbackToSuggestions && !intentsNotAllowed -> {
                 // We will use Intent for SSID, and Suggestion for Passpoint.
                 // It would've been possible to use Intent for both SSID and Passpoint,
                 // but we can never remove intents for Passpoint.
