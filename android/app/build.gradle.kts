@@ -45,6 +45,7 @@ android {
             "appAuthRedirectScheme" to "app.eduroam.geteduroam"
         )
         firebaseAppDistribution {
+            appId = System.getenv("FIREBASE_APP_ID")
             artifactType = "APK"
             releaseNotesFile = "${buildDir}/release_notes.txt"
             groups = "all-testers"
